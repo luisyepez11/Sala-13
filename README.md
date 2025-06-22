@@ -34,8 +34,8 @@ git clone https://github.com/luisyepez11/Pagina-Calificacion-peliculas.git
 git pull origin nombre_de_la_rama
 
 ### Subir cambios
-git add .
-git commit -m "descripcion"
+<p>git add .</p>
+<p>git commit -m "descripcion"</p>
 git pull origin nombre_de_la_rama
 
 ### Recordar verificar que vayan a hacer el push a la rama correcta , antes de trabajar verifiquen que esten en la rama en la que desean trabajar
