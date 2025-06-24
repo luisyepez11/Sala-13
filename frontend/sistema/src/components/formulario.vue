@@ -11,28 +11,28 @@ import {ref} from "vue"
 </script>
 <template>
   <div class="form">
-    <div class="frame-10">
+    <div class="form-header">
       <div class="login-to-your-account">{{ opcion==="login" ? "Login to your account" : "Create Account"}}</div>
     </div>
-    <div class="frame-18">
-      <div class="frame-26">
-        <div v-if="opcion !=='login'" class="frame-27">
+    <div class="form-fields">
+      <div class="user-email-section">
+        <div v-if="opcion !=='login'" class="field-label">
           <label  class="user">User</label>
         </div>
-        <div v-if="opcion !=='login'" class="frame-17">
+        <div v-if="opcion !=='login'" class="field-input">
           <input type="text" class="input-text" placeholder="user.....">
         </div>
         
-        <div class="frame-27">
+        <div class="field-label">
           <label class="email">Email</label>
         </div>
-        <div class="frame-17">
+        <div class="field-input">
           <input type="email" class="input-text" placeholder="balamia@gmail.com">
         </div>
         
       </div>
-      <div class="frame-28">
-        <div class="frame-272">
+      <div class="password-section">
+        <div class="password-label-row">
           <label class="password">Password</label>
           <a v-if="opcion==='login'" class="forgot" href="#">Forgot？</a>
         </div>
@@ -40,7 +40,7 @@ import {ref} from "vue"
           <input type="password" class="input-text2" placeholder="Enter your password">
         </div>
         
-        <div v-if="opcion!=='login'" class="frame-272">
+        <div v-if="opcion!=='login'" class="password-label-row">
           <label class="password">Confirm your password</label>
         </div>
         <div v-if="opcion!=='login'" class="input">
@@ -49,11 +49,11 @@ import {ref} from "vue"
 
       </div>
     </div>
-    <div class="frame-30">
+    <div class="form-actions">
       <button class="button" @click="saludar">
         <div class="login-now">{{ opcion==="login" ? "Login now" : "Sign Up"}}</div>
       </button>
-      <div class="frame-29">
+      <div class="account-links">
         <div class="don-t-have-an-account">{{ opcion==="login" ? "Don't have an account ?" : "Already have an account ?"}}</div>
         <a class="sign-up" href="#">{{ opcion==="login" ? "Sign up" : "Sign in"}}</a>
       </div>
@@ -78,7 +78,7 @@ import {ref} from "vue"
   position: relative;
   width: 500px
 }
-.frame-10 {
+.form-header {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -100,7 +100,7 @@ import {ref} from "vue"
   align-items: center;
   justify-content: flex-start;
 }
-.frame-18 {
+.form-fields {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -110,7 +110,7 @@ import {ref} from "vue"
   flex-shrink: 0;
   position: relative;
 }
-.frame-26 {
+.user-email-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -120,7 +120,7 @@ import {ref} from "vue"
   flex-shrink: 0;
   position: relative;
 }
-.frame-27 {
+.field-label {
   display: flex;
   flex-direction: row;
   gap: 12px;
@@ -147,7 +147,7 @@ import {ref} from "vue"
   align-items: center;
   justify-content: flex-start;
 }
-.frame-17 {
+.field-input {
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -177,7 +177,7 @@ import {ref} from "vue"
   );
   font-size: var(--body-medium-regular-font-size, 14px);
 }
-.frame-28 {
+.password-section {
 
   display: flex;
   flex-direction: column;
@@ -188,7 +188,7 @@ import {ref} from "vue"
   flex-shrink: 0;
   position: relative;
 }
-.frame-272 {
+.password-label-row {
   display: flex;
   flex-direction: row;
   gap: 0px;
@@ -264,7 +264,7 @@ import {ref} from "vue"
   );
   font-size: var(--body-medium-regular-font-size, 14px);
 }
-.frame-30 {
+.form-actions {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -306,7 +306,7 @@ import {ref} from "vue"
   align-items: center;
   justify-content: flex-start;
 }
-.frame-29 {
+.account-links {
   display: flex;
   flex-direction: row;
   gap: 8px;
