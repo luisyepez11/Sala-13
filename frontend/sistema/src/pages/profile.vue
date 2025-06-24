@@ -80,18 +80,22 @@
             <div class="stat-number">{{ stats.watched }}</div>
             <div class="stat-label">watched</div>
           </div>
+          <div class="vertical-line"></div>
           <div class="stat-item">
             <div class="stat-number">{{ stats.likes }}</div>
             <div class="stat-label">likes</div>
           </div>
+          <div class="vertical-line"></div>
           <div class="stat-item">
             <div class="stat-number">{{ stats.reviews }}</div>
             <div class="stat-label">reviews</div>
           </div>
+          <div class="vertical-line"></div>
           <div class="stat-item">
             <div class="stat-number">{{ stats.followers }}</div>
             <div class="stat-label">followers</div>
           </div>
+          <div class="vertical-line"></div>
           <div class="stat-item">
             <div class="stat-number">{{ stats.following }}</div>
             <div class="stat-label">following</div>
@@ -149,9 +153,11 @@
 
 .profile-section {
   display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin-bottom: 32px;
+  align-items: center;
+  gap: 10rem;
+  padding: auto;
+  flex-direction: row;
+  margin-bottom: 2rem;
 }
 
 .profile-info {
@@ -162,6 +168,7 @@
 
 .avatar-section {
   flex-shrink: 0;
+  text-align: center;
 }
 
 .avatar-container {
@@ -254,6 +261,10 @@
   font-size: 12px;
   margin-top: 4px;
 }
+.vertical-line {
+  border-right: 1px solid #ffffff;
+  height: 3rem;
+}
 
 .tabs-nav {
   border-bottom: 1px solid #334155;
@@ -321,6 +332,10 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+  .profile-section {
+    flex-direction: column;
+    gap: 1rem;
   }
   
   .stats-container {

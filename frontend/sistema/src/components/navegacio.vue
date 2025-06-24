@@ -56,11 +56,11 @@
 .nav-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: max-content;
 }
 
 .nav-left {
@@ -98,8 +98,8 @@
 .nav-link {
   color: #d1d5db;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   transition: color 0.2s;
 }
 
@@ -110,7 +110,7 @@
 .search-container {
   flex: 1;
   max-width: 400px;
-  margin: 0 32px;
+  margin: 0 24px;
 }
 
 .search-wrapper {
