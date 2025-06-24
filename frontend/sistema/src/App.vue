@@ -25,7 +25,8 @@ body {
 .bg,
 .bg {
   background: #050a24;
-  height: 900px;
+  min-height: 100vh;
+  position: relative;
   overflow: hidden;
 }
 .ellipse-1 {
