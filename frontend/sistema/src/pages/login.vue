@@ -1,8 +1,10 @@
 <script setup>
 import Form from '../components/formulario.vue'
+import Nav from '../components/navegacio.vue'
 </script>
 
 <template>
+
   <div class="content">
     <Form opcion="login"></Form>
   </div>

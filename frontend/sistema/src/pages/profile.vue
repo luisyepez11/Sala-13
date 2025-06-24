@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from "vue"
   import Nav from "../components/navegacio.vue"
+  import Cart from "../components/pelicula.vue"
   const props = defineProps({
     usuario: {
       type: Object,
@@ -27,10 +28,10 @@
   })
 
   const favoriteMovies = ref([
-    { id: 1, title: "Dragon", poster: "/placeholder.svg?height=300&width=200" },
-    { id: 2, title: "The Hunger Games", poster: "/placeholder.svg?height=300&width=200" },
-    { id: 3, title: "Dune", poster: "/placeholder.svg?height=300&width=200" },
-    { id: 4, title: "X", poster: "/placeholder.svg?height=300&width=200" }
+    { id: 1, title: "Dragon", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
+    { id: 2, title: "The Hunger Games", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
+    { id: 3, title: "Dune", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
+    { id: 4, title: "X", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" }
   ])
 
   function editarPerfil() {
@@ -123,19 +124,7 @@
               :key="movie.id"
               class="movie-card"
             >
-              <div class="movie-poster">
-                <img 
-                  :src="movie.poster" 
-                  :alt="movie.title"
-                  class="poster-image"
-                >
-                <!-- X overlay for the last movie -->
-                <div v-if="movie.id === 4" class="movie-overlay">
-                  <svg class="overlay-x" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                </div>
-              </div>
+              <Cart :poster=movie.poster :title=movie.title :Id=movie.id ></Cart>
             </div>
           </div>
         </div>
@@ -315,51 +304,6 @@
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 24px;
-}
-
-.movies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
-}
-
-.movie-card {
-  position: relative;
-  cursor: pointer;
-}
-
-.movie-poster {
-  aspect-ratio: 2/3;
-  background: #374151;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-}
-
-.poster-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.2s;
-}
-
-.movie-card:hover .poster-image {
-  transform: scale(1.05);
-}
-
-.movie-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.overlay-x {
-  width: 64px;
-  height: 64px;
-  color: #ef4444;
 }
 
 .empty-content {
