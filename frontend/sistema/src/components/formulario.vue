@@ -1,12 +1,35 @@
 <script setup>
 import {ref} from "vue"
+import axios from 'axios';
+axios.defaults.withCredentials = true;
   const props = defineProps({
   opcion: String
   });
   console.log(props.opcion)
   const opcion = props.opcion
-  function saludar(){
-    alert("usuario fue registrado")
+  async function saludar(){
+    const nombre = document.getElementById("user").value
+    const contraseña = document.getElementById("password").value
+    if (opcion=="login"){
+      try {
+        const result = await axios.post(`http://localhost:3300/api/usuario/login`,{
+          user: nombre,
+          password:contraseña
+        })
+      } catch (error) {
+        
+      }
+    }
+    else{
+      try {
+        const result = await axios.post(`http://localhost:3300/api/usuario/create`,{
+          user: nombre,
+          password:contraseña
+        })
+      } catch (error) {
+        
+      }
+    }
   }
 </script>
 <template>
@@ -16,18 +39,18 @@ import {ref} from "vue"
     </div>
     <div class="form-fields">
       <div class="user-email-section">
-        <div v-if="opcion !=='login'" class="field-label">
+        <div class="field-label">
           <label  class="user">User</label>
         </div>
-        <div v-if="opcion !=='login'" class="field-input">
-          <input type="text" class="input-text" placeholder="user.....">
+        <div  class="field-input">
+          <input type="text" class="input-text" id="user" placeholder="user.....">
         </div>
         
-        <div class="field-label">
-          <label class="email">Email</label>
+        <div v-if="opcion !=='login'" class="field-label">
+          <label  class="email">Email</label>
         </div>
-        <div class="field-input">
-          <input type="email" class="input-text" placeholder="balamia@gmail.com">
+        <div v-if="opcion !=='login'" class="field-input">
+          <input  type="email" class="input-text" placeholder="balamia@gmail.com">
         </div>
         
       </div>
@@ -37,14 +60,14 @@ import {ref} from "vue"
           <a v-if="opcion==='login'" class="forgot" href="#">Forgot？</a>
         </div>
         <div class="input">
-          <input type="password" class="input-text2" placeholder="Enter your password">
+          <input type="password" class="input-text2" id="password" placeholder="Enter your password">
         </div>
         
         <div v-if="opcion!=='login'" class="password-label-row">
           <label class="password">Confirm your password</label>
         </div>
         <div v-if="opcion!=='login'" class="input">
-          <input type="password" class="input-text2" placeholder="Confirm your password">
+          <input type="password" class="input-text2"  placeholder="Confirm your password">
         </div>
 
       </div>
@@ -55,7 +78,7 @@ import {ref} from "vue"
       </button>
       <div class="account-links">
         <div class="don-t-have-an-account">{{ opcion==="login" ? "Don't have an account ?" : "Already have an account ?"}}</div>
-        <a class="sign-up" href="#">{{ opcion==="login" ? "Sign up" : "Sign in"}}</a>
+        <a class="sign-up" :href="opcion === 'login' ? '/register' : '/login'">{{ opcion === "login" ? "Sign up" : "Sign in" }}</a>
       </div>
     </div>
   </div>
