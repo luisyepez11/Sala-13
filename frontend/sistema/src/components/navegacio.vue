@@ -9,7 +9,6 @@ const navigateToHome = () => {
   window.location.href = '/'
 }
 </script>
-
 <template>
 <div class="header-nav">
 <div class="nav-content">
