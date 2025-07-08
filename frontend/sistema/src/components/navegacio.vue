@@ -1,4 +1,13 @@
 <script setup>
+// Función para navegar al perfil
+const navigateToProfile = () => {
+  window.location.href = '/profile'
+}
+
+// Función para navegar al home
+const navigateToHome = () => {
+  window.location.href = '/'
+}
 </script>
 
 <template>
@@ -6,14 +15,15 @@
 <div class="nav-content">
         <div class="nav-left">
           <div class="logo-container">
-            <div class="logo-circle">
+            <button class="logo-circle" @click="navigateToProfile">
               <svg class="logo-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
               </svg>
-            </div>
+            </button>
           </div>
           <div class="nav-links">
+            <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
             <a href="#" class="nav-link">Films</a>
             <a href="#" class="nav-link">Lists</a>
             <a href="#" class="nav-link">Communities</a>
@@ -34,7 +44,7 @@
 </div>
 </template>
 
-<style >
+<style>
 .perfil-container,
 .perfil-container * {
   box-sizing: border-box;
@@ -82,6 +92,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-circle:hover {
+  background: #f3f4f6;
+  transform: scale(1.05);
 }
 
 .logo-icon {
@@ -104,6 +122,21 @@
 }
 
 .nav-link:hover {
+  color: #ffffff;
+}
+
+/* Estilos específicos para el botón Home */
+.nav-button-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0;
+}
+
+.nav-button-link:hover {
   color: #ffffff;
 }
 

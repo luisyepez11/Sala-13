@@ -1,7 +1,8 @@
 <script setup>
   import { ref } from "vue"
   import Nav from "../components/navegacio.vue"
-  import Cart from "../components/pelicula.vue"
+  import popularfilmsection from '../components/popularfilmsection.vue'
+  
   const props = defineProps({
     usuario: {
       type: Object,
@@ -26,13 +27,6 @@
     followers: 0,
     following: 0
   })
-
-  const favoriteMovies = ref([
-    { id: 1, title: "Dragon", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
-    { id: 2, title: "The Hunger Games", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
-    { id: 3, title: "Dune", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" },
-    { id: 4, title: "X", poster: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2020/12/alien-octavo-pasajero-2181597.jpg?tf=828x" }
-  ])
 
   function editarPerfil() {
     alert("Editando perfil de usuario")
@@ -119,19 +113,8 @@
 
       <!-- Content Area -->
       <div v-if="activeTab === 'Profile'" class="content-area">
-        <!-- Favorite Movies Section -->
-        <div class="movies-section">
-          <div class="section-title">Favorite Movies</div>
-          <div class="movies-grid">
-            <div 
-              v-for="movie in favoriteMovies" 
-              :key="movie.id"
-              class="movie-card"
-            >
-              <Cart :poster=movie.poster :title=movie.title :Id=movie.id ></Cart>
-            </div>
-          </div>
-        </div>
+        <!-- Popular Films Section - Igual que en Home -->
+        <popularfilmsection />
       </div>
 
       <!-- Other tab content -->
@@ -143,8 +126,6 @@
 </template>
 
 <style>
-
-
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -261,6 +242,7 @@
   font-size: 12px;
   margin-top: 4px;
 }
+
 .vertical-line {
   border-right: 1px solid #ffffff;
   height: 3rem;
@@ -305,18 +287,6 @@
   position: relative;
 }
 
-.movies-section {
-  position: relative;
-}
-
-.section-title {
-  color: #ffffff;
-  font-family: "Poppins-SemiBold", sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
 .empty-content {
   text-align: center;
   padding: 48px 0;
@@ -340,10 +310,6 @@
   
   .stats-container {
     justify-content: center;
-  }
-  
-  .movies-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
   
   .nav-content {
