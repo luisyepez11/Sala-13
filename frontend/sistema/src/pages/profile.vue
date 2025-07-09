@@ -2,20 +2,33 @@
   import { ref } from "vue"
   import Nav from "../components/navegacio.vue"
   import popularfilmsection from '../components/popularfilmsection.vue'
-  
-  const props = defineProps({
-    usuario: {
-      type: Object,
-      default: () => ({
-        nombre: "Usuario1",
-        pronombres: "He/Him",
-        nombreReal: "Real Name",
-        biografia: "Here Goes The User's Biography. Extra Info. About The User"
+  import axios from 'axios';
+  axios.defaults.withCredentials = true;
+  const data = async () =>{
+    try {
+      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
+      const datos = cuenta.data.resultCuenta[0]
+      console.log(usuario.value = {
+        ...usuario.value,
+          nombre: datos.nombreCuenta,
+          pronombres: datos.pronombres,
+          nombreReal: datos.nombreReal, 
+          biografia: datos.descripcionCuenta
       })
-    }
-  });
+    } catch (error) {
+      console.log("error")
+    }  
+  }
+  data()
+  const usuario = ref({
+  nombre: "Usuario1",
+  pronombres: "He/Him",
+  nombreReal: "Real Name", 
+  biografia: "Bio del usuario"
+});
 
-  console.log(props.usuario)
+
 
   const activeTab = ref("Profile")
   const tabs = ["Profile", "Lists", "Likes", "Reviews", "Communities", "Watched"]
@@ -61,10 +74,10 @@
           
           <!-- User Details -->
           <div class="user-details">
-            <div class="user-name">{{ props.usuario.nombre }}</div>
-            <div class="user-pronouns">{{ props.usuario.pronombres }}</div>
-            <div class="user-real-name">{{ props.usuario.nombreReal }}</div>
-            <div class="user-bio">{{ props.usuario.biografia }}</div>
+            <div class="user-name">{{ usuario.nombre }}</div>
+            <div class="user-pronouns">{{ usuario.pronombres }}</div>
+            <div class="user-real-name">{{ usuario.nombreReal }}</div>
+            <div class="user-bio">{{ usuario.biografia }}</div>
           </div>
         </div>
 

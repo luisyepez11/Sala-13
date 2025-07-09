@@ -51,11 +51,11 @@ export const getUser = async(req,res) =>{
         const validar = jwt.verify(tokend,SALT)
         console.log(validar.idUser)
         res.json({
-            message:validar.idUser
+            id:validar.idUser
         })
     } catch (error) {
         res.json({
-            message:"error"
+            message:error
         })
     }
         

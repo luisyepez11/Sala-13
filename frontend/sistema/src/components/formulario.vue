@@ -1,6 +1,8 @@
 <script setup>
 import {ref} from "vue"
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 axios.defaults.withCredentials = true;
   const props = defineProps({
   opcion: String
@@ -16,6 +18,7 @@ axios.defaults.withCredentials = true;
           user: nombre,
           password:contraseña
         })
+        router.push('/profile');
       } catch (error) {
         
       }
