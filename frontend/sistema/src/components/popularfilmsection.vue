@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import moviecard from './moviecard.vue'
-
+  import axios from 'axios';
+  axios.defaults.withCredentials = true;
 const movies = ref([
   {
     id: 1,
@@ -86,7 +87,24 @@ const movies = ref([
   }
   
 ])
-
+const prueba = async() =>{
+    const prueb = await axios.get("http://localhost:3300/api/pelicula/getPelicula")
+    const newMovies = prueb.data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      poster: movie.poster_path 
+        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        : 'https://via.placeholder.com/500x750?text=No+Poster',
+      rating: movie.vote_average / 2, 
+      views: Math.floor(Math.random() * 5000), 
+      likes: Math.floor(movie.vote_count / 10), 
+      year: movie.release_date 
+        ? new Date(movie.release_date).getFullYear() 
+        : 'N/A'
+    }));
+    movies.value=newMovies
+  }
+  prueba()
 const showAll = ref(false)
 const displayedMovies = ref(movies.value.slice(0, 6))
 

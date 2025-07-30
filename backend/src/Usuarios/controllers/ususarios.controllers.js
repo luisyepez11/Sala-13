@@ -48,16 +48,35 @@ export const loginUser = async(req,res) =>{
 export const getUser = async(req,res) =>{
     try {
         const tokend = req.cookies.Login
+        if (tokend == undefined){
+            return res.json({
+            message:"no registrado"
+        })
+        }
         const validar = jwt.verify(tokend,SALT)
         console.log(validar.idUser)
-        res.json({
+        return res.json({
             id:validar.idUser
         })
     } catch (error) {
-        res.json({
+        return res.json({
             message:error
         })
     }
         
+}
+
+export const deleteCookie = async(req,res) =>{
+    try {
+        res.clearCookie('Login');
+        res.json({
+            message:"funcionando"
+        })
+    } catch (error) {
+        console.log("error")
+       res.json({
+            message:error
+        }) 
+    }
 }
 

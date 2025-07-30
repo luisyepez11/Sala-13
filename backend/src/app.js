@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import usuarioRouter from "./Usuarios/routers/usuarios.router.js";
 //Cuentas
 import cuentaRouter from "./Cuentas/routers/cuentas.router.js";
+//Peliculas
+import peliculaRouter from "./Peliculas/routers/pelicula.router.js";
 
 const app = express()
 
@@ -20,5 +22,7 @@ app.use(cookieParser())
 app.use("/api/usuario",usuarioRouter)
 //Cuentas
 app.use("/api/cuenta",cuentaRouter)
+//Peliculas
+app.use("/api/pelicula",peliculaRouter)
 
 export default app;

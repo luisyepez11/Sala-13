@@ -1,36 +1,52 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-
+import axios from 'axios';
+axios.defaults.withCredentials = true;
 const currentSlide = ref(0)
+const slides = ref([])
 let intervalId = null
-
-const slides = [
-  {
-    id: 1,
-    title: "The Batman",
-    image: "https://assets.megamediaradios.fm/sites/2/2022/03/the-batman.jpg",
-    description: "Una nueva visión del icónico detective de Gotham"
-  },
-  {
-    id: 2,
-    title: "F1",
-    image: "https://cloudfront-us-east-1.images.arcpublishing.com/infobae/IWU3IUG7X5DMBOIG4KAUTVKFSE.jpg", 
-    description: "Corremos como uno solo"
-  },
-  {
-    id: 3,
-    title: "Spider-Man",
-    image: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2019/06/spider-man-lejos-casa.jpeg?tf=3840x",
-    description: "El multiverso se abre con consecuencias inesperadas"
-  }
-]
-
+const prueba = async()=>{
+    const prueb = await axios.get("http://localhost:3300/api/pelicula/getPelicula")
+    slides.value = prueb.data.results
+      .filter(movie => movie.backdrop_path) 
+      .slice(0, 10) 
+      .map((movie, index) => ({
+        id: movie.id || index + 1,
+        title: movie.title,
+        image: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
+        description: movie.overview 
+          ? movie.overview.substring(0, 120) + (movie.overview.length > 120 ? '...' : '')
+          : 'Descripción no disponible'
+      }))
+    currentSlide.value = 0
+}
+slides.value = [
+      {
+        id: 1,
+        title: "The Batman",
+        image: "https://assets.megamediaradios.fm/sites/2/2022/03/the-batman.jpg",
+        description: "Una nueva visión del icónico detective de Gotham"
+      },
+      {
+        id: 2,
+        title: "F1",
+        image: "https://cloudfront-us-east-1.images.arcpublishing.com/infobae/IWU3IUG7X5DMBOIG4KAUTVKFSE.jpg", 
+        description: "Corremos como uno solo"
+      },
+      {
+        id: 3,
+        title: "Spider-Man",
+        image: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2019/06/spider-man-lejos-casa.jpeg?tf=3840x",
+        description: "El multiverso se abre con consecuencias inesperadas"
+      }
+    ]
+prueba()
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % slides.length
+  currentSlide.value = (currentSlide.value + 1) % slides.value.length
 }
 
 const prevSlide = () => {
-  currentSlide.value = currentSlide.value === 0 ? slides.length - 1 : currentSlide.value - 1
+  currentSlide.value = currentSlide.value === 0 ? slides.value.length - 1 : currentSlide.value - 1
 }
 
 const goToSlide = (index) => {

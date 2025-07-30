@@ -1,12 +1,23 @@
 <script setup>
-// Función para navegar al perfil
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const deleteUser = async() =>{
+  try {
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/delete")
+    console.log(usarioId)
+    router.push('/login');
+  } catch (error) {
+    console.log(error)
+  }
+        
+}
 const navigateToProfile = () => {
-  window.location.href = '/profile'
+  router.push('/profile');
 }
 
-// Función para navegar al home
 const navigateToHome = () => {
-  window.location.href = '/'
+  router.push('/');
 }
 </script>
 <template>
@@ -38,6 +49,9 @@ const navigateToHome = () => {
               </svg>
             </button>
           </div>
+        </div>
+        <div>
+          <button class="edit-button"  @click="deleteUser" style="margin-top: 0;">salir</button>
         </div>
       </div>
 </div>

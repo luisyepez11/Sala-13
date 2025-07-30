@@ -3,10 +3,15 @@
   import Nav from "../components/navegacio.vue"
   import popularfilmsection from '../components/popularfilmsection.vue'
   import axios from 'axios';
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
   axios.defaults.withCredentials = true;
   const data = async () =>{
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      if (usarioId.data.message == "no registrado"){
+        router.push('/login');
+      }
       const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
       const datos = cuenta.data.resultCuenta[0]
       console.log(usuario.value = {
