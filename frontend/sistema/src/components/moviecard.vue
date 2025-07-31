@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const props = defineProps({
   movie: {
     type: Object,
@@ -23,10 +24,20 @@ const isLiked = ref(false)
 const handleLike = () => {
   isLiked.value = !isLiked.value
 }
-
+const seeDetail = (event) => {
+  event.stopPropagation();
+  router.push({
+    name: "details",
+    params: {
+      id: props.movie.id
+    }
+  })
+};
 const handleWatch = () => {
   console.log(`Watching movie: ${props.movie.title}`)
 }
+
+
 </script>
 
 <template>
@@ -34,6 +45,7 @@ const handleWatch = () => {
     class="movie-card"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
+    @click="seeDetail($event)"
   >
     <!-- Poster Container -->
     <div class="poster-container">

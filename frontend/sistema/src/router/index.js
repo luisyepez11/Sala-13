@@ -3,6 +3,7 @@ import Home from "../pages/home.vue";
 import Login from "../pages/login.vue"
 import Register from "../pages/register.vue"
 import Profile from "../pages/profile.vue"
+import MovieDetail from "../pages/movieDetail.vue"
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -25,6 +26,11 @@ const router = createRouter({
             path:"/register",
             name:"register",
             component:Register
+        },
+        {
+            path:"/details/:id",
+            name: "details",
+            component: MovieDetail
         }
     ]
 })
