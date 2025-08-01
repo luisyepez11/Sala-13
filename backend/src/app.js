@@ -7,6 +7,9 @@ import usuarioRouter from "./Usuarios/routers/usuarios.router.js";
 import cuentaRouter from "./Cuentas/routers/cuentas.router.js";
 //Peliculas
 import peliculaRouter from "./Peliculas/routers/pelicula.router.js";
+//Comentarios
+import comentarioRouter from "./Comentarios/routers/comentarios.router.js";
+
 
 const app = express()
 
@@ -24,5 +27,7 @@ app.use("/api/usuario",usuarioRouter)
 app.use("/api/cuenta",cuentaRouter)
 //Peliculas
 app.use("/api/pelicula",peliculaRouter)
+//Comentarios
+app.use("/api/comentario",comentarioRouter)
 
 export default app;

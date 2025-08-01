@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import {getPelicula} from '../controllers/pelicula.controllers.js';
+import {getPeliculas,getPelicula} from '../controllers/pelicula.controllers.js';
 
 const router = Router();
 
-router.get("/getPelicula",getPelicula)
-
+router.get("/",getPeliculas)
+router.get("/getPelicula/:id",getPelicula)
 export default router;

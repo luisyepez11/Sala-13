@@ -8,27 +8,70 @@ import axios from 'axios'
 const router = useRouter()
 const route = useRoute()
 axios.defaults.withCredentials = true
-
+ 
 const movie = ref(null)
 
 const error = ref(null)
-
+const loadReviews = async () => {
+  try {
+    const movieId = route.params.id;
+    const response = await axios.get(`http://localhost:3300/api/comentario/${movieId}`);
+    const comentarios = response.data;
+    reviews.value = comentarios.map(comentario => ({
+      userName: comentario.nombreCuenta,
+      rating: 4,
+      date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
+      comment: comentario.comentario,
+      realName: comentario.nombreReal,
+      description: comentario.descripcionCuenta,
+      pronouns: comentario.pronombres
+    }));
+  } catch (e) {
+    console.error('Error al cargar las reseñas:', e);
+  }
+};
+const submitReview = async()=>{
+    try {
+    const movieId = route.params.id
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
+    const idcuenta =cuenta.data.resultCuenta[0].idcuenta
+    const comentario = document.getElementById('comentario').value
+    const fechaISO = new Date().toISOString(); 
+    const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
+    const result = await axios.post(`http://localhost:3300/api/comentario`,{
+          idCuenta:idcuenta,
+          idPelicula:movieId,
+          comentario:comentario,
+          fecha:fecha
+        })
+    loadReviews()
+    document.getElementById("comentario").value=""
+  } catch (e) {
+    error.value = 'Error al cargar los detalles de la película: ' + e.message
+    console.error('Error:', e)
+  }
+}
 onMounted(async () => {
   try {
     const movieId = route.params.id
+    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
+    const datos = await resp.json();
+    console.log(datos)
     if (!movieId) {
       router.push('/')
       return
     }
     console.log(movieId)
     movie.value = {
-  title: 'La Sustancia',
-  year: '2024',
+  title: datos.title,
+  year: datos.release_date,
   genre: 'Terror/Ciencia ficción',
-  synopsis: 'Una exestrella de Hollywood prueba una fórmula secreta que promete juventud eterna, pero los efectos secundarios son tan oscuros como adictivos.',
-  rating: 4,
-  poster: '/path/to/movie/poster.jpg'
+  synopsis: datos.overview,
+  rating: datos.vote_average,
+  poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
     }
+    loadReviews()
   } catch (e) {
     error.value = 'Error al cargar los detalles de la película: ' + e.message
     console.error('Error:', e)
@@ -49,29 +92,10 @@ const reviews = ref([
     comment: 'While the cinematography is impressive, the plot felt predictable and the pacing dragged in the second half. The ending was somewhat anticlimactic.'
   }
 ])
-
 const newReview = ref({
   rating: 0,
   comment: ''
 })
-const cargarDetalle = async(id)=>{
-    let APIDetalle=`https://api.themoviedb.org/3/movie/${id}?api_key=a96c294e02f5de8a45192c80ca9bda2f&language=es-ES`;
-  
-    try{
-        const resp = await fetch(APIDetalle)
-        if(resp.status===200){
-            const datos = await resp.json();
-            console.log(datos)
-            renderDetalle(datos,id,tipo);
-        }else{
-            console.log("error del api")
-        }
-
-    }catch(error){
-        console.log(error);
-    }
-}
-
 const isLiked = ref(false)
 
 const like = () => {
@@ -148,6 +172,7 @@ const like = () => {
             v-model="newReview.comment"
             placeholder="Comparte tu opinión sobre la película..."
             class="review-textarea"
+            id="comentario"
           ></textarea>
           <button @click="submitReview" class="btn-submit">Publicar reseña</button>
         </div>
@@ -346,6 +371,12 @@ const like = () => {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s;
+  position: relative;
+  z-index: 1;
+  display: block; 
+  width: auto; 
+  margin: 0 auto; 
 }
 
 .btn-submit:hover {

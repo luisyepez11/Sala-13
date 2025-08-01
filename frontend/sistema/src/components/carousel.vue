@@ -6,7 +6,7 @@ const currentSlide = ref(0)
 const slides = ref([])
 let intervalId = null
 const prueba = async()=>{
-    const prueb = await axios.get("http://localhost:3300/api/pelicula/getPelicula")
+    const prueb = await axios.get("http://localhost:3300/api/pelicula")
     slides.value = prueb.data.results
       .filter(movie => movie.backdrop_path) 
       .slice(0, 10) 

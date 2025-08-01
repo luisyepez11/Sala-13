@@ -89,7 +89,7 @@ const movies = ref([
 ]) 
 
 const prueba = async() =>{
-    const prueb = await axios.get("http://localhost:3300/api/pelicula/getPelicula")
+    const prueb = await axios.get("http://localhost:3300/api/pelicula")
     const newMovies = prueb.data.results.map(movie => ({
       id: movie.id,
       title: movie.title,
