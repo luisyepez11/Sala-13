@@ -36,7 +36,7 @@ git pull origin nombre_de_la_rama
 ### Subir cambios
 <p>git add .</p>
 <p>git commit -m "descripcion"</p>
-git pull origin nombre_de_la_rama
+git push origin nombre_de_la_rama
 
 ### Recordar verificar que vayan a hacer el push a la rama correcta , antes de trabajar verifiquen que esten en la rama en la que desean trabajar
 git branch 
