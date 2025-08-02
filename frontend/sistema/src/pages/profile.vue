@@ -6,6 +6,8 @@
   import { useRouter } from 'vue-router';
   const router = useRouter();
   axios.defaults.withCredentials = true;
+  const editar=ref(false)
+
   const data = async () =>{
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -47,7 +49,21 @@
   })
 
   function editarPerfil() {
-    alert("Editando perfil de usuario")
+    editar.value=true
+  }
+  async function aceptareditar (){
+    try {
+      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      const result = await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`,{
+       nombreReal:document.getElementById('nombre').value
+      ,descripcionCuenta:document.getElementById('descripcion').value
+      ,nombreCuenta:document.getElementById('apodo').value
+      })
+    } catch (error) {
+      
+    }
+    editar.value=false
+    data()
   }
 
   function cambiarTab(tab) {
@@ -72,17 +88,26 @@
                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
               </svg>
             </div>
-            <button class="edit-button" @click="editarPerfil">
+            <button v-if="!editar" class="edit-button" @click="editarPerfil">
               <div class="edit-text">Edit</div>
+            </button>
+            <button v-if="editar" class="edit-button" @click="aceptareditar">
+              <div class="edit-text">aceptar</div>
             </button>
           </div>
           
           <!-- User Details -->
-          <div class="user-details">
+          <div v-if="!editar" class="user-details">
             <div class="user-name">{{ usuario.nombre }}</div>
-            <div class="user-pronouns">{{ usuario.pronombres }}</div>
+            <div  v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
             <div class="user-real-name">{{ usuario.nombreReal }}</div>
             <div class="user-bio">{{ usuario.biografia }}</div>
+          </div>
+          <div v-if="editar" class="user-details">
+            <div class="user-name"><input type="text" placeholder="Nombre de la cuenta" id="nombre"></div>
+            <div v-if="false" class="user-pronouns"><section><option value=""></option></section></div>
+            <div class="user-real-name"><input type="text" id="apodo" placeholder="apodo"></div>
+            <div class="user-bio"><input type="text" id="descripcion" placeholder="descripcion"></div>
           </div>
         </div>
 
