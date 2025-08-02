@@ -4,15 +4,7 @@ import moviecard from './moviecard.vue'
   import axios from 'axios';
   axios.defaults.withCredentials = true;
 const movies = ref([
-  {
-    id: 1,
-    title: "F1",
-    poster: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/formula-1-livestream-event-flyer-poster-faceb-design-template-6032dfba99519bcf936a5aed1a8c9d75_screen.jpg?ts=1731313915",
-    rating: 4.2,
-    views: 1500,
-    likes: 95,
-    year: 2024
-  },
+  
   {
     id: 2,
     title: "28 Years Later",
