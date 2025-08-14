@@ -2,6 +2,8 @@
 import Nav from '../components/navegacio.vue'
 import carousel from '../components/carousel.vue'
 import popularfilmsection from '../components/popularfilmsection.vue'
+import { useRouter, useRoute } from 'vue-router'
+import { ref } from 'vue'
 const data = {
   "generos": [
     {"id": 28, "name": "Acción"},
@@ -25,44 +27,61 @@ const data = {
     {"id": 37, "name": "Western"}
   ]
 }
+const router = useRouter()
+const route = useRoute()
+const buscador = ref("")
+const mostrar = ref(true)
+const buscar = (nombre)=>{
+    if (nombre==""){
+        router.push("/")
+    }else{
+      router.push("/search/"+nombre)
+    }
+}
 </script>
 
 <template>
   <div class="home-page-container">
     <!-- Navigation -->
-    <Nav />
+    <Nav :buscar="buscar" />
     
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Hero Carousel Section -->
-      <section class="hero-section">
-        <carousel />
-      </section>
-      
-      <!-- Popular Films Section -->
-       <popularfilmsection titulo="Populares" genero=""/>
-       <popularfilmsection 
-      v-for="(item, index) in data.generos" 
-      :key="index"
-      :genero='"/"+item.id'
-      :titulo="item.name"
-    />
-      
-      
-      
-      <!-- Additional Sections -->
-      <section class="trending-section">
-        <h2 class="section-title">Trends this week</h2>
-        <div class="coming-soon-message">
-          <div class="coming-soon-icon">
-            <svg class="clock-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12,6 12,12 16,14"/>
-            </svg>
+      <div v-if="!mostrar">
+        <popularfilmsection titulo="Populares" :genero='"/busqueda/"+buscador.value'/>
+      </div>
+
+      <div v-if="mostrar">
+        <!-- Hero Carousel Section -->
+        <section class="hero-section">
+          <carousel />
+        </section>
+        
+        <!-- Popular Films Section -->
+        <popularfilmsection titulo="Populares" genero=""/>
+        <popularfilmsection 
+        v-for="(item, index) in data.generos" 
+        :key="index"
+        :genero='"/genero/"+item.id'
+        :titulo="item.name"
+      />
+        
+        
+        
+        <!-- Additional Sections -->
+        <section class="trending-section">
+          <h2 class="section-title">Trends this week</h2>
+          <div class="coming-soon-message">
+            <div class="coming-soon-icon">
+              <svg class="clock-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+            </div>
+            <p class="coming-soon-text">Próximamente...</p>
           </div>
-          <p class="coming-soon-text">Próximamente...</p>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
     
     <!-- Footer -->

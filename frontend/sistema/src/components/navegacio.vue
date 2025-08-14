@@ -1,7 +1,30 @@
 <script setup>
+import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+
 const router = useRouter();
+const props = defineProps({
+  buscar: {
+    type: Function,
+    required: true,
+  },
+});
+
+
+const realizarBusqueda = async () => {
+  try {
+    const buscar = document.getElementById("busqueda")?.value
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
+};
+
+function reemplazarEspacios(texto) {
+  return texto.replace(/\s+/g, '+');
+}
+
 const deleteUser = async() =>{
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/delete")
@@ -42,8 +65,8 @@ const navigateToHome = () => {
         
         <div class="search-container">
           <div class="search-wrapper">
-            <input type="text" class="search-input" placeholder="search">
-            <button class="search-button">
+            <input type="text" class="search-input" placeholder="search" id="busqueda">
+            <button class="search-button" @click="realizarBusqueda">
               <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>

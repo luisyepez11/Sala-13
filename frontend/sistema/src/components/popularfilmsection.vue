@@ -6,7 +6,7 @@ import axios from 'axios'
 axios.defaults.withCredentials = true
 
 const props = defineProps({ genero: "", titulo: "" })
-
+console.log(props.genero)
 const movies = ref([])
 const showAll = ref(false)
 const displayedMovies = ref([])
