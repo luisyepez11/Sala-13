@@ -1,96 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import moviecard from './moviecard.vue'
-  import axios from 'axios';
-  axios.defaults.withCredentials = true;
-const movies = ref([
-  {
-    id: 1,
-    title: "F1",
-    poster: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/formula-1-livestream-event-flyer-poster-faceb-design-template-6032dfba99519bcf936a5aed1a8c9d75_screen.jpg?ts=1731313915",
-    rating: 4.2,
-    views: 1500,
-    likes: 95,
-    year: 2024
-  },
-  {
-    id: 2,
-    title: "28 Years Later",
-    poster: "https://es.web.img2.acsta.net/medias/nmedia/18/79/49/98/19505162.jpg",
-    rating: 4.7,
-    views: 2300,
-    likes: 187,
-    year: 2024
-  },
-  {
-    id: 3,
-    title: "Minecraft",
-    poster: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1FSqbjtPabXPuN3EobN21ZTmXNcbT11IyZ_zCjpXVsUbiw2cFh1uZE_F5aGcrGvo3zaLPePZgoVzKKT50sVMEK_fnL4z1M-1r5NrEiAdu7GMXRt64zz-FgJ4k9IaidLT4FBniUO3oNB3cnNwffeeGEBl0aFoDUiI-RqBp8uoDdmSYbf6DqdYoK8pjsYI/s889/Minecraf-tPelicula.jpg",
-    rating: 4.1,
-    views: 890,
-    likes: 67,
-    year: 2025
-  },
-  {
-    id: 4,
-    title: "Spider-Man: Across the Spider-Verse",
-    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLXWNQNm6Qr-bGrPFlVGXOP127aKr2D_cyQ&s",
-    rating: 4.5,
-    views: 1800,
-    likes: 142,
-    year: 2024
-  },
-  {
-    id: 5,
-    title: "Oppenheimer",
-    poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-    rating: 4.8,
-    views: 2500,
-    likes: 189,
-    year: 2023
-  },
-  {
-    id: 6,
-    title: "Son como Niños 2",
-    poster: "https://image.tmdb.org/t/p/original/6TRhV0E6wDQjMEtvYru0Kel6juW.jpg",
-    rating: 4.5,
-    views: 3200,
-    likes: 245,
-    year: 2023
-  },
-  {
-    id: 7,
-    title: "Spider-Man: Across the Spider-Verse",
-    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLXWNQNm6Qr-bGrPFlVGXOP127aKr2D_cyQ&s",
-    rating: 4.5,
-    views: 1800,
-    likes: 142,
-    year: 2024
-  },
-  {
-    id: 8,
-    title: "Oppenheimer",
-    poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-    rating: 4.8,
-    views: 2500,
-    likes: 189,
-    year: 2023
-  },
-  {
-    id: 9,
-    title: "Son como Niños 2",
-    poster: "https://image.tmdb.org/t/p/original/6TRhV0E6wDQjMEtvYru0Kel6juW.jpg",
-    rating: 4.5,
-    views: 3200,
-    likes: 245,
-    year: 2023
-  }
-  
-]) 
+import axios from 'axios'
 
-const prueba = async() =>{
-    const prueb = await axios.get("http://localhost:3300/api/pelicula")
-    const newMovies = prueb.data.results.map(movie => ({
+axios.defaults.withCredentials = true
+
+const props = defineProps({ genero: "", titulo: "" })
+
+const movies = ref([])
+const showAll = ref(false)
+const displayedMovies = ref([])
+
+const fetchMovies = async () => {
+  try {
+    const res = await axios.get(`http://localhost:3300/api/pelicula${props.genero}`)
+    const newMovies = res.data.results.map(movie => ({
       id: movie.id,
       title: movie.title,
       poster: movie.poster_path 
@@ -102,25 +26,40 @@ const prueba = async() =>{
       year: movie.release_date 
         ? new Date(movie.release_date).getFullYear() 
         : 'N/A'
-    }));
+    }))
     movies.value = newMovies
+    updateDisplayedMovies()
+  } catch (err) {
+    console.error("Error al obtener películas:", err)
   }
+}
 
-prueba()
-const showAll = ref(false)
-const displayedMovies = ref(movies.value.slice(0, 6))
-
-const toggleShowAll = () => {
-  
-  showAll.value = !showAll.value
+const updateDisplayedMovies = () => {
   displayedMovies.value = showAll.value ? movies.value : movies.value.slice(0, 6)
 }
+
+const toggleShowAll = () => {
+  showAll.value = !showAll.value
+  updateDisplayedMovies()
+}
+
+
+fetchMovies()
+
+watch(() => props.genero, () => {
+  fetchMovies()
+})
+
+watch(movies, () => {
+  updateDisplayedMovies()
+})
 </script>
+
 
 <template>
   <section class="popular-section">
     <div class="section-header">
-      <h2 class="section-title">Popular Films</h2>
+      <h2 class="section-title">{{props.titulo}}</h2>
       <button class="see-all-btn" @click="toggleShowAll">
         {{ showAll ? 'Ver Menos' : 'See All' }}
         <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

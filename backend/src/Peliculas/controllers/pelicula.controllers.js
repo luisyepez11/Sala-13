@@ -12,6 +12,18 @@ export const getPeliculas= async(req,res) =>{
         })
     }
 }
+export const getPeliculasGenero= async(req,res) =>{
+    const id = req.params.id;
+    try {
+        const data = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=a96c294e02f5de8a45192c80ca9bda2f&language&with_genres=${id}`)
+        res.status(201).json(data.data)
+    } catch (error) {
+        console.log(error)
+        res.json({
+            message:"error"
+        })
+    }
+}
 export const getPelicula= async(req,res) =>{
     const id = req.params.id;
     try {
