@@ -4,6 +4,7 @@ import Login from "../pages/login.vue"
 import Register from "../pages/register.vue"
 import Profile from "../pages/profile.vue"
 import MovieDetail from "../pages/movieDetail.vue"
+import HomeBusqueda from "../pages/homeBusqueda.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -31,6 +32,11 @@ const router = createRouter({
             path:"/details/:id",
             name: "details",
             component: MovieDetail
+        },
+        {
+            path:"/search/:id",
+            name: "search",
+            component: HomeBusqueda
         }
     ]
 })
