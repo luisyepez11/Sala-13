@@ -11,5 +11,19 @@ export const getCuenta= async(req,res) =>{
         })
     }
 }
+export const updateCuenta= async(req,res) =>{
+    try {
+        const idCuenta = req.params.id;
+        const {nombreReal,descripcionCuenta,nombreCuenta} = req.body;
+        const [resultCuenta] = await pool.query(`UPDATE cuentas SET nombreCuenta=? , descripcionCuenta=?,nombreReal=? WHERE idcuenta = ?`,[nombreReal,descripcionCuenta,nombreCuenta,idCuenta])
+        console.log(resultCuenta)
+        res.status(201).json({resultCuenta})
+    } catch (error) {
+        console.log(error)
+        res.json({
+            message:"error"
+        })
+    }
+}
 
 
