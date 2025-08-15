@@ -4,22 +4,25 @@
   import popularfilmsection from '../components/popularfilmsection.vue'
   import Modal from "../components/modal.vue";
   import axios from 'axios';
-  import { useRouter } from 'vue-router';
-  const router = useRouter();
+  import { useRouter,useRoute } from 'vue-router';
+  const router = useRouter()
+  const route = useRoute()
+
   axios.defaults.withCredentials = true;
   const editar=ref(false)
-  const listaSolicitudes = ref({})
-  const usuarioId = ref("")
+  const id = route.params.id;
+  const usario = ref("")
+  
   const data = async () =>{
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      usario.value=usarioId.data.id
       if (usarioId.data.message == "no registrado"){
         router.push('/login');
       }
-      const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
-      listaSolicitudes.value=datosSolicitudes.data
-      const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-      usuarioId.value=usarioId.data.id
+      
+      console.log(id)
+      const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`)
       const datos = cuenta.data.resultCuenta[0]
       console.log(usuario.value = {
         ...usuario.value,
@@ -29,7 +32,7 @@
           biografia: datos.descripcionCuenta
       })
     } catch (error) {
-      console.log("error")
+      console.log(error)
     }  
   }
   data()
@@ -53,23 +56,19 @@
     following: 0,
     requests: 0
   })
-  function editarPerfil() {
-    editar.value=true
-  }
-  async function aceptareditar (){
+
+  async function seguirPerfil () {
     try {
-      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-      const result = await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`,{
-       nombreReal:document.getElementById('nombre').value
-      ,descripcionCuenta:document.getElementById('descripcion').value
-      ,nombreCuenta:document.getElementById('apodo').value
-      })
+      const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
+          idReceptor:id,
+          idUsuario:usario.value
+        })
     } catch (error) {
-      
+      console.log(error)
     }
-    editar.value=false
-    data()
+    
   }
+
   function cambiarTab(tab) {
     activeTab.value = tab
   }
@@ -84,24 +83,6 @@ const closeModal = () => {
     alert("funcionando")
     openModal()
 };
-const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
-  try {
-      const result = await axios.post(`http://localhost:3300/api/amigo/insertAmigo`,{
-          idReceptor:usuarioId.value,
-          idUsuario:id,
-          idsolicitudes:idsolicitudes
-        })
-    } catch (error) {
-      console.log(error)
-    }
-}
-const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
-  try {
-    alert("oka"+nombre)
-  } catch (error) {
-    
-  }
-}
 </script>
 
 <template>
@@ -110,26 +91,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
       @close="closeModal"
       @confirm="handleConfirm"
     >
-   <table>
-    <thead>
-        <tr>
-          <th>nombre</th>
-          <th>seguir</th>
-          <th>rechazar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda">
-          <td>{{ solicitud.nombremanda }} </td>
-          <td>
-            <button @click="aceptarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Aceptar</button>
-          </td>
-          <td>
-            <button @click="rechazarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Rechazar</button>
-          </td>
-        </tr>
-      </tbody>
-   </table>
+    
   </Modal>
   <div class="perfil-container">
     <!-- Header Navigation -->
@@ -147,11 +109,8 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
               </svg>
             </div>
-            <button v-if="!editar" class="edit-button" @click="editarPerfil">
-              <div class="edit-text">Edit</div>
-            </button>
-            <button v-if="editar" class="edit-button" @click="aceptareditar">
-              <div class="edit-text">aceptar</div>
+            <button v-if="!editar" class="edit-button" @click="seguirPerfil">
+              <div class="edit-text">seguir</div>
             </button>
           </div>
           
@@ -161,12 +120,6 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
             <div  v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
             <div class="user-real-name">{{ usuario.nombreReal }}</div>
             <div class="user-bio">{{ usuario.biografia }}</div>
-          </div>
-          <div v-if="editar" class="user-details">
-            <div class="user-name"><input type="text" placeholder="Nombre de la cuenta" id="nombre"></div>
-            <div v-if="false" class="user-pronouns"><section><option value=""></option></section></div>
-            <div class="user-real-name"><input type="text" id="apodo" placeholder="apodo"></div>
-            <div class="user-bio"><input type="text" id="descripcion" placeholder="descripcion"></div>
           </div>
         </div>
 
@@ -221,7 +174,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
       <!-- Content Area -->
       <div v-if="activeTab === 'Profile'" class="content-area">
         <!-- Popular Films Section - Igual que en Home -->
-        <popularfilmsection titulo="Populares" genero=""/>
+        <popularfilmsection />
       </div>
 
       <!-- Other tab content -->

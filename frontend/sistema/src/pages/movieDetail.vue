@@ -18,6 +18,7 @@ const loadReviews = async () => {
     const response = await axios.get(`http://localhost:3300/api/comentario/${movieId}`);
     const comentarios = response.data;
     reviews.value = comentarios.map(comentario => ({
+      idCuenta:comentario.idCuenta,
       userName: comentario.nombreCuenta,
       rating: 4,
       date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
@@ -181,6 +182,7 @@ const like = () => {
           <ReviewComment 
             v-for="review in reviews" 
             :key="review.userName"
+            :idCuenta="review.idCuenta"
             :userName="review.userName"
             :rating="review.rating"
             :date="review.date"
