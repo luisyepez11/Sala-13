@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-
+  import { useRouter } from 'vue-router';
 const props = defineProps({
   userAvatar: {
     type: String,
@@ -10,6 +10,11 @@ const props = defineProps({
     type: String,
     required: true
   },
+  idCuenta: {
+    type: String,
+    required: true
+  }
+  ,
   rating: {
     type: Number,
     required: true,
@@ -31,19 +36,23 @@ const stars = ref(Array(5).fill(false));
 for (let i = 0; i < props.rating; i++) {
   stars.value[i] = true;
 }
+const router = useRouter()
+const cargarUsuario =()=>{
+  router.push('/otherProfile/'+props.idCuenta);
+}
 </script>
 
 <template>
-  <div class="review-comment">
-    <div class="user-info">
-      <div class="avatar-container">
-        <img v-if="userAvatar" :src="userAvatar" :alt="userName" class="avatar">
+  <div class="review-comment" >
+    <div class="user-info" >
+      <div class="avatar-container" @click="cargarUsuario" @touchstart="cargarUsuario">
+        <img v-if="userAvatar" :src="userAvatar" :alt="userName" class="avatar" >
         <div v-else class="avatar-placeholder">
           {{ userName.charAt(0).toUpperCase() }}
         </div>
       </div>
-      <div class="user-details">
-        <h3 class="username">{{ userName }}</h3>
+      <div class="user-details" >
+        <h3 class="username" >{{ userName }}</h3>
         <div class="rating">
           <span v-for="(filled, index) in stars" :key="index" class="star">
             ★
@@ -71,6 +80,9 @@ for (let i = 0; i < props.rating; i++) {
 }
 
 .avatar-container {
+  pointer-events: auto ;
+  position: relative;
+  z-index: 10;
   width: 48px;
   height: 48px;
   margin-right: 1rem;
