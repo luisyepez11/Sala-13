@@ -8,7 +8,7 @@
   const router = useRouter();
   axios.defaults.withCredentials = true;
   const editar=ref(false)
-  const listaSolicitudes = ref({})
+  const listaSolicitudes = ref([])
   const usuarioId = ref("")
   const data = async () =>{
     try {
@@ -17,7 +17,11 @@
         router.push('/login');
       }
       const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
-      listaSolicitudes.value=datosSolicitudes.data
+      const unicas = datosSolicitudes.data.filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
+      );
+      listaSolicitudes.value = unicas;
       const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
       usuarioId.value=usarioId.data.id
       const datos = cuenta.data.resultCuenta[0]
@@ -81,7 +85,6 @@ const closeModal = () => {
   modalIsOpen.value = false;
 };
   const solicitudes = () =>{
-    alert("funcionando")
     openModal()
 };
 const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
@@ -91,15 +94,16 @@ const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
           idUsuario:id,
           idsolicitudes:idsolicitudes
         })
+      await data();
     } catch (error) {
       console.log(error)
     }
 }
 const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   try {
-    alert("oka"+nombre)
+    await data();
   } catch (error) {
-    
+    console.log(error)
   }
 }
 </script>
@@ -110,26 +114,30 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
       @close="closeModal"
       @confirm="handleConfirm"
     >
-   <table>
-    <thead>
+   <template v-if="listaSolicitudes.length > 0">
+    <table class="solicitudes-table">
+      <thead>
         <tr>
-          <th>nombre</th>
-          <th>seguir</th>
-          <th>rechazar</th>
+          <th class="table-header" colspan="2">Solicitud de Seguimiento</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda">
-          <td>{{ solicitud.nombremanda }} </td>
-          <td>
-            <button @click="aceptarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Aceptar</button>
-          </td>
-          <td>
-            <button @click="rechazarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Rechazar</button>
+        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda" class="table-row">
+          <td class="table-data nombre">{{ solicitud.nombremanda }}</td>
+          <td class="table-data acciones">
+            <button class="btn-aceptar" @click="aceptarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Aceptar</button>
+            <button class="btn-rechazar" @click="rechazarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Rechazar</button>
           </td>
         </tr>
       </tbody>
-   </table>
+    </table>
+  </template>
+
+  <template v-else>
+    <div class="sin-solicitudes">
+      <p>No tienes solicitudes pendientes</p>
+    </div>
+  </template>
   </Modal>
   <div class="perfil-container">
     <!-- Header Navigation -->
@@ -151,7 +159,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
               <div class="edit-text">Edit</div>
             </button>
             <button v-if="editar" class="edit-button" @click="aceptareditar">
-              <div class="edit-text">aceptar</div>
+              <div class="edit-text">Aceptar</div>
             </button>
           </div>
           
@@ -353,6 +361,159 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
 .vertical-line {
   border-right: 1px solid #ffffff;
   height: 3rem;
+}
+.cancel-button {
+  display: none;
+}
+
+.modal-actions {
+  display: none;
+  }
+.modal-container {
+  width: 95vw;         
+  max-width: 400px;     
+  max-height: 80vh;     
+  padding: 30px;        
+  border-radius: 16px;
+  background-color: #0f172a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.modal-close{
+  color: #ffffff
+}
+.solicitudes-table {
+  width: 100%;
+  border-collapse:collapse; 
+  border-spacing: 0; 
+  background-color: #091f32;
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+}
+.solicitudes-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table-data.acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding-right: 16px; 
+}
+
+.solicitudes-table tr {
+  padding: 12px 0;
+}
+
+.solicitudes-table td.acciones {
+  text-align: center;
+}
+
+.solicitudes-table .btn-aceptar,
+.solicitudes-table .btn-rechazar {
+  display: inline-block;
+  min-width: 80px;
+  margin: 0px; 
+}
+  .table-header {
+  background-color: #17344e;
+  color: #ffffff;
+  padding: 12px 16px;
+  text-align: left;
+  font-family: "Poppins-SemiBold", sans-serif;
+  font-size: 14px;
+}
+
+.table-row {
+  border-bottom: 1px solid #334155;
+  transition: background-color 0.2s;
+}
+
+
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-data {
+  padding: 10px 16px;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.table-data.nombre {
+  font-family: "Poppins-Medium", sans-serif;
+  max-width: 150px;         
+  white-space: nowrap;    
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.btn-aceptar, .btn-rechazar {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-family: "Poppins-Medium", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-aceptar {
+  background-color: #16a34a;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-aceptar:hover {
+  background-color: #22c55e;
+}
+
+.btn-rechazar {
+  background-color: #be0000;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-rechazar:hover {
+  background-color: #ef4444;
+}
+.sin-solicitudes {
+  text-align: center;
+  padding: 30px 16px;
+  color: #9ca3af;
+  font-size: 16px;
+  font-family: "Poppins-Regular", sans-serif;
+}
+
+
+  @media (max-width: 640px) {
+  .solicitudes-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    font-size: 12px;
+  }
+  .table-header, .table-data {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .table-data.nombre {
+    max-width: 80px;
+  }
+  .btn-aceptar, .btn-rechazar {
+    min-width: 60px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
 }
 
 .tabs-nav {
