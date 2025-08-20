@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import CommunityMessage from './CommunityMessage.vue';
+import io from "socket.io-client"
 
+const socket = io("http://localhost:3300")
 const props = defineProps({
   title: {
     type: String,
@@ -9,19 +11,7 @@ const props = defineProps({
   }
 });
 
-// Variable para el nuevo mensaje
 const newMessage = ref("");
-
-// Función para enviar el mensaje
-const submitReview = () => {
-  if (newMessage.value.trim() !== "") {
-    // Aquí iría la lógica para enviar el mensaje
-    console.log("Mensaje enviado:", newMessage.value);
-    newMessage.value = "";
-  }
-};
-
-// Datos de ejemplo para los mensajes
 const messages = ref([
   {
     id: 1,
@@ -29,31 +19,35 @@ const messages = ref([
     idCuenta: '1',
     comment: '¿Ustedes vieron Hereditary más de una vez? No sé por qué, pero me traumó más la segunda vez'
   },
-  {
-    id: 2,
-    userName: 'Carlos',
-    idCuenta: '2',
-    comment: '¡La segunda vez es peor! Porque ya sabes lo que viene y te vas fijando en los detalles del fondo. Esa película es una clase magistral en incomodidad'
-  },
-  {
-    id: 3,
-    userName: 'Renzo',
-    idCuenta: '3',
-    comment: 'Siii, ese plano donde [spoiler] collette está en la esquina del techo... en la segunda vista ya no puedes dejar de verla ahí. Me da escalofríos solo pensarlo'
-  },
-  {
-    id: 4,
-    userName: 'Yo',
-    idCuenta: '1',
-    comment: 'Exacto. Y el sonido, el clic de la lengua del niño... ya está entre mis traumas de por vida!'
-  },
-  {
-    id: 5,
-    userName: 'Carlos',
-    idCuenta: '2',
-    comment: 'Pero ustedes son más de terror psicológico o prefieren algo más slasher tipo Viernes 13?'
-  }
+  // ... otros mensajes existentes
 ]);
+
+const submitReview = () => {
+  if (newMessage.value.trim() !== "") {
+    socket.emit("mensaje", {
+      id: messages.value.length + 1, // Mejor generación de ID
+      userName: 'Yo', // Deberías obtener esto de tu sistema de autenticación
+      idCuenta: '1', // Esto también debería venir de tu auth
+      comment: newMessage.value,
+      sala: 1
+    });
+    newMessage.value = "";
+  }
+};
+
+// Listener corregido
+socket.on("mensaje", (nuevoMensaje) => {
+  console.log("Nuevo mensaje recibido:", nuevoMensaje);
+  // Agregar directamente al array de mensajes
+  messages.value.push({
+    id: messages.value.length > 0 
+      ? Math.max(...messages.value.map(m => m.id)) + 1 
+      : 1,
+    userName: nuevoMensaje.userName,
+    idCuenta: nuevoMensaje.idCuenta,
+    comment: nuevoMensaje.mensaje
+  });
+});
 </script>
 
 <template>
