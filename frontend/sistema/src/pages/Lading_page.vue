@@ -119,7 +119,9 @@
       clearInterval(interval);
     }
   }, 1000 / frameRate);
-  
+  onUnmounted(() => {
+    clearInterval(interval);
+  });
 }
   
   // Limpia el temporizador si el componente es desmontado
