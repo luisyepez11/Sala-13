@@ -7,8 +7,11 @@ import MovieDetail from "../pages/movieDetail.vue"
 import HomeBusqueda from "../pages/homeBusqueda.vue";
 import OtherProfile from "../pages/otherProfile.vue";
 import Community from "../pages/Community.vue";
+<<<<<<< HEAD
 import ListDetail from "../pages/listDetail.vue";
 import Lading_page from "../pages/Lading_page.vue";
+=======
+>>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -41,6 +44,21 @@ const router = createRouter({
             path:"/search/:id",
             name: "search",
             component: HomeBusqueda
+<<<<<<< HEAD
+=======
+        }
+        ,
+        {
+            path:"/otherProfile/:id",
+            name: "otherProfile",
+            component: OtherProfile
+        },
+        {
+            path:"/community",
+            name:"community",
+            component:Community
+
+>>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
         }
         ,
         {
