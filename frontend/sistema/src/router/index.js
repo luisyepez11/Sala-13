@@ -6,6 +6,7 @@ import Profile from "../pages/profile.vue"
 import MovieDetail from "../pages/movieDetail.vue"
 import HomeBusqueda from "../pages/homeBusqueda.vue";
 import OtherProfile from "../pages/otherProfile.vue";
+import Community from "../pages/Community.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -44,6 +45,12 @@ const router = createRouter({
             path:"/otherProfile/:id",
             name: "otherProfile",
             component: OtherProfile
+        },
+        {
+            path:"/community",
+            name:"community",
+            component:Community
+
         }
     ]
 })
