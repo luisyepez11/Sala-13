@@ -3,31 +3,21 @@ import { ref, onMounted } from 'vue'
 import Nav from '../components/navegacio.vue'
 import ReviewComment from '../components/ReviewComment.vue'
 import { useRouter, useRoute } from 'vue-router'
-<<<<<<< HEAD
 import Modal from "../components/modal.vue";
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
 axios.defaults.withCredentials = true
-<<<<<<< HEAD
  const  lista = ref({})
-=======
- 
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 const movie = ref(null)
 
 const error = ref(null)
 const loadReviews = async () => {
   try {
-<<<<<<< HEAD
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
     const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
     lista.value = listas.data
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
     const movieId = route.params.id;
     const response = await axios.get(`http://localhost:3300/api/comentario/${movieId}`);
     const comentarios = response.data;
@@ -122,7 +112,6 @@ const like = () => {
       likeButton.classList.remove('btn-click-like')
   }
 }
-<<<<<<< HEAD
 const modalIsOpen = ref(false);
 const openModal = () => {
   modalIsOpen.value = true;
@@ -141,6 +130,8 @@ const agregar_lista = async () =>{
             idLista:id, 
             idPelicula:route.params.id
           })
+          alert("agregado a la lista")
+          closeModal()
         } catch (error) {
           
         }
@@ -171,13 +162,6 @@ const agregar_lista = async () =>{
    </table>
    <button @click="agregar_lista" >confirmar</button>
   </Modal>
-=======
-
-
-</script>
-
-<template>
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
   <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
   <div class="movie-page">
       <Nav />
@@ -213,11 +197,7 @@ const agregar_lista = async () =>{
           
           <div class="action-buttons">
             <button class="btn-like" @click="like"><i class='bx bx-like'></i></button>
-<<<<<<< HEAD
             <button class="btn-list" @click="openModal"><i class='bx  bx-bookmark-plus-alt'  ></i> </button>
-=======
-            <button class="btn-list"><i class='bx  bx-bookmark-plus-alt'  ></i> </button>
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
             <button class="btn-eye"><i class='bx bx-eye-alt'></i></button>
             
             

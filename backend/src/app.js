@@ -13,12 +13,8 @@ import comentarioRouter from "./Comentarios/routers/comentarios.router.js";
 import solicitudesRouter from "./Solicitudes/routers/solicitudes.router.js";
 //Amigos
 import amigosRouter from "./Amigos/routers/amigos.router.js";
-<<<<<<< HEAD
 //Listas
 import listaRouter from "./Listas/routers/lista.router.js";
-=======
-
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 
 const app = express()
 
@@ -42,10 +38,7 @@ app.use("/api/comentario",comentarioRouter)
 app.use("/api/solicitud",solicitudesRouter)
 //Amigos
 app.use("/api/amigo",amigosRouter)
-<<<<<<< HEAD
 //Listas
 app.use("/api/lista", listaRouter) 
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 
 export default app;

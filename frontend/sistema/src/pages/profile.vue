@@ -8,16 +8,11 @@
   const router = useRouter();
   axios.defaults.withCredentials = true;
   const editar=ref(false)
-<<<<<<< HEAD
   const listaSolicitudes = ref()
   const  lista = ref({})
   const usuarioId = ref("")
   const nombreLista = ref("")
   const descripcion = ref("")
-=======
-  const listaSolicitudes = ref([])
-  const usuarioId = ref("")
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
   const data = async () =>{
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -25,7 +20,6 @@
         router.push('/login');
       }
       const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
-<<<<<<< HEAD
       listaSolicitudes.value=datosSolicitudes.data
       const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
       const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
@@ -33,16 +27,12 @@
       const datos = cuenta.data.resultCuenta[0]
       lista.value = listas.data
       console.log(lista.value)
-=======
       const unicas = datosSolicitudes.data.filter(
         (item, index, self) =>
           index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
       );
       listaSolicitudes.value = unicas;
-      const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
       usuarioId.value=usarioId.data.id
-      const datos = cuenta.data.resultCuenta[0]
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
       console.log(usuario.value = {
         ...usuario.value,
           nombre: datos.nombreCuenta,
@@ -103,10 +93,7 @@ const closeModal = () => {
   modalIsOpen.value = false;
 };
   const solicitudes = () =>{
-<<<<<<< HEAD
     alert("funcionando")
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
     openModal()
 };
 const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
@@ -116,17 +103,13 @@ const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
           idUsuario:id,
           idsolicitudes:idsolicitudes
         })
-<<<<<<< HEAD
-=======
       await data();
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
     } catch (error) {
       console.log(error)
     }
 }
 const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   try {
-<<<<<<< HEAD
     alert("oka"+nombre)
   } catch (error) {
     
@@ -159,11 +142,6 @@ const crearLista = async() => {
     
   } catch (error) {
     console.error("Error creando lista:", error);
-=======
-    await data();
-  } catch (error) {
-    console.log(error)
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
   }
 }
 </script>
@@ -174,38 +152,6 @@ const crearLista = async() => {
       @close="closeModal"
       @confirm="handleConfirm"
     >
-<<<<<<< HEAD
-   <table>
-    <thead>
-        <tr>
-          <th>nombre</th>
-          <th>seguir</th>
-          <th>rechazar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda">
-          <td>{{ solicitud.nombremanda }} </td>
-          <td>
-            <button @click="aceptarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Aceptar</button>
-          </td>
-          <td>
-            <button @click="rechazarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Rechazar</button>
-          </td>
-        </tr>
-      </tbody>
-   </table>
-  </Modal>
-  <Modal 
-      :isOpen="modalCrearListas" 
-      @close="cerrarModal"
-    >
-   <div>
-    <input type="text" :value="nombreLista" @input="nombreLista = $event.target.value" placeholder="nombre de lista">
-    <input type="text" :value="descripcion" @input="descripcion = $event.target.value" placeholder="descripcion de lista">
-    <button @click="crearLista" >crear</button>
-   </div>
-=======
    <template v-if="listaSolicitudes.length > 0">
     <table class="solicitudes-table">
       <thead>
@@ -230,7 +176,16 @@ const crearLista = async() => {
       <p>No tienes solicitudes pendientes</p>
     </div>
   </template>
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
+  </Modal>
+  <Modal 
+      :isOpen="modalCrearListas" 
+      @close="cerrarModal"
+    >
+   <div>
+    <input type="text" :value="nombreLista" @input="nombreLista = $event.target.value" placeholder="nombre de lista">
+    <input type="text" :value="descripcion" @input="descripcion = $event.target.value" placeholder="descripcion de lista">
+    <button @click="crearLista" >crear</button>
+   </div>
   </Modal>
   <div class="perfil-container">
     <!-- Header Navigation -->
@@ -252,11 +207,7 @@ const crearLista = async() => {
               <div class="edit-text">Edit</div>
             </button>
             <button v-if="editar" class="edit-button" @click="aceptareditar">
-<<<<<<< HEAD
-              <div class="edit-text">aceptar</div>
-=======
               <div class="edit-text">Aceptar</div>
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
             </button>
           </div>
           
@@ -329,7 +280,6 @@ const crearLista = async() => {
         <popularfilmsection titulo="Populares" genero=""/>
       </div>
 
-<<<<<<< HEAD
       <div v-if="activeTab === 'Lists'" class="content-area">
           <button @click="abrirModal">crear lista</button>
           <div v-for="listas in lista " :key="listas.idlista" class="list-item">
@@ -339,8 +289,6 @@ const crearLista = async() => {
         
       </div>
 
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
       <!-- Other tab content -->
       <div v-else class="empty-content">
         <div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
@@ -355,16 +303,12 @@ const crearLista = async() => {
   margin: 0 auto;
   padding: 32px 24px;
 }
-<<<<<<< HEAD
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
-=======
-
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 .profile-section {
   display: flex;
   align-items: center;
@@ -480,8 +424,6 @@ const crearLista = async() => {
   border-right: 1px solid #ffffff;
   height: 3rem;
 }
-<<<<<<< HEAD
-=======
 .cancel-button {
   display: none;
 }
@@ -635,7 +577,6 @@ const crearLista = async() => {
     font-size: 11px;
   }
 }
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 
 .tabs-nav {
   border-bottom: 1px solid #334155;
