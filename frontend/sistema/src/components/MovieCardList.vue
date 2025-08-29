@@ -10,7 +10,7 @@ const peliculas = ref([])
 
 onMounted(async () => {
   try {
-    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${props.idPelicula}`)
+    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${props.idLista}`)
     const datos = await resp.json()
     peliculas.value = datos
   } catch (e) {

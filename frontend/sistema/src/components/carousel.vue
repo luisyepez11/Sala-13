@@ -168,10 +168,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-<<<<<<< HEAD
-  filter: brightness(50%)
-=======
->>>>>>> 5d3cfc1f16b7d0ed4541f67e704cccaa14538e41
 }
 
 .slide-gradient {
