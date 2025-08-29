@@ -1,18 +1,18 @@
 import { pool } from "../../db.js";
 import axios from 'axios';
 axios.defaults.withCredentials = true;
-export const getPeliculas= async(req,res) =>{
+export const getPeliculas = async (req, res) => {
     try {
         const data = await axios.get("https://api.themoviedb.org/3/movie/popular?api_key=a96c294e02f5de8a45192c80ca9bda2f&language=es-MX&page=1")
         res.status(201).json(data.data)
     } catch (error) {
         console.log(error)
         res.json({
-            message:"error"
+            message: "error"
         })
     }
 }
-export const getPeliculasGenero= async(req,res) =>{
+export const getPeliculasGenero = async (req, res) => {
     const id = req.params.id;
     try {
         const data = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=a96c294e02f5de8a45192c80ca9bda2f&language&with_genres=${id}`)
@@ -20,7 +20,7 @@ export const getPeliculasGenero= async(req,res) =>{
     } catch (error) {
         console.log(error)
         res.json({
-            message:"error"
+            message: "error"
         })
     }
 }
@@ -32,7 +32,7 @@ export const getBusquedaPeliculas = async (req, res) => {
         let totalPages = 1;
         while (currentPage <= totalPages) {
             const params = {
-                api_key: "a96c294e02f5de8a45192c80ca9bda2f", 
+                api_key: "a96c294e02f5de8a45192c80ca9bda2f",
                 language: "es-MX",
                 query: query,
                 page: currentPage
@@ -56,7 +56,7 @@ export const getBusquedaPeliculas = async (req, res) => {
         console.error("Error en getBusquedaPeliculas:", error);
         if (error.response) {
             res.status(error.response.status).json({
-                message: `Error de TMDB: ${error.response.data.status_message}`,
+                message: "Error de TMDB: ${error.response.data.status_message}",
                 code: error.response.status
             });
         } else {
@@ -66,7 +66,7 @@ export const getBusquedaPeliculas = async (req, res) => {
         }
     }
 };
-export const getPelicula= async(req,res) =>{
+export const getPelicula = async (req, res) => {
     const id = req.params.id;
     try {
         const data = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=a96c294e02f5de8a45192c80ca9bda2f&language=es-MX`)
@@ -74,9 +74,7 @@ export const getPelicula= async(req,res) =>{
     } catch (error) {
         console.log(error)
         res.json({
-            message:"error"
+            message: "error"
         })
     }
 }
-
-
