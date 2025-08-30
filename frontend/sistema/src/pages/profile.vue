@@ -3,6 +3,7 @@
   import Nav from "../components/navegacio.vue"
   import popularfilmsection from '../components/popularfilmsection.vue'
   import Modal from "../components/modal.vue";
+  import ListasGrid from "../components/ListasGrid.vue";
   import axios from 'axios';
   import { useRouter } from 'vue-router';
   const router = useRouter();
@@ -148,6 +149,40 @@ const crearLista = async() => {
 
 <template>
   <Modal 
+  :isOpen="modalCrearListas" 
+  @close="cerrarModal"
+>
+  <div class="modal-crear-lista">
+    <h2 class="modal-title">Crear nueva lista</h2>
+
+    <div class="form-group">
+      <label class="user-bio" for="nombreLista">Nombre de la lista</label>
+      <input 
+        id="nombreLista" 
+        type="text" 
+        v-model="nombreLista" 
+        placeholder="Ejemplo: Terror" 
+        class="input-field"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="user-bio" for="descripcion">Descripción</label>
+      <textarea 
+        id="descripcion" 
+        v-model="descripcion" 
+        placeholder="Describe tu lista..." 
+        class="input-field textarea"
+      ></textarea>
+    </div>
+
+    <div class="modal-btn">
+      <button class="btn-cancel" @click="cerrarModal">Cancelar</button>
+      <button class="btn-crear" @click="crearLista">Crear</button>
+    </div>
+  </div>
+</Modal>
+  <Modal 
       :isOpen="modalIsOpen" 
       @close="closeModal"
       @confirm="handleConfirm"
@@ -177,16 +212,7 @@ const crearLista = async() => {
     </div>
   </template>
   </Modal>
-  <Modal 
-      :isOpen="modalCrearListas" 
-      @close="cerrarModal"
-    >
-   <div>
-    <input type="text" :value="nombreLista" @input="nombreLista = $event.target.value" placeholder="nombre de lista">
-    <input type="text" :value="descripcion" @input="descripcion = $event.target.value" placeholder="descripcion de lista">
-    <button @click="crearLista" >crear</button>
-   </div>
-  </Modal>
+  
   <div class="perfil-container">
     <!-- Header Navigation -->
     <Nav></Nav>
@@ -280,22 +306,56 @@ const crearLista = async() => {
         <popularfilmsection titulo="Populares" genero=""/>
       </div>
 
-      <div v-if="activeTab === 'Lists'" class="content-area">
-          <button @click="abrirModal">crear lista</button>
-          <div v-for="listas in lista " :key="listas.idlista" class="list-item">
-            <h3><a :href='"/listDetail/"+listas.idlista'>{{ listas.nombreLista }}</a></h3>
+      <!-- Listas -->
+      <div v-else-if="activeTab === 'Lists'" class="content-area">
+        <!-- Caso: No hay listas -->
+        <div v-if="!lista || lista.length === 0" class="listas-vacias">
+          <div class="lista-card create-card" @click="abrirModal">
+            <div class="lista-info">
+              <h2 class="lista-title">+ Crear nueva lista</h2>
+              <p class="lista-description">Empieza a organizar tus películas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caso: Sí hay listas -->
+        <div v-else class="listas-contenedor">
+          <div
+            v-for="listas in lista"
+            :key="listas.idlista"
+            class="lista-card"
+            @click="$router.push('/listDetail/' + listas.idlista)"
+          >
+            <!-- Portada de la lista -->
+            <div class="lista-portada">
+              <img :src="listas.portada || '/img/placeholder.jpg'" alt="Portada de la lista" />
+            </div>
+
+            <!-- Info de la lista -->
+            <div class="lista-info">
+              <h2 class="lista-title">{{ listas.nombreLista }}</h2>
+              <p class="lista-description">{{ listas.descripcion }}</p>
+            </div>
           </div>
 
-        
+          <!-- Botón para crear nueva lista -->
+          <div class="lista-card create-card" @click="abrirModal">
+            <div class="lista-info">
+              <h2 class="lista-title">+ Crear nueva lista</h2>
+              <p class="lista-description">Empieza a organizar tus películas</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Other tab content -->
+      <!-- Otros tabs -->
       <div v-else class="empty-content">
         <div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style>
 .main-content {
@@ -339,6 +399,21 @@ const crearLista = async() => {
   justify-content: center;
   overflow: hidden;
 }
+.lista-portada {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  overflow: hidden;
+  border-bottom: 1px solid #334155;
+}
+
+.lista-portada img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  display: block;
+}
+
 
 .avatar-icon {
   width: 64px;
@@ -356,6 +431,7 @@ const crearLista = async() => {
   transition: background-color 0.2s;
 }
 
+
 .edit-button:hover {
   background: #2563eb;
 }
@@ -366,6 +442,59 @@ const crearLista = async() => {
   font-size: 14px;
   font-weight: 600;
 }
+.listas-contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.lista-card {
+  background: #1f2937;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 200px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.lista-card:hover {
+  transform: translateY(-5px);
+}
+
+.lista-info {
+  padding: 10px;
+  color: #ffffff;
+}
+
+.lista-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.lista-description {
+  font-size: 0.9rem;
+  color: #9ca3af;
+text-overflow: ellipsis
+}
+
+.create-card {
+  background: rgba(75, 85, 99, 0.3);
+  width: 200px;
+  height: 355px;
+  border: 2px dashed #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.create-card:hover {
+  background: rgba(75, 85, 99, 0.5);
+}
+
 
 .user-details {
   flex: 1;
@@ -396,6 +525,7 @@ const crearLista = async() => {
   font-size: 14px;
   line-height: 1.5;
   max-width: 400px;
+  font-family: "Poppins-Regular", sans-serif;;
 }
 
 .stats-container {
@@ -557,6 +687,7 @@ const crearLista = async() => {
 }
 
 
+
   @media (max-width: 640px) {
   .solicitudes-table {
     display: block;
@@ -604,6 +735,89 @@ const crearLista = async() => {
   border-bottom-color: #3b82f6;
   color: #ffffff;
 }
+.modal-crear-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.input-field {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1f2937;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+}
+
+.input-field.textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.modal-btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-crear {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-cancel {
+  background-color: #4b5563;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #6b7280;
+}
+
+.btn-crear {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-crear:hover {
+  background-color: #2563eb;
+}
+
 
 .tab-inactive {
   color: #9ca3af;
@@ -626,6 +840,27 @@ const crearLista = async() => {
   color: #9ca3af;
   font-size: 16px;
 }
+
+.listas-vacias {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.listas-contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+
+.btn-crear-lista-inline {
+  height: fit-content;
+  align-self: center;
+}
+
 
 @media (max-width: 768px) {
   .profile-info {
@@ -652,6 +887,52 @@ const crearLista = async() => {
   .search-container {
     margin: 0;
     max-width: none;
+  }
+  .tabs-container {
+    overflow-x: auto;
+    gap: 16px;
+  }
+  .tab-button {
+    flex: 0 0 auto;
+  }
+  .vertical-line {
+    display: none;
+  }
+  .main-content {
+    padding: 16px 12px;
+  }
+  .profile-section {
+    gap: 2rem;
+  }
+  .avatar-container {
+    width: 96px;
+    height: 96px;
+  }
+  .avatar-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .user-name {
+    font-size: 24px;
+  }
+  .stat-number {
+    font-size: 20px;
+  }
+  .stat-label {
+    font-size: 10px;
+  }
+  .edit-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  .edit-text {
+    font-size: 12px;
+  }
+  .stats-container {
+    gap: 12px;
+  }
+  .stat-item {
+    margin: 0 4px;
   }
 }
 </style>

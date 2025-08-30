@@ -140,28 +140,47 @@ const agregar_lista = async () =>{
 </script>
 
 <template>
-  <Modal 
-      :isOpen="modalIsOpen" 
-      @close="closeModal"
-      @confirm="handleConfirm"
-    >
-   <table>
-    <thead>
+ <Modal 
+  :isOpen="modalIsOpen" 
+  @close="closeModal"
+  @confirm="handleConfirm"
+>
+  <div class="modal-listas">
+    <table class="listas-table">
+      <thead>
         <tr>
-          <th>nombre</th>
-          <th>seguir</th>
-          <th>rechazar</th>
+          <th colspan="2" class="table-header">
+            Agregar Película a la Lista...
+          </th>
         </tr>
       </thead>
       <tbody>
-       <tr v-for="listas in lista " :key="listas.idlista" class="list-item">
-            {{ listas.nombreLista }}
-            <input type="checkbox"  @change="selecionado(listas.idlista)">
-       </tr>
+        <tr 
+          v-for="listas in lista" 
+          :key="listas.idlista" 
+          class="list-item"
+        >
+          <td class="list-name">{{ listas.nombreLista }}</td>
+          <td class="list-check">
+  <input 
+    type="checkbox"  
+    class="styled-checkbox"
+    @change="selecionado(listas.idlista)"
+  >
+</td>
+
+        </tr>
       </tbody>
-   </table>
-   <button @click="agregar_lista" >confirmar</button>
-  </Modal>
+    </table>
+
+    <div class="modal-actions">
+      <button class="btn-cancelar" @click="closeModal">Cancelar</button>
+      <button class="btn-confirmar" @click="agregar_lista">Confirmar</button>
+    </div>
+  </div>
+</Modal>
+
+
   <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
   <div class="movie-page">
       <Nav />
@@ -433,6 +452,167 @@ const agregar_lista = async () =>{
 .btn-submit:hover {
   background: #2563eb;
 }
+.table-header {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  background: none;
+  color: #f1f5f9;
+  font-family: "Poppins-Regular", sans-serif;
+}
+
+.listas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-family: "Poppins-Regular", sans-serif;
+}
+
+.listas-table td {
+  padding: 10px;
+  border-bottom: 1px solid #374151;
+  color: #f1f5f9;
+  font-family: "Poppins-Regular", sans-serif;
+}
+
+.list-item:hover {
+  background: #111827;
+}
+
+.list-name {
+  text-align: left;
+}
+
+.list-check {
+  text-align: center;
+  width: 60px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-listas{
+width: 400px;
+}
+.modal-container{
+  width: 300px;         
+  max-width: 35px;     
+  max-height: 80vh;     
+  padding: 30px;        
+  border-radius: 16px;
+  background-color: #0f172a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.listas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.listas-table th,
+.listas-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+  color: #f1f5f9;
+}
+/* Ocultar el checkbox nativo */
+.styled-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #3b82f6; /* azul */
+  border-radius: 6px;
+  background-color: transparent;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.styled-checkbox:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.6);
+}
+
+/* Cuando está marcado */
+.styled-checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* El ícono de check */
+.styled-checkbox:checked::after {
+  content: "X";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 1px;
+  left: 4px;
+}
+
+
+.listas-table th {
+  
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.list-item:hover {
+  background: #111827;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-cancelar,
+.btn-confirmar {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.btn-cancelar {
+  background: #4b5563;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background: #6b7280;
+}
+
+.btn-confirmar {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-confirmar:hover {
+  background: #2563eb;
+}
+
 
 @media (max-width: 768px) {
   .movie-header {
