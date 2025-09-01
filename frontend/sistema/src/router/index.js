@@ -7,7 +7,8 @@ import MovieDetail from "../pages/movieDetail.vue"
 import HomeBusqueda from "../pages/homeBusqueda.vue";
 import OtherProfile from "../pages/otherProfile.vue";
 import Community from "../pages/Community.vue";
-import Landing from "../pages/Lading_page.vue";
+import ListDetail from "../pages/listDetail.vue";
+import Lading_page from "../pages/lading_page.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -55,11 +56,26 @@ const router = createRouter({
         }
         ,
         {
-            path:"/landing",
-            name:"landing",
-            component:Landing
+            path:"/otherProfile/:id",
+            name: "otherProfile",
+            component: OtherProfile
+        },
+        {
+            path:"/community",
+            name:"community",
+            component:Community
 
-        }
+        },
+        {
+            path:"/listDetail/:id",
+            name:"listDetail",
+            component:ListDetail
+        },
+         {
+            path:"/lading_page",
+            name:"lading_page",
+            component:Lading_page
+        },
     ]
 })
 export default router;
