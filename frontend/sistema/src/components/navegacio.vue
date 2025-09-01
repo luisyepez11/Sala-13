@@ -4,83 +4,94 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+// --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
+// Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
 const props = defineProps({
-  buscar: {
-    type: Function,
-    required: true,
-  },
+  buscar: {
+    type: Function,
+    required: true,
+  },
 });
 
-
+// Esta es la función de búsqueda original que utiliza getElementById.
 const realizarBusqueda = async () => {
-  try {
-    const buscar = document.getElementById("busqueda")?.value
-    await props.buscar(reemplazarEspacios(buscar));
-  } catch (error) {
-    console.error('Error en la búsqueda:', error);
-  }
+  try {
+    const buscar = document.getElementById("busqueda")?.value;
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
 };
 
 function reemplazarEspacios(texto) {
-  return texto.replace(/\s+/g, '+');
+  return texto.replace(/\s+/g, '+');
 }
 
 const deleteUser = async() =>{
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/delete")
-    console.log(usarioId)
+    await axios.get("http://localhost:3300/api/usuario/delete");
     router.push('/login');
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-        
-}
+};
+
 const navigateToProfile = () => {
   router.push('/profile');
-}
+};
 
 const navigateToHome = () => {
   router.push('/');
-}
+};
 </script>
+
 <template>
 <div class="header-nav">
-<div class="nav-content">
-        <div class="nav-left">
-          <div class="logo-container">
-            <button class="logo-circle" @click="navigateToProfile">
-              <svg class="logo-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-          </div>
-          <div class="nav-links">
-            <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
-            <a href="#" class="nav-link">Films</a>
-            <a href="#" class="nav-link">Lists</a>
-            <a href="#" class="nav-link">Communities</a>
-          </div>
-        </div>
-        
-        <div class="search-container">
-          <div class="search-wrapper">
-            <input type="text" class="search-input" placeholder="search" id="busqueda">
-            <button class="search-button" @click="realizarBusqueda">
-              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div>
-          <button class="edit-button"  @click="deleteUser" style="margin-top: 0;">salir</button>
-        </div>
+  <div class="nav-content">
+    <div class="nav-left">
+      <div class="app-logo-container">
+        <button @click="navigateToHome" class="app-logo-button">
+          <img src="/src/assets/logo.png" alt="SALA 13 Logo" class="app-logo">
+        </button>
       </div>
+      <div class="logo-container">
+        <button class="logo-circle" @click="navigateToProfile">
+          <svg class="logo-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+      <div class="nav-links">
+        <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
+        <a href="#" class="nav-link">Films</a>
+        <a href="#" class="nav-link">Lists</a>
+        <a href="#" class="nav-link">Communities</a>
+      </div>
+    </div>
+    
+    <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
+        <input type="text" class="search-input" placeholder="search" id="busqueda">
+        <!-- El botón vuelve a usar el evento @click -->
+        <button class="search-button" @click="realizarBusqueda">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <div>
+      <button class="edit-button" @click="deleteUser" style="margin-top: 0;">salir</button>
+    </div>
+  </div>
 </div>
 </template>
 
-<style>
+<style scoped>
 .perfil-container,
 .perfil-container * {
   box-sizing: border-box;
@@ -113,6 +124,25 @@ const navigateToHome = () => {
   display: flex;
   align-items: center;
   gap: 32px;
+}
+
+/* Styles for the new logo */
+.app-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.app-logo {
+  height: 55px; 
+  width: auto;
+  display: block;
 }
 
 .logo-container {
