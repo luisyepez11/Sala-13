@@ -13,7 +13,8 @@ import comentarioRouter from "./Comentarios/routers/comentarios.router.js";
 import solicitudesRouter from "./Solicitudes/routers/solicitudes.router.js";
 //Amigos
 import amigosRouter from "./Amigos/routers/amigos.router.js";
-
+//Listas
+import listaRouter from "./Listas/routers/lista.router.js";
 
 const app = express()
 
@@ -37,5 +38,7 @@ app.use("/api/comentario",comentarioRouter)
 app.use("/api/solicitud",solicitudesRouter)
 //Amigos
 app.use("/api/amigo",amigosRouter)
+//Listas
+app.use("/api/lista", listaRouter) 
 
 export default app;

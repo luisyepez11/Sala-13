@@ -3,13 +3,17 @@
   import Nav from "../components/navegacio.vue"
   import popularfilmsection from '../components/popularfilmsection.vue'
   import Modal from "../components/modal.vue";
+  import ListasGrid from "../components/ListasGrid.vue";
   import axios from 'axios';
   import { useRouter } from 'vue-router';
   const router = useRouter();
   axios.defaults.withCredentials = true;
   const editar=ref(false)
-  const listaSolicitudes = ref({})
+  const listaSolicitudes = ref()
+  const  lista = ref({})
   const usuarioId = ref("")
+  const nombreLista = ref("")
+  const descripcion = ref("")
   const data = async () =>{
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -19,8 +23,17 @@
       const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
       listaSolicitudes.value=datosSolicitudes.data
       const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
+      const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
       usuarioId.value=usarioId.data.id
       const datos = cuenta.data.resultCuenta[0]
+      lista.value = listas.data
+      console.log(lista.value)
+      const unicas = datosSolicitudes.data.filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
+      );
+      listaSolicitudes.value = unicas;
+      usuarioId.value=usarioId.data.id
       console.log(usuario.value = {
         ...usuario.value,
           nombre: datos.nombreCuenta,
@@ -91,6 +104,7 @@ const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
           idUsuario:id,
           idsolicitudes:idsolicitudes
         })
+      await data();
     } catch (error) {
       console.log(error)
     }
@@ -102,35 +116,103 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
     
   }
 }
+const modalCrearListas = ref(false);
+const abrirModal = () =>{
+      modalCrearListas.value=true
+}
+const cerrarModal = () =>{
+      modalCrearListas.value=false
+}
+const crearLista = async() => {
+  try {
+    console.log("Intentando crear lista:", nombreLista.value, descripcion.value); 
+    
+    const result = await axios.post(`http://localhost:3300/api/lista`, {
+      nombreLista: nombreLista.value, 
+      descripcion: descripcion.value, 
+      idCuenta: usuarioId.value 
+    });
+    
+    console.log("Lista creada exitosamente:", result.data);
+ 
+    cerrarModal();
+    nombreLista.value = "";
+    descripcion.value = "";
+    
+    data();
+    
+  } catch (error) {
+    console.error("Error creando lista:", error);
+  }
+}
 </script>
 
 <template>
+  <Modal 
+  :isOpen="modalCrearListas" 
+  @close="cerrarModal"
+>
+  <div class="modal-crear-lista">
+    <h2 class="modal-title">Crear nueva lista</h2>
+
+    <div class="form-group">
+      <label class="user-bio" for="nombreLista">Nombre de la lista</label>
+      <input 
+        id="nombreLista" 
+        type="text" 
+        v-model="nombreLista" 
+        placeholder="Ejemplo: Terror" 
+        class="input-field"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="user-bio" for="descripcion">Descripción</label>
+      <textarea 
+        id="descripcion" 
+        v-model="descripcion" 
+        placeholder="Describe tu lista..." 
+        class="input-field textarea"
+      ></textarea>
+    </div>
+
+    <div class="modal-btn">
+      <button class="btn-cancel" @click="cerrarModal">Cancelar</button>
+      <button class="btn-crear" @click="crearLista">Crear</button>
+    </div>
+  </div>
+</Modal>
   <Modal 
       :isOpen="modalIsOpen" 
       @close="closeModal"
       @confirm="handleConfirm"
     >
-   <table>
-    <thead>
+   <template v-if="listaSolicitudes.length > 0">
+    <table class="solicitudes-table">
+      <thead>
         <tr>
-          <th>nombre</th>
-          <th>seguir</th>
-          <th>rechazar</th>
+          <th class="table-header" colspan="2">Solicitud de Seguimiento</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda">
-          <td>{{ solicitud.nombremanda }} </td>
-          <td>
-            <button @click="aceptarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Aceptar</button>
-          </td>
-          <td>
-            <button @click="rechazarSolicitud(solicitud.idManda,solicitud.nombremanda,solicitud.idsolicitudes)">Rechazar</button>
+        <tr v-for="solicitud in listaSolicitudes" :key="solicitud.idManda" class="table-row">
+          <td class="table-data nombre">{{ solicitud.nombremanda }}</td>
+          <td class="table-data acciones">
+            <button class="btn-aceptar" @click="aceptarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Aceptar</button>
+            <button class="btn-rechazar" @click="rechazarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Rechazar</button>
           </td>
         </tr>
       </tbody>
-   </table>
+    </table>
+  </template>
+
+  <template v-else>
+    <div class="sin-solicitudes">
+      <p>No tienes solicitudes pendientes</p>
+    </div>
+  </template>
   </Modal>
+  
   <div class="perfil-container">
     <!-- Header Navigation -->
     <Nav></Nav>
@@ -151,7 +233,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
               <div class="edit-text">Edit</div>
             </button>
             <button v-if="editar" class="edit-button" @click="aceptareditar">
-              <div class="edit-text">aceptar</div>
+              <div class="edit-text">Aceptar</div>
             </button>
           </div>
           
@@ -224,7 +306,49 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
         <popularfilmsection titulo="Populares" genero=""/>
       </div>
 
-      <!-- Other tab content -->
+      <!-- Listas -->
+      <div v-else-if="activeTab === 'Lists'" class="content-area">
+        <!-- Caso: No hay listas -->
+        <div v-if="!lista || lista.length === 0" class="listas-vacias">
+          <div class="lista-card create-card" @click="abrirModal">
+            <div class="lista-info">
+              <h2 class="lista-title">+ Crear nueva lista</h2>
+              <p class="lista-description">Empieza a organizar tus películas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caso: Sí hay listas -->
+        <div v-else class="listas-contenedor">
+          <div
+            v-for="listas in lista"
+            :key="listas.idlista"
+            class="lista-card"
+            @click="$router.push('/listDetail/' + listas.idlista)"
+          >
+            <!-- Portada de la lista -->
+            <div class="lista-portada">
+              <img :src="listas.portada || '/img/placeholder.jpg'" alt="Portada de la lista" />
+            </div>
+
+            <!-- Info de la lista -->
+            <div class="lista-info">
+              <h2 class="lista-title">{{ listas.nombreLista }}</h2>
+              <p class="lista-description">{{ listas.descripcion }}</p>
+            </div>
+          </div>
+
+          <!-- Botón para crear nueva lista -->
+          <div class="lista-card create-card" @click="abrirModal">
+            <div class="lista-info">
+              <h2 class="lista-title">+ Crear nueva lista</h2>
+              <p class="lista-description">Empieza a organizar tus películas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Otros tabs -->
       <div v-else class="empty-content">
         <div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
       </div>
@@ -232,13 +356,19 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   </div>
 </template>
 
+
 <style>
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px;
 }
-
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
 .profile-section {
   display: flex;
   align-items: center;
@@ -269,6 +399,21 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   justify-content: center;
   overflow: hidden;
 }
+.lista-portada {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  overflow: hidden;
+  border-bottom: 1px solid #334155;
+}
+
+.lista-portada img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  display: block;
+}
+
 
 .avatar-icon {
   width: 64px;
@@ -286,6 +431,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   transition: background-color 0.2s;
 }
 
+
 .edit-button:hover {
   background: #2563eb;
 }
@@ -296,6 +442,59 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   font-size: 14px;
   font-weight: 600;
 }
+.listas-contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.lista-card {
+  background: #1f2937;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 200px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.lista-card:hover {
+  transform: translateY(-5px);
+}
+
+.lista-info {
+  padding: 10px;
+  color: #ffffff;
+}
+
+.lista-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.lista-description {
+  font-size: 0.9rem;
+  color: #9ca3af;
+text-overflow: ellipsis
+}
+
+.create-card {
+  background: rgba(75, 85, 99, 0.3);
+  width: 200px;
+  height: 355px;
+  border: 2px dashed #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.create-card:hover {
+  background: rgba(75, 85, 99, 0.5);
+}
+
 
 .user-details {
   flex: 1;
@@ -326,6 +525,7 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   font-size: 14px;
   line-height: 1.5;
   max-width: 400px;
+  font-family: "Poppins-Regular", sans-serif;;
 }
 
 .stats-container {
@@ -354,6 +554,160 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   border-right: 1px solid #ffffff;
   height: 3rem;
 }
+.cancel-button {
+  display: none;
+}
+
+.modal-actions {
+  display: none;
+  }
+.modal-container {
+  width: 95vw;         
+  max-width: 400px;     
+  max-height: 80vh;     
+  padding: 30px;        
+  border-radius: 16px;
+  background-color: #0f172a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.modal-close{
+  color: #ffffff
+}
+.solicitudes-table {
+  width: 100%;
+  border-collapse:collapse; 
+  border-spacing: 0; 
+  background-color: #091f32;
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+}
+.solicitudes-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table-data.acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding-right: 16px; 
+}
+
+.solicitudes-table tr {
+  padding: 12px 0;
+}
+
+.solicitudes-table td.acciones {
+  text-align: center;
+}
+
+.solicitudes-table .btn-aceptar,
+.solicitudes-table .btn-rechazar {
+  display: inline-block;
+  min-width: 80px;
+  margin: 0px; 
+}
+  .table-header {
+  background-color: #17344e;
+  color: #ffffff;
+  padding: 12px 16px;
+  text-align: left;
+  font-family: "Poppins-SemiBold", sans-serif;
+  font-size: 14px;
+}
+
+.table-row {
+  border-bottom: 1px solid #334155;
+  transition: background-color 0.2s;
+}
+
+
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-data {
+  padding: 10px 16px;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.table-data.nombre {
+  font-family: "Poppins-Medium", sans-serif;
+  max-width: 150px;         
+  white-space: nowrap;    
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.btn-aceptar, .btn-rechazar {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-family: "Poppins-Medium", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-aceptar {
+  background-color: #16a34a;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-aceptar:hover {
+  background-color: #22c55e;
+}
+
+.btn-rechazar {
+  background-color: #be0000;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-rechazar:hover {
+  background-color: #ef4444;
+}
+.sin-solicitudes {
+  text-align: center;
+  padding: 30px 16px;
+  color: #9ca3af;
+  font-size: 16px;
+  font-family: "Poppins-Regular", sans-serif;
+}
+
+
+
+  @media (max-width: 640px) {
+  .solicitudes-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    font-size: 12px;
+  }
+  .table-header, .table-data {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .table-data.nombre {
+    max-width: 80px;
+  }
+  .btn-aceptar, .btn-rechazar {
+    min-width: 60px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
 
 .tabs-nav {
   border-bottom: 1px solid #334155;
@@ -381,6 +735,89 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   border-bottom-color: #3b82f6;
   color: #ffffff;
 }
+.modal-crear-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.input-field {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1f2937;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+}
+
+.input-field.textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: "Poppins-Regular", sans-serif;;
+}
+
+.modal-btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-crear {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-cancel {
+  background-color: #4b5563;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #6b7280;
+}
+
+.btn-crear {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-crear:hover {
+  background-color: #2563eb;
+}
+
 
 .tab-inactive {
   color: #9ca3af;
@@ -403,6 +840,27 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   color: #9ca3af;
   font-size: 16px;
 }
+
+.listas-vacias {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.listas-contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+
+.btn-crear-lista-inline {
+  height: fit-content;
+  align-self: center;
+}
+
 
 @media (max-width: 768px) {
   .profile-info {
@@ -429,6 +887,52 @@ const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   .search-container {
     margin: 0;
     max-width: none;
+  }
+  .tabs-container {
+    overflow-x: auto;
+    gap: 16px;
+  }
+  .tab-button {
+    flex: 0 0 auto;
+  }
+  .vertical-line {
+    display: none;
+  }
+  .main-content {
+    padding: 16px 12px;
+  }
+  .profile-section {
+    gap: 2rem;
+  }
+  .avatar-container {
+    width: 96px;
+    height: 96px;
+  }
+  .avatar-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .user-name {
+    font-size: 24px;
+  }
+  .stat-number {
+    font-size: 20px;
+  }
+  .stat-label {
+    font-size: 10px;
+  }
+  .edit-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  .edit-text {
+    font-size: 12px;
+  }
+  .stats-container {
+    gap: 12px;
+  }
+  .stat-item {
+    margin: 0 4px;
   }
 }
 </style>
