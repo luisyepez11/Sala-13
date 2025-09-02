@@ -65,7 +65,7 @@ const navigateToHome = () => {
       <div class="nav-links">
         <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
         <a href="#" class="nav-link">Films</a>
-        <a href="#" class="nav-link">Lists</a>
+        <a href="/homeListas" class="nav-link">Lists</a>
         <a href="#" class="nav-link">Communities</a>
       </div>
     </div>
