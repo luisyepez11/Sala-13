@@ -8,7 +8,7 @@ const router = useRouter()
 const props = defineProps({ idPelicula: [String, Number],idLista: String })
 
 const movie = ref(null)
-
+const emit = defineEmits(['portada'])
 onMounted(async () => {
   try {
     const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${props.idPelicula}`)
@@ -22,6 +22,7 @@ onMounted(async () => {
       rating: datos.vote_average,
       poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
     }
+    emit('portada', `https://image.tmdb.org/t/p/original${datos.poster_path}`)
   } catch (e) {
     console.error('Error al cargar la película:', e)
   }
