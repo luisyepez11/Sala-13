@@ -11,6 +11,7 @@ const route = useRoute()
 axios.defaults.withCredentials = true
  const  lista = ref({})
 const movie = ref(null)
+const nombrePelicula=ref("")
 
 const error = ref(null)
 const loadReviews = async () => {
@@ -19,7 +20,7 @@ const loadReviews = async () => {
     const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
     lista.value = listas.data
     const movieId = route.params.id;
-    const response = await axios.get(`http://localhost:3300/api/comentario/${movieId}`);
+    const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
     reviews.value = comentarios.map(comentario => ({
       idCuenta:comentario.idCuenta,
@@ -48,7 +49,8 @@ const submitReview = async()=>{
           idCuenta:idcuenta,
           idPelicula:movieId,
           comentario:comentario,
-          fecha:fecha
+          fecha:fecha,
+          nombrePelicula:nombrePelicula.value
         })
     loadReviews()
     document.getElementById("comentario").value=""
@@ -67,7 +69,8 @@ onMounted(async () => {
       router.push('/')
       return
     }
-    console.log(movieId)
+    
+    nombrePelicula.value=datos.title
     movie.value = {
   title: datos.title,
   year: datos.release_date,
