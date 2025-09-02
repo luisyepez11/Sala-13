@@ -8,7 +8,9 @@ export const getListas = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: "Error al obtener las listas" });
     }
-};export const getListasUsuarios = async (req, res) => {
+};
+
+export const getListasUsuarios = async (req, res) => {
     try {
         const [listas] = await pool.query("SELECT * FROM listas WHERE idCuenta = ?", [req.params.id]);
         res.status(200).json(listas);
