@@ -528,51 +528,69 @@ fill="currentColor" viewBox="0 0 24 24" >
   gap: 2rem;
   align-items: center;
 }
-.container-card{
-  position: relative;
-  gap: 1rem;
-  max-width: 600px;
-  height: 250px;
-  width: 100%;
-  transition: opacity 0.5s ease-in-out;
+.container-card {
+	display: grid;
+	place-items: center;
+	gap: 1rem;
+	width: 450px;
+	max-width: 100%;
+	transition: opacity 0.5s ease-in-out;
 }
+
+.container-card {
+	display: grid;
+	place-items: center;
+	gap: 1rem;
+	width: 450px;
+	max-width: 100%;
+	transition: opacity 0.5s ease-in-out;
+	
+}
+
 .review-card {
-  
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #1e293b;
-  border-radius: 1rem;
-  padding: 1rem;
-  opacity: 0;
-  transform: translateX(100%);
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+	grid-area: 1 / 1;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: #1e293b;
+	border-radius: 1rem;
+	padding: 1.5rem; 
+	opacity: 0;
+	transform: translateX(100%);
+	transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	align-items: center; 
+	text-align: center;
+	gap: 0.5rem; 
+	
 }
+
 .active-card {
-  opacity: 1;
-  transform: translateX(0);
+	opacity: 1;
+	transform: translateX(0);
 }
 
 
 .review-card:hover {
-  transform: translateY(-5px);
+	transform: translateY(-5px);
 }
 
 .review-card img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-bottom: 0.5rem;
 }
 
 .review-card strong {
-  display: block;
-  font-weight: bold;
+	display: block;
+	font-weight: bold;
 }
 
 .review-card em {
-  font-style: italic;
-  color: #93c5fd;
+	font-style: italic;
+	color: #93c5fd;
 }
 
 
