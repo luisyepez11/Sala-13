@@ -162,7 +162,7 @@
     <Nav />
     <section class="hero-section">
         <div class="hero-left">
-            <img src="../assets/vue.svg" alt="Sala 13 Logo" class="hero-logo" />
+            <img src="/src/assets/logo.png" alt="Sala 13 Logo" class="hero-logo" />
             <h1 class="hero-title">"la nueva red social para cinéfilos"</h1>
         </div>
         <div class="hero-right">
@@ -228,14 +228,14 @@ fill="currentColor" viewBox="0 0 24 24" >
 
         <div class="testimonials">
             <div class="testimonial-card">
-            <img src="../assets/vue.svg" alt="Usuario 1" />
+            <img src="/src/assets/perfilGen.png" alt="Usuario 1" />
             <p>"Sala 13 me hizo volver a amar el cine."</p>
-            <cite>— Carla R.</cite>
+            <cite>— ElPadrino_</cite>
             </div>
             <div class="testimonial-card">
-            <img src="../assets/vue.svg" alt="Usuario 2" />
+            <img src="/src/assets/perfilGen.png" alt="Usuario 2" />
             <p>"Me encantan las comunidades, he conocido gente increíble."</p>
-            <cite>— Marcos G.</cite>
+            <cite>— PotterheadFav13</cite>
             </div>
         </div>
     </section>
