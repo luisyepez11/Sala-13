@@ -5,7 +5,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-/* 👉 Paso 3: asegurar credenciales (cookies) en cada request */
+
 axios.defaults.withCredentials = true;
 
 const props = defineProps({
