@@ -1,40 +1,50 @@
 <script setup>
-import {ref} from "vue"
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
 const router = useRouter();
+
+/* 👉 Paso 3: asegurar credenciales (cookies) en cada request */
 axios.defaults.withCredentials = true;
-  const props = defineProps({
-  opcion: String
-  });
-  console.log(props.opcion)
-  const opcion = props.opcion
-  async function saludar(){
-    const nombre = document.getElementById("user").value
-    const contraseña = document.getElementById("password").value
-    if (opcion=="login"){
-      try {
-        const result = await axios.post(`http://localhost:3300/api/usuario/login`,{
-          user: nombre,
-          password:contraseña
-        })
-        router.push('/profile');
-      } catch (error) {
-        
-      }
+
+const props = defineProps({
+  opcion: String,
+});
+
+const opcion = props.opcion;
+
+async function saludar() {
+  const nombre = document.getElementById("user").value;
+  const contraseña = document.getElementById("password").value;
+
+  if (opcion === "login") {
+    try {
+      await axios.post(
+        "http://localhost:3300/api/usuario/login",
+        { user: nombre, password: contraseña },
+        { withCredentials: true } 
+      );
+      router.push("/profile");
+    } catch (error) {
+      console.error("Error en login:", error);
+
     }
-    else{
-      try {
-        const result = await axios.post(`http://localhost:3300/api/usuario/create`,{
-          user: nombre,
-          password:contraseña
-        })
-      } catch (error) {
-        
-      }
+  } else {
+    try {
+      await axios.post(
+        "http://localhost:3300/api/usuario/create",
+        { user: nombre, password: contraseña },
+        { withCredentials: true } 
+      );
+      router.push("/login");
+    } catch (error) {
+      console.error("Error al registrar:", error);
     }
   }
+}
 </script>
+
 <template>
   <div class="form">
     <div class="form-header">
