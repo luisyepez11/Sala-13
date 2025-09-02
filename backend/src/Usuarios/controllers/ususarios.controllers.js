@@ -77,13 +77,12 @@ export const getUser = async(req,res) =>{
 
 export const deleteCookie = async(req,res) =>{
     try {
-        // === LIMPIEZA DE COOKIE SEGÚN ENTORNO ===
         const isProd = process.env.NODE_ENV === 'production'
         res.clearCookie('Login', {
             httpOnly: true,
-            secure: isProd ? true : false,     // en dev (localhost) -> false
-            sameSite: isProd ? 'none' : 'lax', // en dev -> 'lax'
-            path: '/',                          // mismo path que al crear
+            secure: isProd ? true : false,     
+            sameSite: isProd ? 'none' : 'lax', 
+            path: '/',                      
         })
         res.json({
             message:"funcionando"

@@ -10,10 +10,6 @@ const props = defineProps({
   buscar: { type: Function, required: true },
 });
 
-/* ========= Paso 4: Auth por cookie httpOnly =========
-   - Verifica sesión llamando al backend (no localStorage).
-   - Muestra "salir" si hay sesión, "Iniciar sesión" si no.
-*/
 axios.defaults.withCredentials = true;
 
 const isAuthenticated = ref(false);
@@ -34,7 +30,7 @@ onMounted(() => {
   refreshAuth();
 });
 
-// Si cambias de ruta (ej. tras login/registro), revalida
+
 watch(() => route.fullPath, () => {
   refreshAuth();
 });
@@ -58,9 +54,6 @@ async function handleAuth () {
   }
 }
 
-/* =========================
-   BÚSQUEDA (igual)
-   ========================= */
 const realizarBusqueda = async () => {
   try {
     const buscar = document.getElementById("busqueda")?.value
@@ -73,9 +66,6 @@ function reemplazarEspacios(texto) {
   return texto.replace(/\s+/g, '+');
 }
 
-/* =========================
-   NAVEGACIÓN (igual)
-   ========================= */
 const navigateToProfile = () => { router.push('/profile'); }
 const navigateToHome    = () => { router.push('/'); }
 </script>
