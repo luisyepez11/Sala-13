@@ -13,7 +13,8 @@ const props = defineProps({
       rating: 4.5,
       views: 1200,
       likes: 89,
-      year: 2024
+      year: 2024,
+      adult: false // Añadimos la propiedad adult con valor por defecto
     })
   }
 })
@@ -36,27 +37,31 @@ const seeDetail = (event) => {
 const handleWatch = () => {
   console.log(`Watching movie: ${props.movie.title}`)
 }
-
-
+const vista = ref()
 </script>
 
 <template>
   <div 
     class="movie-card"
+    :class="{ 'adult-content': movie.adult }"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @click="seeDetail($event)"
+    :style="movie.poster=='https://via.placeholder.com/500x750?text=No+Poster' ? 'display:none' : ''"
   >
-    <!-- Poster Container -->
     <div class="poster-container">
       <img 
         :src="movie.poster" 
         :alt="movie.title"
         class="poster-image"
+        :class="{ 'blur-poster': movie.adult }"
       />
-      
-      <!-- Hover Overlay -->
-      <div :class="['hover-overlay', { 'visible': isHovered }]">
+
+      <div v-if="movie.adult" class="adult-overlay">
+        <span>Contenido para adultos</span>
+      </div>
+  
+      <div :class="['hover-overlay', { 'visible': isHovered }] " >
         <button class="play-btn" @click="handleWatch">
           <svg class="play-icon" fill="currentColor" viewBox="0 0 20 20">
             <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
@@ -126,11 +131,37 @@ const handleWatch = () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.poster-image.blur-poster {
+  filter: blur(8px);
 }
 
 .movie-card:hover .poster-image {
   transform: scale(1.05);
+}
+
+.movie-card:hover .poster-image.blur-poster {
+  transform: scale(1.05) blur(8px);
+}
+
+.adult-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  z-index: 1;
+  padding: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .hover-overlay {
@@ -145,6 +176,7 @@ const handleWatch = () => {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 2;
 }
 
 .hover-overlay.visible {
@@ -245,6 +277,11 @@ const handleWatch = () => {
     width: 0.75rem;
     height: 0.75rem;
   }
+  
+  .adult-overlay {
+    font-size: 0.7rem;
+    padding: 0.375rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -259,6 +296,10 @@ const handleWatch = () => {
   
   .stat {
     font-size: 0.625rem;
+  }
+  
+  .adult-overlay {
+    font-size: 0.6rem;
   }
 }
 </style>
