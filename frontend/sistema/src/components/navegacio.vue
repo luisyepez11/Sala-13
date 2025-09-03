@@ -1,39 +1,59 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-// --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
-// Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
+
 const props = defineProps({
-  buscar: {
-    type: Function,
-    required: true,
-  },
+  buscar: {
+    type: Function,
+    required: true,
+  },
 });
 
-// Esta es la función de búsqueda original que utiliza getElementById.
+const logueado = ref(false); // Inicializar como false por defecto
+
+const cargar = async () => {
+  try {
+    const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
+    logueado.value = usuarioId.data.message !== "no registrado";
+    console.log("Estado de autenticación:", logueado.value);
+  } catch (error) {
+    console.error("Error al verificar autenticación:", error);
+    logueado.value = false;
+  }
+};
+
+onMounted(() => {
+  cargar();
+});
+
 const realizarBusqueda = async () => {
-  try {
-    const buscar = document.getElementById("busqueda")?.value;
-    await props.buscar(reemplazarEspacios(buscar));
-  } catch (error) {
-    console.error('Error en la búsqueda:', error);
-  }
+  try {
+    const buscar = document.getElementById("busqueda")?.value;
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
 };
 
 function reemplazarEspacios(texto) {
-  return texto.replace(/\s+/g, '+');
+  return texto.replace(/\s+/g, '+');
 }
 
-const deleteUser = async() =>{
+const deleteUser = async () => {
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
+    logueado.value = false; // Actualizar estado local
     router.push('/login');
   } catch (error) {
     console.log(error);
   }
+};
+
+const navigateToLogin = () => {
+  router.push('/login');
 };
 
 const navigateToProfile = () => {
@@ -70,12 +90,9 @@ const navigateToHome = () => {
       </div>
     </div>
     
-    <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
     <div class="search-container">
       <div class="search-wrapper">
-        <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
         <input type="text" class="search-input" placeholder="search" id="busqueda">
-        <!-- El botón vuelve a usar el evento @click -->
         <button class="search-button" @click="realizarBusqueda">
           <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -85,11 +102,19 @@ const navigateToHome = () => {
     </div>
     
     <div>
-      <button class="edit-button" @click="deleteUser" style="margin-top: 0;">salir</button>
+      <!-- Corrección aquí: usar logueado directamente sin .value -->
+      <button v-if="logueado" class="edit-button" @click="deleteUser" style="margin-top: 0;">
+        <p>Salir</p>
+      </button>
+      <button v-else class="edit-button" @click="navigateToLogin" style="margin-top: 0;">
+        <p>Iniciar sesión</p>
+      </button>
     </div>
   </div>
 </div>
 </template>
+
+<!-- Tus estilos se mantienen igual -->
 
 <style scoped>
 .perfil-container,
