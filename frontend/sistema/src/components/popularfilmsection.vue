@@ -61,7 +61,7 @@ watch(movies, () => {
     <div class="section-header">
       <h2 class="section-title">{{props.titulo}}</h2>
       <button class="see-all-btn" @click="toggleShowAll">
-        {{ showAll ? 'Ver Menos' : 'See All' }}
+        {{ showAll ? 'Ver Menos' : 'Cargar Más' }}
         <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
