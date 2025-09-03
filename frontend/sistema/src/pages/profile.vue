@@ -39,7 +39,11 @@
           nombre: datos.nombreCuenta,
           pronombres: datos.pronombres,
           nombreReal: datos.nombreReal, 
-          biografia: datos.descripcionCuenta
+          biografia: datos.descripcionCuenta,
+          cantidad_solicitudes:datos.total_solicitudes,
+          total_seguidos:datos.total_seguidos,
+          total_seguidores:datos.total_seguidores,
+          total_comentarios:datos.total_comentarios
       })
     } catch (error) {
       console.log("error")
@@ -265,22 +269,22 @@ const crearLista = async() => {
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number">{{ stats.reviews }}</div>
+            <div class="stat-number">{{ usuario.total_comentarios }}</div>
             <div class="stat-label">reviews</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number">{{ stats.followers }}</div>
+            <div class="stat-number">{{ usuario.total_seguidores }}</div>
             <div class="stat-label">followers</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number">{{ stats.following }}</div>
+            <div class="stat-number">{{ usuario.total_seguidos }}</div>
             <div class="stat-label">following</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number" @click="solicitudes" >{{ stats.requests }}</div>
+            <div class="stat-number" @click="solicitudes" >{{ usuario.cantidad_solicitudes }}</div>
             <div class="stat-label">requests</div>
           </div>
         </div>
