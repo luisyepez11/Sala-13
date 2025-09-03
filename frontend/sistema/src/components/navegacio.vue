@@ -1,9 +1,59 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route  = useRoute();
+
+const props = defineProps({
+  buscar: { type: Function, required: true },
+});
+
+axios.defaults.withCredentials = true;
+
+const isAuthenticated = ref(false);
+
+async function refreshAuth() {
+  try {
+    const { data } = await axios.get('http://localhost:3300/api/usuario/user', {
+      withCredentials: true,
+    });
+    // si hay id => hay sesión
+    isAuthenticated.value = !!(data && data.id);
+  } catch {
+    isAuthenticated.value = false;
+  }
+}
+
+onMounted(() => {
+  refreshAuth();
+});
+
+
+watch(() => route.fullPath, () => {
+  refreshAuth();
+});
+
+const authLabel = computed(() => (isAuthenticated.value ? 'salir' : 'Iniciar sesión'));
+
+async function handleAuth () {
+  if (isAuthenticated.value) {
+    try {
+      await axios.get('http://localhost:3300/api/usuario/delete', {
+        withCredentials: true,
+      });
+    } catch (_) {
+      // ignoramos errores del endpoint en dev
+    } finally {
+      isAuthenticated.value = false;
+      router.push('/login');
+    }
+  } else {
+    router.push('/login');
+  }
+}
+
 // --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
 // Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
 const props = defineProps({
@@ -22,11 +72,12 @@ const realizarBusqueda = async () => {
     console.error('Error en la búsqueda:', error);
   }
 };
-
 function reemplazarEspacios(texto) {
   return texto.replace(/\s+/g, '+');
 }
 
+const navigateToProfile = () => { router.push('/profile'); }
+const navigateToHome    = () => { router.push('/'); }
 const deleteUser = async() =>{
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
@@ -70,6 +121,25 @@ const navigateToHome = () => {
       </div>
     </div>
     
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input type="text" class="search-input" placeholder="search" id="busqueda">
+        <button class="search-button" @click="realizarBusqueda">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <!-- Botón dinámico -->
+      <button class="edit-button" @click="handleAuth" style="margin-top: 0;">
+        {{ authLabel }}
+      </button>
+      </div>
+    </div>
+    
     <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
     <div class="search-container">
       <div class="search-wrapper">
@@ -93,38 +163,19 @@ const navigateToHome = () => {
 
 <style scoped>
 .perfil-container,
-.perfil-container * {
-  box-sizing: border-box;
-}
-
+.perfil-container * { box-sizing: border-box; }
 .perfil-container {
-  background: #091f32;
-  min-height: 100vh;
-  color: #ffffff;
+  background: #091f32; min-height: 100vh; color: #ffffff;
   font-family: "Poppins-Regular", sans-serif;
 }
-
-.header-nav {
-  background: #2b3a6e;
-  border-bottom: 1px solid #334155;
-  position: relative;
-}
-
+.header-nav { background: #2b3a6e; border-bottom: 1px solid #334155; position: relative; }
 .nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: max-content;
+  max-width: 1200px; margin: 0 auto; padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between; height: max-content;
 }
+.nav-left { display: flex; align-items: center; gap: 32px; }
+.logo-container { display: flex; align-items: center; }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
 
 /* Styles for the new logo */
 .app-logo-container {
@@ -149,101 +200,28 @@ const navigateToHome = () => {
   display: flex;
   align-items: center;
 }
-
 .logo-circle {
-  width: 32px;
-  height: 32px;
-  background: #d1d5db;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  width: 32px; height: 32px; background: #d1d5db; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.3s ease;
 }
-
-.logo-circle:hover {
-  background: #f3f4f6;
-  transform: scale(1.05);
-}
-
-.logo-icon {
-  width: 20px;
-  height: 20px;
-  color: #6b7280;
-}
-
-.nav-links {
-  display: flex;
-  gap: 24px;
-}
-
+.logo-circle:hover { background: #f3f4f6; transform: scale(1.05); }
+.logo-icon { width: 20px; height: 20px; color: #6b7280; }
+.nav-links { display: flex; gap: 24px; }
 .nav-link {
-  color: #d1d5db;
-  text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  transition: color 0.2s;
+  color: #d1d5db; text-decoration: none; font-size: 1.2rem; font-weight: 600; transition: color 0.2s;
 }
-
-.nav-link:hover {
-  color: #ffffff;
-}
-
-/* Estilos específicos para el botón Home */
+.nav-link:hover { color: #ffffff; }
 .nav-button-link {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding: 0;
+  background: none; border: none; cursor: pointer; font-family: inherit; font-size: 1.2rem; font-weight: 600; padding: 0;
 }
-
-.nav-button-link:hover {
-  color: #ffffff;
-}
-
-.search-container {
-  flex: 1;
-  max-width: 400px;
-  margin: 0 24px;
-}
-
-.search-wrapper {
-  position: relative;
-}
-
+.nav-button-link:hover { color: #ffffff; }
+.search-container { flex: 1; max-width: 400px; margin: 0 24px; }
+.search-wrapper { position: relative; }
 .search-input {
-  width: 100%;
-  background: #4a5c75;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 8px 40px 8px 16px;
-  font-size: 14px;
-  color: #ffffff;
-  outline: none;
+  width: 100%; background: #4a5c75; border: 1px solid #475569; border-radius: 6px;
+  padding: 8px 40px 8px 16px; font-size: 14px; color: #ffffff; outline: none;
 }
-
-.search-input::placeholder {
-  color: #9ca3af;
-}
-
-.search-button {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.search-icon {
-  width: 16px;
-  height: 16px;
-  color: #9ca3af;
-}
+.search-input::placeholder { color: #9ca3af; }
+.search-button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
+.search-icon { width: 16px; height: 16px; color: #9ca3af; }
 </style>
