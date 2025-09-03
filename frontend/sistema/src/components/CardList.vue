@@ -19,7 +19,7 @@ onMounted(async () => {
       year: datos.release_date,
       genre: datos.genre || 'Sin género',
       synopsis: datos.overview,
-      rating: datos.vote_average,
+      rating: (datos.vote_average/2).toFixed(1),
       poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
     }
     emit('portada', `https://image.tmdb.org/t/p/original${datos.poster_path}`)
