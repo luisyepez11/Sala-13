@@ -59,8 +59,8 @@
 
 
 
-  const activeTab = ref("Profile")
-  const tabs = ["Profile", "Lists", "Likes", "Reviews", "Communities", "Watched"]
+  const activeTab = ref("Favoritas")
+  const tabs = ["Favoritas", "Listas", "Likes", "Reseñas", "Comunidades", "Vistas"]
 
   const stats = ref({
     watched: 0,
@@ -98,7 +98,6 @@ const closeModal = () => {
   modalIsOpen.value = false;
 };
   const solicitudes = () =>{
-    alert("funcionando")
     openModal()
 };
 const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
@@ -115,7 +114,6 @@ const aceptarSolicitud = async(id,nombre,idsolicitudes) =>{
 }
 const rechazarSolicitud = async (id,nombre,idsolicitudes) =>{
   try {
-    alert("oka"+nombre)
   } catch (error) {
     
   }
@@ -234,7 +232,7 @@ const crearLista = async() => {
               </svg>
             </div>
             <button v-if="!editar" class="edit-button" @click="editarPerfil">
-              <div class="edit-text">Edit</div>
+              <div class="edit-text">Editar</div>
             </button>
             <button v-if="editar" class="edit-button" @click="aceptareditar">
               <div class="edit-text">Aceptar</div>
@@ -260,12 +258,12 @@ const crearLista = async() => {
         <div class="stats-container">
           <div class="stat-item">
             <div class="stat-number">{{ stats.watched }}</div>
-            <div class="stat-label">watched</div>
+            <div class="stat-label">Vistas</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
             <div class="stat-number">{{ stats.likes }}</div>
-            <div class="stat-label">likes</div>
+            <div class="stat-label">Likes</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
@@ -305,13 +303,13 @@ const crearLista = async() => {
       </div>
 
       <!-- Content Area -->
-      <div v-if="activeTab === 'Profile'" class="content-area">
+      <div v-if="activeTab === 'Favoritas'" class="content-area">
         <!-- Popular Films Section - Igual que en Home -->
         <popularfilmsection titulo="Populares" genero=""/>
       </div>
 
       <!-- Listas -->
-      <div v-else-if="activeTab === 'Lists'" class="content-area">
+      <div v-else-if="activeTab === 'Listas'" class="content-area">
         <!-- Caso: No hay listas -->
         <div v-if="!lista || lista.length === 0" class="listas-vacias">
           <div class="lista-card create-card" @click="abrirModal">
