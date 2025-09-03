@@ -30,7 +30,7 @@ function reemplazarEspacios(texto) {
 const deleteUser = async() =>{
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
-    router.push('/login');
+    router.push('/');
   } catch (error) {
     console.log(error);
   }
@@ -41,7 +41,7 @@ const navigateToProfile = () => {
 };
 
 const navigateToHome = () => {
-  router.push('/');
+  router.push('/home');
 };
 </script>
 
@@ -63,10 +63,10 @@ const navigateToHome = () => {
         </button>
       </div>
       <div class="nav-links">
-        <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
-        <a href="#" class="nav-link">Films</a>
-        <a href="#" class="nav-link">Lists</a>
-        <a href="#" class="nav-link">Communities</a>
+        <button @click="navigateToHome" class="nav-link nav-button-link">Inicio</button>
+        <a href="#" class="nav-link">Timeline</a>
+        <a href="#" class="nav-link">Listas</a>
+        <a href="#" class="nav-link">Comunidades</a>
       </div>
     </div>
     
@@ -74,7 +74,7 @@ const navigateToHome = () => {
     <div class="search-container">
       <div class="search-wrapper">
         <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
-        <input type="text" class="search-input" placeholder="search" id="busqueda">
+        <input type="text" class="search-input" placeholder="Buscar" id="busqueda">
         <!-- El botón vuelve a usar el evento @click -->
         <button class="search-button" @click="realizarBusqueda">
           <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
