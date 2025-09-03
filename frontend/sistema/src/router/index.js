@@ -73,8 +73,8 @@ const router = createRouter({
             component:ListDetail
         },
          {
-            path:"/lading_page",
-            name:"lading_page",
+            path:"/landingPage",
+            name:"landing_page",
             component:Lading_page
         },
          {
