@@ -1,37 +1,66 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import moviecard from './moviecard.vue'
 import axios from 'axios'
 
 axios.defaults.withCredentials = true
 
-const props = defineProps({ genero: "", titulo: "" })
-console.log(props.genero)
+const props = defineProps({ idLista: "", titulo: "" })
 const movies = ref([])
 const showAll = ref(false)
 const displayedMovies = ref([])
+const loading = ref(false)
+
+const datosPeliculas = async (movieId) => {
+  try {
+    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
+    if (!resp.ok) throw new Error('Error al obtener datos de la película')
+    
+    const datos = await resp.json();
+    return {
+      id: datos.id,
+      title: datos.title,
+      poster: datos.poster_path 
+        ? `https://image.tmdb.org/t/p/w500${datos.poster_path}`
+        : 'https://via.placeholder.com/500x750?text=No+Poster',
+      rating: (datos.vote_average / 2).toFixed(2), 
+      views: Math.floor(Math.random() * 5000), 
+      likes: Math.floor(datos.vote_count / 10), 
+      year: datos.release_date 
+        ? new Date(datos.release_date).getFullYear() 
+        : 'N/A'
+    }
+  } catch (error) {
+    console.error("Error en datosPeliculas:", error)
+    return {
+      id: movieId,
+      title: "Película no disponible",
+      poster: 'https://via.placeholder.com/500x750?text=Error',
+      rating: "0.00",
+      views: 0,
+      likes: 0,
+      year: 'N/A'
+    }
+  }
+}
 
 const fetchMovies = async () => {
   try {
-    const res = await axios.get(`http://localhost:3300/api/pelicula${props.genero}`)
-    const newMovies = res.data.results.map(movie => ({
-      id: movie.id,
-      title: movie.title,
-      poster: movie.poster_path 
-        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-        : 'https://via.placeholder.com/500x750?text=No+Poster',
-      rating: (movie.vote_average / 2).toFixed(2), 
-      views: Math.floor(Math.random() * 5000), 
-      likes: Math.floor(movie.vote_count / 10), 
-      year: movie.release_date 
-        ? new Date(movie.release_date).getFullYear() 
-        : 'N/A',
-      adult: movie.adult 
-    }))
-    movies.value = newMovies
+    loading.value = true
+    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${props.idLista}`)
+    if (!resp.ok) throw new Error('Error al obtener la lista de películas')
+    
+    const datos = await resp.json()
+    
+    const peliculasPromesas = datos.map(movie => datosPeliculas(movie.idPelicula))
+    const nuevasPeliculas = await Promise.all(peliculasPromesas)
+    
+    movies.value = nuevasPeliculas.filter(pelicula => pelicula !== null)
     updateDisplayedMovies()
   } catch (err) {
     console.error("Error al obtener películas:", err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -44,10 +73,16 @@ const toggleShowAll = () => {
   updateDisplayedMovies()
 }
 
-fetchMovies()
+onMounted(() => {
+  if (props.idLista) {
+    fetchMovies()
+  }
+})
 
-watch(() => props.genero, () => {
-  fetchMovies()
+watch(() => props.idLista, (newId) => {
+  if (newId) {
+    fetchMovies()
+  }
 })
 
 watch(movies, () => {
@@ -58,25 +93,35 @@ watch(movies, () => {
 <template>
   <section class="popular-section">
     <div class="section-header">
-      <h2 class="section-title">{{props.titulo}}</h2>
-      <button class="see-all-btn" @click="toggleShowAll">
-        {{ showAll ? 'Ver Menos' : 'Cargar Más' }}
+      <h2 class="section-title"
+       @click="$router.push('/listDetail/' + props.idLista)"
+       >{{ props.titulo }}</h2>
+      <button class="see-all-btn" @click="toggleShowAll" v-if="movies.length > 6">
+        {{ showAll ? 'Ver Menos' : 'See All' }}
         <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
       </button>
     </div>
     
-    <div class="movies-grid">
+    <div v-if="loading" class="loading-container">
+      <p>Cargando películas...</p>
+    </div>
+    
+    <div v-else class="movies-grid">
       <moviecard 
         v-for="movie in displayedMovies"
         :key="movie.id"
         :movie="movie"
       />
+      
+      <div v-if="movies.length === 0" class="no-movies">
+        <p>No hay películas en esta lista</p>
+      </div>
     </div>
     
     <!-- Mobile Load More -->
-    <div class="mobile-load-more">
+    <div class="mobile-load-more" v-if="movies.length > 6">
       <button class="load-more-btn" @click="toggleShowAll">
         {{ showAll ? 'Ver Menos' : 'Cargar Más' }}
       </button>
@@ -139,6 +184,13 @@ watch(movies, () => {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+.loading-container, .no-movies {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #d1d5db;
 }
 
 .mobile-load-more {
