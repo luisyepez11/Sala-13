@@ -83,10 +83,10 @@ const navigateToHome = () => {
         </button>
       </div>
       <div class="nav-links">
-        <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
-        <a href="#" class="nav-link">Films</a>
-        <a href="/homeListas" class="nav-link">Lists</a>
-        <a href="#" class="nav-link">Communities</a>
+        <button @click="navigateToHome" class="nav-link nav-button-link">Inicio</button>
+        <a href="#" class="nav-link">Timeline</a>
+        <a href="/homeListas" class="nav-link">Listas</a>
+        <a href="#" class="nav-link">Comunidades</a>
       </div>
     </div>
     
@@ -132,8 +132,8 @@ const navigateToHome = () => {
 }
 
 .header-nav {
-  background: #2b3a6e;
-  border-bottom: 1px solid #334155;
+  background: #10246f;
+  border-bottom: 1px solid #10246f;
   position: relative;
 }
 
