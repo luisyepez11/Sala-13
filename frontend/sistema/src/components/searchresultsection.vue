@@ -28,6 +28,7 @@ const fetchMovies = async () => {
 		}))
 		// Ahora 'movies' se llena directamente con todos los resultados
 		movies.value = newMovies
+		console.log(movies.value)
 	} catch (err) {
 		console.error("Error al obtener películas:", err)
 	}

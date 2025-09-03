@@ -25,7 +25,8 @@ const fetchMovies = async () => {
       likes: Math.floor(movie.vote_count / 10), 
       year: movie.release_date 
         ? new Date(movie.release_date).getFullYear() 
-        : 'N/A'
+        : 'N/A',
+      adult: movie.adult 
     }))
     movies.value = newMovies
     updateDisplayedMovies()
@@ -43,7 +44,6 @@ const toggleShowAll = () => {
   updateDisplayedMovies()
 }
 
-
 fetchMovies()
 
 watch(() => props.genero, () => {
@@ -54,7 +54,6 @@ watch(movies, () => {
   updateDisplayedMovies()
 })
 </script>
-
 
 <template>
   <section class="popular-section">
