@@ -1,39 +1,59 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-// --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
-// Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
+
 const props = defineProps({
-  buscar: {
-    type: Function,
-    required: true,
-  },
+  buscar: {
+    type: Function,
+    required: true,
+  },
 });
 
-// Esta es la función de búsqueda original que utiliza getElementById.
+const logueado = ref(false); // Inicializar como false por defecto
+
+const cargar = async () => {
+  try {
+    const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
+    logueado.value = usuarioId.data.message !== "no registrado";
+    console.log("Estado de autenticación:", logueado.value);
+  } catch (error) {
+    console.error("Error al verificar autenticación:", error);
+    logueado.value = false;
+  }
+};
+
+onMounted(() => {
+  cargar();
+});
+
 const realizarBusqueda = async () => {
-  try {
-    const buscar = document.getElementById("busqueda")?.value;
-    await props.buscar(reemplazarEspacios(buscar));
-  } catch (error) {
-    console.error('Error en la búsqueda:', error);
-  }
+  try {
+    const buscar = document.getElementById("busqueda")?.value;
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
 };
 
 function reemplazarEspacios(texto) {
-  return texto.replace(/\s+/g, '+');
+  return texto.replace(/\s+/g, '+');
 }
 
-const deleteUser = async() =>{
+const deleteUser = async () => {
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
     router.push('/');
+
   } catch (error) {
     console.log(error);
   }
+};
+
+const navigateToLogin = () => {
+  router.push('/login');
 };
 
 const navigateToProfile = () => {
@@ -63,14 +83,13 @@ const navigateToHome = () => {
         </button>
       </div>
       <div class="nav-links">
-        <button @click="navigateToHome" class="nav-link nav-button-link">Inicio</button>
-        <a href="#" class="nav-link">Timeline</a>
-        <a href="#" class="nav-link">Listas</a>
-        <a href="#" class="nav-link">Comunidades</a>
+        <button @click="navigateToHome" class="nav-link nav-button-link">Home</button>
+        <a href="#" class="nav-link">Films</a>
+        <a href="/homeListas" class="nav-link">Lists</a>
+        <a href="#" class="nav-link">Communities</a>
       </div>
     </div>
     
-    <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
     <div class="search-container">
       <div class="search-wrapper">
         <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
@@ -85,11 +104,19 @@ const navigateToHome = () => {
     </div>
     
     <div>
-      <button class="edit-button" @click="deleteUser" style="margin-top: 0;">salir</button>
+      <!-- Corrección aquí: usar logueado directamente sin .value -->
+      <button v-if="logueado" class="edit-button" @click="deleteUser" style="margin-top: 0;">
+        <p>Salir</p>
+      </button>
+      <button v-else class="edit-button" @click="navigateToLogin" style="margin-top: 0;">
+        <p>Iniciar sesión</p>
+      </button>
     </div>
   </div>
 </div>
 </template>
+
+<!-- Tus estilos se mantienen igual -->
 
 <style scoped>
 .perfil-container,

@@ -8,7 +8,8 @@ import HomeBusqueda from "../pages/homeBusqueda.vue";
 import OtherProfile from "../pages/otherProfile.vue";
 import Community from "../pages/Community.vue";
 import ListDetail from "../pages/listDetail.vue";
-import Lading_page from "../pages/Lading_page.vue";
+import Lading_page from "../pages/lading_page.vue";
+import homeBusquedaListas from "../pages/homeBusquedaListas.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -76,6 +77,11 @@ const router = createRouter({
             name:"Home",
             component:Home
         },
+         {
+            path:"/homeListas",
+            name:"homeListas",
+            component:homeBusquedaListas
+        }
     ]
 })
 export default router;
