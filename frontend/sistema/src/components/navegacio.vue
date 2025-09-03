@@ -45,8 +45,8 @@ function reemplazarEspacios(texto) {
 const deleteUser = async () => {
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
-    logueado.value = false; // Actualizar estado local
-    router.push('/login');
+    router.push('/');
+
   } catch (error) {
     console.log(error);
   }
@@ -61,7 +61,7 @@ const navigateToProfile = () => {
 };
 
 const navigateToHome = () => {
-  router.push('/');
+  router.push('/home');
 };
 </script>
 
@@ -92,7 +92,9 @@ const navigateToHome = () => {
     
     <div class="search-container">
       <div class="search-wrapper">
-        <input type="text" class="search-input" placeholder="search" id="busqueda">
+        <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
+        <input type="text" class="search-input" placeholder="Buscar" id="busqueda">
+        <!-- El botón vuelve a usar el evento @click -->
         <button class="search-button" @click="realizarBusqueda">
           <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
