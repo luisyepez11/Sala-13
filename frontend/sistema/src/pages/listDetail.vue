@@ -8,7 +8,7 @@ import MovieCartList from '../components/MovieCardList.vue'
 
 const route = useRoute()
 axios.defaults.withCredentials = true
-
+const portadasPeliculas = ref([])
 
 const peliculas = ref([
   {
@@ -94,6 +94,7 @@ onMounted(async () => {
     const listaId = route.params.id
     const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaId}`)
     const datos = await resp.json()
+    console.log(datos)
     if (!Array.isArray(datos)) {
       error.value = 'No se encontraron películas para esta lista.'
       return
@@ -107,6 +108,7 @@ onMounted(async () => {
       rating: p.vote_average,
       poster: `https://image.tmdb.org/t/p/original${p.poster_path}`
     }))
+    console.log(peliculas.value)
   } catch (e) {
     error.value = 'Error al cargar las películas de la lista: ' + e.message
     console.error('Error:', e)
@@ -132,10 +134,12 @@ const lista = ref({
   favorito: false
 });
 
-const portadaLista = computed(() => {
-  const imgs = peliculas.value.map(p => p.poster).slice(0, 4)
-  return imgs
-})
+const portadaLista = ref([])
+const getposters = (mensaje)=>{
+          mensaje.map((elementos)=>{
+            portadaLista.value.push(elementos)
+          })
+        }
 </script>
 
 <template>
@@ -189,7 +193,7 @@ const portadaLista = computed(() => {
           </div>
         </div>
 
-        <MovieCartList  :idLista="route.params.id" />
+        <MovieCartList  :idLista="route.params.id"  @listaPoster="getposters"/>
       </div>
     </div>
   </div>

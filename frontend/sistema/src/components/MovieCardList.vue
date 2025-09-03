@@ -1,12 +1,22 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import CardList from './CardList.vue'
 
 const router = useRouter()
 const props = defineProps({ idPelicula: String ,idLista: String})
-
+const emit = defineEmits(['listaPoster'])
+const lista = ref([])
 const peliculas = ref([])
+const isLoading = ref(true)
+let bandera = ref(false)
+const getPoster = (mensaje)=>{
+      lista.value.push(mensaje)
+      if (lista.value.length==peliculas.value.length){
+          console.log("termine")
+          emit("listaPoster",lista.value)
+      }
+    }
 
 onMounted(async () => {
   try {
@@ -15,6 +25,7 @@ onMounted(async () => {
     peliculas.value = datos
   } catch (e) {
     console.error('Error al cargar las películas de la lista:', e)
+    isLoading.value = false
   }
 })
 
@@ -31,7 +42,7 @@ const goToDetail = (id) => {
       :idPelicula="value.idPelicula || value.id"
       :movie="value"
       :idLista="props.idLista"
-    />
+    @portada="getPoster"/>
   </div>
 </template>
 
