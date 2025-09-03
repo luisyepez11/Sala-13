@@ -4,6 +4,9 @@ import popularfilmsection from "../components/popularfilmsection.vue"
 import carousel from "../components/carousel.vue";
 import {ref, onMounted, onUnmounted, watch} from "vue";
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const activeTab = ref('Reseñas Destacadas');
 const slide = ref(0); 
@@ -146,6 +149,12 @@ onMounted(() => {
 onUnmounted(() => {
     if (intervalId) clearInterval(intervalId);
 });
+const navigateToLogin = () => {
+  router.push('/login');
+};
+const navigateToRegister = () => {
+  router.push('/register');
+};
 </script>
 <template>
     <Nav />
@@ -159,9 +168,9 @@ onUnmounted(() => {
             Si estás listo para compartir tus opiniones, tus listas y tus gustos con todos tus amigos y el resto del mundo:
             </p>
             <div class="hero-buttons">
-                <button class="btn">Regístrate</button>
+                <button @click="navigateToRegister" class="btn">Regístrate</button>
                 <span>ó</span>
-                <button class="btn">Inicia sesión</button>
+                <button @click="navigateToLogin" class="btn">Inicia sesión</button>
             </div>
         </div>
     </section>

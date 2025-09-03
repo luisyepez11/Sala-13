@@ -18,7 +18,7 @@
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
       if (usarioId.data.message == "no registrado"){
-        router.push('/login');
+        router.push('/');
       }
       const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
       listaSolicitudes.value=datosSolicitudes.data

@@ -15,8 +15,8 @@ const router = createRouter({
     routes:[
         {
             path:"/",
-            name:"home",
-            component:Home
+            name:"LandingPage",
+            component:Lading_page
         },
         {
             path:"/profile",
@@ -73,9 +73,9 @@ const router = createRouter({
             component:ListDetail
         },
          {
-            path:"/landingPage",
-            name:"landing_page",
-            component:Lading_page
+            path:"/home",
+            name:"Home",
+            component:Home
         },
          {
             path:"/homeListas",
