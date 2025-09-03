@@ -1,90 +1,59 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const route  = useRoute();
 
 const props = defineProps({
-  buscar: { type: Function, required: true },
+  buscar: {
+    type: Function,
+    required: true,
+  },
 });
 
-axios.defaults.withCredentials = true;
+const logueado = ref(false); // Inicializar como false por defecto
 
-const isAuthenticated = ref(false);
-
-async function refreshAuth() {
+const cargar = async () => {
   try {
-    const { data } = await axios.get('http://localhost:3300/api/usuario/user', {
-      withCredentials: true,
-    });
-    // si hay id => hay sesión
-    isAuthenticated.value = !!(data && data.id);
-  } catch {
-    isAuthenticated.value = false;
+    const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
+    logueado.value = usuarioId.data.message !== "no registrado";
+    console.log("Estado de autenticación:", logueado.value);
+  } catch (error) {
+    console.error("Error al verificar autenticación:", error);
+    logueado.value = false;
   }
-}
+};
 
 onMounted(() => {
-  refreshAuth();
+  cargar();
 });
 
-
-watch(() => route.fullPath, () => {
-  refreshAuth();
-});
-
-const authLabel = computed(() => (isAuthenticated.value ? 'salir' : 'Iniciar sesión'));
-
-async function handleAuth () {
-  if (isAuthenticated.value) {
-    try {
-      await axios.get('http://localhost:3300/api/usuario/delete', {
-        withCredentials: true,
-      });
-    } catch (_) {
-      // ignoramos errores del endpoint en dev
-    } finally {
-      isAuthenticated.value = false;
-      router.push('/login');
-    }
-  } else {
-    router.push('/login');
-  }
-}
-
-// --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
-// Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
-const props = defineProps({
-  buscar: {
-    type: Function,
-    required: true,
-  },
-});
-
-// Esta es la función de búsqueda original que utiliza getElementById.
 const realizarBusqueda = async () => {
-  try {
-    const buscar = document.getElementById("busqueda")?.value;
-    await props.buscar(reemplazarEspacios(buscar));
-  } catch (error) {
-    console.error('Error en la búsqueda:', error);
-  }
+  try {
+    const buscar = document.getElementById("busqueda")?.value;
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
 };
+
 function reemplazarEspacios(texto) {
-  return texto.replace(/\s+/g, '+');
+  return texto.replace(/\s+/g, '+');
 }
 
-const navigateToProfile = () => { router.push('/profile'); }
-const navigateToHome    = () => { router.push('/'); }
-const deleteUser = async() =>{
+const deleteUser = async () => {
   try {
     await axios.get("http://localhost:3300/api/usuario/delete");
+    logueado.value = false; // Actualizar estado local
     router.push('/login');
   } catch (error) {
     console.log(error);
   }
+};
+
+const navigateToLogin = () => {
+  router.push('/login');
 };
 
 const navigateToProfile = () => {
@@ -131,51 +100,56 @@ const navigateToHome = () => {
         </button>
       </div>
     </div>
-
+    
     <div>
-      <!-- Botón dinámico -->
-      <button class="edit-button" @click="handleAuth" style="margin-top: 0;">
-        {{ authLabel }}
+      <!-- Corrección aquí: usar logueado directamente sin .value -->
+      <button v-if="logueado" class="edit-button" @click="deleteUser" style="margin-top: 0;">
+        <p>Salir</p>
       </button>
-      </div>
-    </div>
-    
-    <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
-    <div class="search-container">
-      <div class="search-wrapper">
-        <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
-        <input type="text" class="search-input" placeholder="search" id="busqueda">
-        <!-- El botón vuelve a usar el evento @click -->
-        <button class="search-button" @click="realizarBusqueda">
-          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-    
-    <div>
-      <button class="edit-button" @click="deleteUser" style="margin-top: 0;">salir</button>
+      <button v-else class="edit-button" @click="navigateToLogin" style="margin-top: 0;">
+        <p>Iniciar sesión</p>
+      </button>
     </div>
   </div>
 </div>
 </template>
 
+<!-- Tus estilos se mantienen igual -->
+
 <style scoped>
 .perfil-container,
-.perfil-container * { box-sizing: border-box; }
+.perfil-container * {
+  box-sizing: border-box;
+}
+
 .perfil-container {
-  background: #091f32; min-height: 100vh; color: #ffffff;
+  background: #091f32;
+  min-height: 100vh;
+  color: #ffffff;
   font-family: "Poppins-Regular", sans-serif;
 }
-.header-nav { background: #2b3a6e; border-bottom: 1px solid #334155; position: relative; }
-.nav-content {
-  max-width: 1200px; margin: 0 auto; padding: 20px 24px;
-  display: flex; align-items: center; justify-content: space-between; height: max-content;
-}
-.nav-left { display: flex; align-items: center; gap: 32px; }
-.logo-container { display: flex; align-items: center; }
 
+.header-nav {
+  background: #2b3a6e;
+  border-bottom: 1px solid #334155;
+  position: relative;
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: max-content;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
 
 /* Styles for the new logo */
 .app-logo-container {
@@ -200,28 +174,101 @@ const navigateToHome = () => {
   display: flex;
   align-items: center;
 }
+
 .logo-circle {
-  width: 32px; height: 32px; background: #d1d5db; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.3s ease;
+  width: 32px;
+  height: 32px;
+  background: #d1d5db;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.logo-circle:hover { background: #f3f4f6; transform: scale(1.05); }
-.logo-icon { width: 20px; height: 20px; color: #6b7280; }
-.nav-links { display: flex; gap: 24px; }
+
+.logo-circle:hover {
+  background: #f3f4f6;
+  transform: scale(1.05);
+}
+
+.logo-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
 .nav-link {
-  color: #d1d5db; text-decoration: none; font-size: 1.2rem; font-weight: 600; transition: color 0.2s;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: color 0.2s;
 }
-.nav-link:hover { color: #ffffff; }
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+/* Estilos específicos para el botón Home */
 .nav-button-link {
-  background: none; border: none; cursor: pointer; font-family: inherit; font-size: 1.2rem; font-weight: 600; padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0;
 }
-.nav-button-link:hover { color: #ffffff; }
-.search-container { flex: 1; max-width: 400px; margin: 0 24px; }
-.search-wrapper { position: relative; }
+
+.nav-button-link:hover {
+  color: #ffffff;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 24px;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
 .search-input {
-  width: 100%; background: #4a5c75; border: 1px solid #475569; border-radius: 6px;
-  padding: 8px 40px 8px 16px; font-size: 14px; color: #ffffff; outline: none;
+  width: 100%;
+  background: #4a5c75;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  padding: 8px 40px 8px 16px;
+  font-size: 14px;
+  color: #ffffff;
+  outline: none;
 }
-.search-input::placeholder { color: #9ca3af; }
-.search-button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
-.search-icon { width: 16px; height: 16px; color: #9ca3af; }
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+}
 </style>

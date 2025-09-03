@@ -1,166 +1,157 @@
 <script setup>
-    import Nav from '../components/navegacio.vue'
-    import popularfilmsection from "../components/popularfilmsection.vue"
-    import carousel from "../components/carousel.vue";
-    import {ref,onMounted,onUnmounted} from "vue";
+import Nav from '../components/navegacio.vue'
+import popularfilmsection from "../components/popularfilmsection.vue"
+import carousel from "../components/carousel.vue";
+import {ref, onMounted, onUnmounted, watch} from "vue";
+import axios from 'axios';
 
+const activeTab = ref('Reseñas Destacadas');
+const slide = ref(0); 
+const reviews = ref([]);
+const isLoading = ref(true);
 
-    const activeTab = ref('Reseñas Destacadas');
-    const slide = ref(1)
-    let intervalId = null
-    const animatedNumber = ref(0);
-    const animatedNumber2 = ref(0);
-    const animatedNumber3 = ref(0);
-    const animatedNumber4 = ref(0);
-    const targetNumber = 10000; // El número final que quieres alcanzar
-    const targetNumber2 = 5000; // El número final que quieres alcanzar
-    const targetNumber3 = 3200;
-    const targetNumber4 = 800;
-    const duration = 6000; // Duración total de la animación en milisegundos (2 segundos)
-    const frameRate = 60; // Cuadros por segundo
-    const communities = ref([
-  // Community 1
-  {
-    id: 1,
-    name: 'Sci-Fi Fans',
-    description: 'Discussions about classic science fiction and the latest genre news, from Star Wars to Blade Runner.',
-    image: 'https://picsum.photos/id/237/200/200',
-  },
-  // Community 2
-  {
-    id: 2,
-    name: '80s Cinema',
-    description: 'A trip back in time to remember the great hits of the decade, like The Goonies, Back to the Future, and Top Gun.',
-    image: 'https://picsum.photos/id/163/200/200',
-  },
-  // Community 3
-  {
-    id: 3,
-    name: 'Horror Film Critics',
-    description: 'For lovers of all things horror. Reviews, analysis, and debates about movies that will make you jump out of your seat.',
-    image: 'https://picsum.photos/id/357/200/200',
-  },
-  // Community 4
-  {
-    id: 4,
-    name: 'Independent Film',
-    description: 'A debate community for those who enjoy auteur cinema and films that don\'t make it to the major circuits.',
-    image: 'https://picsum.photos/id/838/200/200',
-  }
-]);
-    const reviews = ref([
+const loadComments = async () => {
+    try {
+        const response = await axios.get('http://localhost:3300/api/comentario/comentarios');
+        
+        reviews.value = response.data.map((comment, index) => ({
+            id: comment.idcomentario || index, 
+            name: "Usuario " + (comment.nombreCuenta || "Anónimo"),
+            peli: comment.nombrePelicula || "Película desconocida",
+            comment: comment.comentario || "Sin comentario",
+            punt: "⭐⭐⭐⭐⭐",
+            img: `https://picsum.photos/id/${1005 + index}/200/200`,
+            small: false,
+        }));
+        
+        console.log("Comentarios cargados:", reviews.value);
+    } catch(error) {
+        console.error("Error cargando comentarios:", error);
+
+        reviews.value = [
+            {
+                id: 1,
+                name: "Usuario Ejemplo 1",
+                peli: "El Padrino",
+                comment: "Una obra maestra del cine. Marlon Brando está increíble.",
+                punt: "⭐⭐⭐⭐⭐",
+                img: "https://picsum.photos/id/1005/200/200",
+            },
+            {
+                id: 2,
+                name: "Usuario Ejemplo 2",
+                peli: "Pulp Fiction",
+                comment: "Tarantino en su máximo esplendor. Diálogos brillantes.",
+                punt: "⭐⭐⭐⭐",
+                img: "https://picsum.photos/id/1006/200/200",
+            }
+        ];
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+let intervalId = null;
+const animatedNumber = ref(0);
+const animatedNumber2 = ref(0);
+const animatedNumber3 = ref(0);
+const animatedNumber4 = ref(0);
+const targetNumber = 10000;
+const targetNumber2 = 5000;
+const targetNumber3 = 3200;
+const targetNumber4 = 800;
+const duration = 6000;
+const frameRate = 60;
+
+const communities = ref([
     {
         id: 1,
-        name: "Juan Pérez",
-        peli: "Duna",
-        comment: "Visualmente asombrosa y emocionalmente densa, Duna es una película que te dejará sin aliento. Una verdadera obra maestra del cine.",
-        punt: "⭐⭐⭐⭐☆",
-        img: "https://picsum.photos/id/1005/200/200",
-        small: false,
-        active: true
+        name: 'Sci-Fi Fans',
+        description: 'Discussions about classic science fiction and the latest genre news, from Star Wars to Blade Runner.',
+        image: 'https://picsum.photos/id/237/200/200',
     },
     {
         id: 2,
-        name: "María García",
-        peli: "El Padrino",
-        comment: "Una película clásica que sigue la historia de una familia mafiosa. El Padrino es una película que te dejará sin aliento. Una verdadera obra maestra del cine.",
-        punt: "⭐⭐⭐⭐☆",
-        img: "https://picsum.photos/id/1011/200/200",
-        small: false,
-        active: false
-    },
-    {
-        id: 3,
-        name: "Carlos López",
-        peli: "El Señor de los Anillos",
-        comment: "Una película épica que sigue la historia de un hobbit que intenta destruir el Anillo Único. El Señor de los Anillos es una película que te dejará sin aliento. Una verdadera obra maestra del cine.",
-        punt: "⭐⭐⭐⭐☆",
-        img: "https://picsum.photos/id/1025/200/200",
-        small: false,
-        active: false
-    },
-    {
-        id: 4,
-        name: "Ana Martínez",
-        peli: "El Señor de los Anillos: La Comunidad del Anillo",
-        comment: "Una película épica que sigue la historia de un hobbit que intenta destruir el Anillo Único. El Señor de los Anillos es una película que te dejará sin aliento. Una verdadera obra maestra del cine.",
-        punt: "⭐⭐⭐⭐☆",
-        img: "https://picsum.photos/id/1027/200/200",
-        small: false,
-        active: false
+        name: '80s Cinema',
+        description: 'A trip back in time to remember the great hits of the decade, like The Goonies, Back to the Future, and Top Gun.',
+        image: 'https://picsum.photos/id/163/200/200',
     }
 ]);
-   const startCounting = () => {
-  const steps = duration / (1000 / frameRate); // Calcular el número de pasos
-  const increment = parseInt(targetNumber / steps); // Calcular el incremento por cada paso
-  const increment2 = parseInt(targetNumber2 / steps); // Calcular el incremento por cada paso
-  const increment3 = parseInt(targetNumber3 / steps); // Calcular el incremento por cada paso
-  const increment4 = parseInt(targetNumber4 / steps); // Calcular el incremento por cada paso
 
+const startCounting = () => {
+    const steps = duration / (1000 / frameRate);
+    const increment = parseInt(targetNumber / steps);
+    const increment2 = parseInt(targetNumber2 / steps);
+    const increment3 = parseInt(targetNumber3 / steps);
+    const increment4 = parseInt(targetNumber4 / steps);
 
-  let currentStep = 0;
+    let currentStep = 0;
 
-  const interval = setInterval(() => {
-    animatedNumber.value += increment;
-    animatedNumber2.value += increment2;
-    animatedNumber3.value += increment3;
-    animatedNumber4.value += increment4;
+    const interval = setInterval(() => {
+        animatedNumber.value += increment;
+        animatedNumber2.value += increment2;
+        animatedNumber3.value += increment3;
+        animatedNumber4.value += increment4;
 
-
-    currentStep++;
+        currentStep++;
+        
+        if (currentStep >= steps) {
+            animatedNumber.value = targetNumber;
+            animatedNumber2.value = targetNumber2;
+            animatedNumber3.value = targetNumber3;
+            animatedNumber4.value = targetNumber4;
+            clearInterval(interval);
+        }
+    }, 1000 / frameRate);
     
-    // Detener la animación cuando alcance el número final o el último paso
-    if (currentStep >= steps) {
-      animatedNumber.value = targetNumber; // Asegurar que el número final sea exacto
-      animatedNumber2.value = targetNumber2;
-      animatedNumber3.value = targetNumber3;
-      animatedNumber4.value = targetNumber4;
-
-      clearInterval(interval);
-    }
-  }, 1000 / frameRate);
-  
-}
-  
-  // Limpia el temporizador si el componente es desmontado
-  
-    const nextSlide = () => {
-      slide.value = slide.value + 1
-      if(slide.value > reviews.value.length){
-        slide.value = 1
-      }
-    }
-    
-    const startAutoplay = () => {
-      intervalId = setInterval(nextSlide, 5000)
-    }
-
-    const tabs = ref([
-        'Reseñas Destacadas',
-        'Peliculas Populares',
-        'Comunidades Activas'
-    ]);
-
-    const setActive = (tab)=>{
-      activeTab.value = tab
-    }
-    
-
-    onMounted(() => {
-      startCounting()
-      startAutoplay()
-    }) 
     onUnmounted(() => {
-      clearInterval(intervalId);
-      
+        clearInterval(interval);
     });
-</script>
+}
 
+const nextSlide = () => {
+    if (reviews.value.length > 0) {
+        slide.value = (slide.value + 1) % reviews.value.length;
+    }
+}
+
+const startAutoplay = () => {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(nextSlide, 5000);
+}
+
+const tabs = ref([
+    'Reseñas Destacadas',
+    'Peliculas Populares',
+    'Comunidades Activas'
+]);
+
+const setActive = (tab) => {
+    activeTab.value = tab;
+}
+
+// Reiniciar el carrusel cuando cambien los comentarios
+watch(reviews, (newReviews) => {
+    if (newReviews.length > 0) {
+        slide.value = 0;
+        startAutoplay();
+    }
+});
+
+onMounted(() => {
+    startCounting();
+    loadComments();
+});
+
+onUnmounted(() => {
+    if (intervalId) clearInterval(intervalId);
+});
+</script>
 <template>
     <Nav />
     <section class="hero-section">
         <div class="hero-left">
-            <img src="../assets/vue.svg" alt="Sala 13 Logo" class="hero-logo" />
+            <img src="/src/assets/logo.png" alt="Sala 13 Logo" class="hero-logo" />
             <h1 class="hero-title">"la nueva red social para cinéfilos"</h1>
         </div>
         <div class="hero-right">
@@ -226,14 +217,14 @@ fill="currentColor" viewBox="0 0 24 24" >
 
         <div class="testimonials">
             <div class="testimonial-card">
-            <img src="../assets/vue.svg" alt="Usuario 1" />
+            <img src="/src/assets/perfilGen.png" alt="Usuario 1" />
             <p>"Sala 13 me hizo volver a amar el cine."</p>
-            <cite>— Carla R.</cite>
+            <cite>— ElPadrino_</cite>
             </div>
             <div class="testimonial-card">
-            <img src="../assets/vue.svg" alt="Usuario 2" />
+            <img src="/src/assets/perfilGen.png" alt="Usuario 2" />
             <p>"Me encantan las comunidades, he conocido gente increíble."</p>
-            <cite>— Marcos G.</cite>
+            <cite>— PotterheadFav13</cite>
             </div>
         </div>
     </section>
@@ -255,21 +246,34 @@ fill="currentColor" viewBox="0 0 24 24" >
         <div class="tab-content">
             <!-- Puedes usar componentes dinámicos aquí -->
             
-            <div v-if="activeTab === 'Reseñas Destacadas'" class="container-card">
-              <div v-for="review in reviews"
-                :class="{'active-card': review.id === slide}"
+             <div v-if="activeTab === 'Reseñas Destacadas'" class="tab-content">
+        <div v-if="isLoading" class="loading">Cargando reseñas...</div>
+        
+        <div v-else-if="reviews.length === 0" class="loading">No hay reseñas disponibles</div>
+        
+        <div v-else class="container-card">
+            <div v-for="(review, index) in reviews"
+                :key="review.id"
+                :class="{'active-card': index === slide}"
                 class="review-card"
-              >
+            >
                 <img :src="review.img" alt="Perfil" />
-                  <div>
-                      <strong>{{review.name}}</strong> vio <em>{{review.peli}}</em>
-                      <p>“{{review.comment}}”</p>
-                      <span>{{review.punt}}</span>
-                      <button>Leer más</button>
-                  </div>
-              </div>  
-                
+                <div>
+                    <strong>{{ review.name }}</strong> vio <em>{{ review.peli }}</em>
+                    <p>“{{ review.comment }}”</p>
+                    <span>{{ review.punt }}</span>
+                    <button class="btn">Leer más</button>
+                </div>
             </div>
+            
+            <!-- Controles del carrusel -->
+            <div class="carousel-controls">
+                <button @click="slide = (slide - 1 + reviews.length) % reviews.length" class="btn">←</button>
+                <span>{{ slide + 1 }} / {{ reviews.length }}</span>
+                <button @click="nextSlide()" class="btn">→</button>
+            </div>
+        </div>
+    </div>
             <!-- Agrega más cards similares o carousel -->
             <div v-if="activeTab === 'Peliculas Populares'" style="width: 60%;">
 
@@ -524,51 +528,69 @@ fill="currentColor" viewBox="0 0 24 24" >
   gap: 2rem;
   align-items: center;
 }
-.container-card{
-  position: relative;
-  gap: 1rem;
-  max-width: 600px;
-  height: 250px;
-  width: 100%;
-  transition: opacity 0.5s ease-in-out;
+.container-card {
+	display: grid;
+	place-items: center;
+	gap: 1rem;
+	width: 450px;
+	max-width: 100%;
+	transition: opacity 0.5s ease-in-out;
 }
+
+.container-card {
+	display: grid;
+	place-items: center;
+	gap: 1rem;
+	width: 450px;
+	max-width: 100%;
+	transition: opacity 0.5s ease-in-out;
+	
+}
+
 .review-card {
-  
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #1e293b;
-  border-radius: 1rem;
-  padding: 1rem;
-  opacity: 0;
-  transform: translateX(100%);
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+	grid-area: 1 / 1;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: #1e293b;
+	border-radius: 1rem;
+	padding: 1.5rem; 
+	opacity: 0;
+	transform: translateX(100%);
+	transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	align-items: center; 
+	text-align: center;
+	gap: 0.5rem; 
+	
 }
+
 .active-card {
-  opacity: 1;
-  transform: translateX(0);
+	opacity: 1;
+	transform: translateX(0);
 }
 
 
 .review-card:hover {
-  transform: translateY(-5px);
+	transform: translateY(-5px);
 }
 
 .review-card img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-bottom: 0.5rem;
 }
 
 .review-card strong {
-  display: block;
-  font-weight: bold;
+	display: block;
+	font-weight: bold;
 }
 
 .review-card em {
-  font-style: italic;
-  color: #93c5fd;
+	font-style: italic;
+	color: #93c5fd;
 }
 
 

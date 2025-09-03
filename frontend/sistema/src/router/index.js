@@ -8,7 +8,7 @@ import HomeBusqueda from "../pages/homeBusqueda.vue";
 import OtherProfile from "../pages/otherProfile.vue";
 import Community from "../pages/Community.vue";
 import ListDetail from "../pages/listDetail.vue";
-import Lading_page from "../pages/lading_page.vue";
+import Lading_page from "../pages/Lading_page.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -72,8 +72,8 @@ const router = createRouter({
             component:ListDetail
         },
          {
-            path:"/lading_page",
-            name:"lading_page",
+            path:"/landingPage",
+            name:"landing_page",
             component:Lading_page
         },
     ]
