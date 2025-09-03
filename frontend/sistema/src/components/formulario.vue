@@ -48,50 +48,50 @@ async function saludar() {
 <template>
   <div class="form">
     <div class="form-header">
-      <div class="login-to-your-account">{{ opcion==="login" ? "Login to your account" : "Create Account"}}</div>
+      <div class="login-to-your-account">{{ opcion==="login" ? "Iniciar Sesión" : "Crear Cuenta"}}</div>
     </div>
     <div class="form-fields">
       <div class="user-email-section">
         <div class="field-label">
-          <label  class="user">User</label>
+          <label  class="user">Nombre de Usuario</label>
         </div>
         <div  class="field-input">
-          <input type="text" class="input-text" id="user" placeholder="user.....">
+          <input type="text" class="input-text" id="user" placeholder="Nombre de Usuario">
         </div>
         
         <div v-if="opcion !=='login'" class="field-label">
           <label  class="email">Email</label>
         </div>
         <div v-if="opcion !=='login'" class="field-input">
-          <input  type="email" class="input-text" placeholder="balamia@gmail.com">
+          <input  type="email" class="input-text" placeholder="ejemplo@gmail.com">
         </div>
         
       </div>
       <div class="password-section">
         <div class="password-label-row">
-          <label class="password">Password</label>
-          <a v-if="opcion==='login'" class="forgot" href="#">Forgot？</a>
+          <label class="password">Contraseña</label>
+          <a v-if="opcion==='login'" class="forgot" href="#">Olvidaste tu contraseña?</a>
         </div>
         <div class="input">
-          <input type="password" class="input-text2" id="password" placeholder="Enter your password">
+          <input type="password" class="input-text2" id="password" placeholder="Contraseña">
         </div>
         
         <div v-if="opcion!=='login'" class="password-label-row">
-          <label class="password">Confirm your password</label>
+          <label class="password">Confirmar Contraseña</label>
         </div>
         <div v-if="opcion!=='login'" class="input">
-          <input type="password" class="input-text2"  placeholder="Confirm your password">
+          <input type="password" class="input-text2"  placeholder="Confirmar contraseña">
         </div>
 
       </div>
     </div>
     <div class="form-actions">
       <button class="button" @click="saludar">
-        <div class="login-now">{{ opcion==="login" ? "Login now" : "Sign Up"}}</div>
+        <div class="login-now">{{ opcion==="login" ? "Iniciar Sesión" : "Registrar"}}</div>
       </button>
       <div class="account-links">
-        <div class="don-t-have-an-account">{{ opcion==="login" ? "Don't have an account ?" : "Already have an account ?"}}</div>
-        <a class="sign-up" :href="opcion === 'login' ? '/register' : '/login'">{{ opcion === "login" ? "Sign up" : "Sign in" }}</a>
+        <div class="don-t-have-an-account">{{ opcion==="login" ? "¿No tienes una cuenta?" : "¿Ya tienes una cuenta?"}}</div>
+        <a class="sign-up" :href="opcion === 'login' ? '/register' : '/login'">{{ opcion === "login" ? "Regístrate" : "Inicia Sesión" }}</a>
       </div>
     </div>
   </div>
