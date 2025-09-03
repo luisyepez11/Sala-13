@@ -54,26 +54,57 @@ async function handleAuth () {
   }
 }
 
+// --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA ---
+// Volvemos a usar defineProps para recibir la función 'buscar' del componente padre.
+const props = defineProps({
+  buscar: {
+    type: Function,
+    required: true,
+  },
+});
+
+// Esta es la función de búsqueda original que utiliza getElementById.
 const realizarBusqueda = async () => {
-  try {
-    const buscar = document.getElementById("busqueda")?.value
-    await props.buscar(reemplazarEspacios(buscar));
-  } catch (error) {
-    console.error('Error en la búsqueda:', error);
-  }
+  try {
+    const buscar = document.getElementById("busqueda")?.value;
+    await props.buscar(reemplazarEspacios(buscar));
+  } catch (error) {
+    console.error('Error en la búsqueda:', error);
+  }
 };
 function reemplazarEspacios(texto) {
-  return texto.replace(/\s+/g, '+');
+  return texto.replace(/\s+/g, '+');
 }
 
 const navigateToProfile = () => { router.push('/profile'); }
 const navigateToHome    = () => { router.push('/'); }
+const deleteUser = async() =>{
+  try {
+    await axios.get("http://localhost:3300/api/usuario/delete");
+    router.push('/login');
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const navigateToProfile = () => {
+  router.push('/profile');
+};
+
+const navigateToHome = () => {
+  router.push('/');
+};
 </script>
 
 <template>
 <div class="header-nav">
   <div class="nav-content">
     <div class="nav-left">
+      <div class="app-logo-container">
+        <button @click="navigateToHome" class="app-logo-button">
+          <img src="/src/assets/logo.png" alt="SALA 13 Logo" class="app-logo">
+        </button>
+      </div>
       <div class="logo-container">
         <button class="logo-circle" @click="navigateToProfile">
           <svg class="logo-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -106,12 +137,31 @@ const navigateToHome    = () => { router.push('/'); }
       <button class="edit-button" @click="handleAuth" style="margin-top: 0;">
         {{ authLabel }}
       </button>
+      </div>
+    </div>
+    
+    <!-- --- LÓGICA DE BÚSQUEDA ORIGINAL RESTAURADA --- -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <!-- Se vuelve a usar un 'id' para que getElementById funcione -->
+        <input type="text" class="search-input" placeholder="search" id="busqueda">
+        <!-- El botón vuelve a usar el evento @click -->
+        <button class="search-button" @click="realizarBusqueda">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <div>
+      <button class="edit-button" @click="deleteUser" style="margin-top: 0;">salir</button>
     </div>
   </div>
 </div>
 </template>
 
-<style>
+<style scoped>
 .perfil-container,
 .perfil-container * { box-sizing: border-box; }
 .perfil-container {
@@ -125,6 +175,31 @@ const navigateToHome    = () => { router.push('/'); }
 }
 .nav-left { display: flex; align-items: center; gap: 32px; }
 .logo-container { display: flex; align-items: center; }
+
+
+/* Styles for the new logo */
+.app-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.app-logo {
+  height: 55px; 
+  width: auto;
+  display: block;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
 .logo-circle {
   width: 32px; height: 32px; background: #d1d5db; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.3s ease;

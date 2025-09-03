@@ -1,6 +1,7 @@
 <script setup>
 import Nav from '../components/navegacio.vue'
-import popularfilmsection from '../components/popularfilmsection.vue'
+// --- CAMBIO AQUÍ: Se importa el nuevo componente ---
+import searchresultsection from '../components/searchresultsection.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
 
@@ -8,45 +9,69 @@ const router = useRouter()
 const route = useRoute()
 
 const movieId = ref(null)
-const componentKey = ref(0) 
+const componentKey = ref(0)
+// Referencia para guardar la opción seleccionada en el filtro
+const selectedFilter = ref('peliculas') // 'peliculas' es el valor por defecto
 
 onMounted(() => {
-  movieId.value = route.params.id
+  movieId.value = route.params.id
 })
 
 watch(() => route.params.id, (newId) => {
-  movieId.value = newId
-  componentKey.value++ 
+  movieId.value = newId
+  componentKey.value++ 
+})
+
+// Observador que se activa cuando cambia el filtro
+watch(selectedFilter, (newFilter) => {
+  // Aquí puedes añadir la lógica para cambiar lo que se muestra
+  // en la página según el filtro seleccionado.
+  // Por ejemplo:
+  console.log(`El filtro ha cambiado a: ${newFilter}`);
+  // podrías llamar a una función que recargue los datos con el nuevo filtro.
 })
 
 const buscar = (nombre) => {
-  if (nombre==""){
-        router.push("/")
-    }else{
-      router.push("/search/"+nombre)
-    }
+  if (nombre==""){
+        router.push("/")
+    }else{
+      router.push("/search/"+nombre)
+    }
 }
 </script>
 
 <template>
-  <div class="home-page-container">
-    <Nav :buscar="buscar" />
-    
-    <main class="main-content">
+  <div class="home-page-container">
+    <Nav :buscar="buscar" />
+    
+    <main class="main-content">
+      <!-- Filtro añadido aquí -->
+      <div class="filter-container">
+        <label for="filter-select" class="filter-label">Filtrar por:</label>
+        <div class="select-wrapper">
+          <select id="filter-select" v-model="selectedFilter" class="filter-select">
+            <option value="peliculas">Películas</option>
+            <option value="listas">Listas</option>
+            <option value="usuarios">Usuarios</option>
+            <option value="comunidades">Comunidades</option>
+          </select>
+        </div>
+      </div>
 
-      <popularfilmsection 
-        v-if="movieId"
-        :key="componentKey"
-        titulo="Populares" 
-        :genero="'/busqueda/' + movieId"
+      <!-- --- CAMBIO AQUÍ: Se utiliza el nuevo componente --- -->
+      <searchresultsection 
+      v-if="movieId"
+      :key="componentKey"
+      titulo="Resultados" 
+      :genero="'/busqueda/' + movieId"
       />
 
-      <div v-else class="loading-message">
-        Cargando...
-      </div>
-    </main>
+      <div v-else class="loading-message">
+        Cargando...
+      </div>
+    </main>
 
-  </div>
+  </div>
 </template>
 
 <style scoped>
@@ -61,6 +86,45 @@ const buscar = (nombre) => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+}
+
+/* Estilos para el nuevo filtro */
+.filter-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.filter-label {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-select {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px; /* Para forma de píldora */
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.filter-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
 .hero-section {
