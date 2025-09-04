@@ -9,6 +9,28 @@ export const getListas = async (req, res) => {
         res.status(500).json({ message: "Error al obtener las listas" });
     }
 };
+function decodificarParametroURL(cadena) {
+    let resultado = cadena.replace(/\+/g, ' ');
+    return decodeURIComponent(resultado);
+}
+export const getListasBusqueda = async (req, res) => {
+    try {
+        const listaId = req.params.id;
+        if (!listaId) {
+            return res.status(400).json({ message: "El parámetro listaId es requerido" });
+        }
+
+        const [listas] = await pool.query(`
+            SELECT * FROM listas 
+            WHERE nombreLista LIKE ?;
+        `, ['%' +decodificarParametroURL(listaId)+ '%']);
+        
+        res.status(200).json(listas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al obtener las listas" });
+    }
+};
 
 export const getListasUsuarios = async (req, res) => {
     try {
