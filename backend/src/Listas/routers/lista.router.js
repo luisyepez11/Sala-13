@@ -6,6 +6,7 @@ import {
   agregarPeliculaALista,
   eliminarPeliculaDeLista,
     getListasUsuarios,
+    getListasBusqueda
 } from "../controllers/lista.controllers.js";
 
 const router = Router();
@@ -26,6 +27,8 @@ router.post("/agregarPelicula", agregarPeliculaALista);
 router.delete("/eliminarPelicula", eliminarPeliculaDeLista);
 
 router.get("/getListasUsuarios/:id", getListasUsuarios);
+
+router.get("/getListasBusqueda/:id",getListasBusqueda)
 
 
 export default router;
