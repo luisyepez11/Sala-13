@@ -5,6 +5,7 @@
 	import UserReviewCard from "../components/UserReviewCard.vue";
 	import FavoriteMovies from "../components/FavoriteMovies.vue";
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
+	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
 
@@ -16,6 +17,22 @@
 	const usuarioId = ref("")
 	const nombreLista = ref("")
 	const descripcion = ref("")
+	const comunidades = ref([
+  {
+    id: 1,
+    titulo: 'Cinéfilos Latinos',
+    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
+    imagen: 'https://example.com/latinos.jpg',
+    usuarios: 1245
+  },
+  {
+    id: 2,
+    titulo: 'Sci-Fi Lovers',
+    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
+    imagen: 'https://example.com/scifi.jpg',
+    usuarios: 893
+  }
+])
 
 	const mockReviews = ref([
 		{
@@ -126,10 +143,24 @@
 		requests: 0
 	})
 	function editarPerfil() {
-		editar.value = true
-	}
+    editar.value = true
+        document.getElementById('nombre').value = usuario.value.nombre
+        document.getElementById('apodo').value = usuario.value.nombreReal
+        document.getElementById('descripcion').value = usuario.value.biografia
+    }
+
 	async function aceptareditar() {
 		try {
+        	const nombre = document.getElementById('nombre').value.trim()
+        	const apodo = document.getElementById('apodo').value.trim()
+        	const descripcion = document.getElementById('descripcion').value.trim()
+
+        	if (!nombre || !apodo || !descripcion) {
+            	 document.getElementById("error-msg").style.display = "block"
+					return
+				} else {
+					document.getElementById("error-msg").style.display = "none"
+				}
 			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
 			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
 				nombreReal: document.getElementById('nombre').value
@@ -137,7 +168,9 @@
 				, nombreCuenta: document.getElementById('apodo').value
 			})
 		} catch (error) {
-
+			console.error("Error al editar el perfil:", error)
+		    errorMsg.textContent = "Hubo un problema al guardar los cambios."
+		    errorMsg.style.display = 'block'
 		}
 		editar.value = false
 		data()
@@ -278,19 +311,32 @@
 					</div>
 
 					<div v-if="!editar" class="user-details">
-						<div class="user-name">{{ usuario.nombre }}</div>
-						<div v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
-						<div class="user-real-name">{{ usuario.nombreReal }}</div>
-						<div class="user-bio">{{ usuario.biografia }}</div>
+    <div class="user-name">{{ usuario.nombre }}</div>
+    <div v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
+    <div class="user-real-name">{{ usuario.nombreReal }}</div>
+    <div class="user-bio">{{ usuario.biografia }}</div>
+				</div>
+				<div v-if="editar" class="user-details">
+					<div class="user-name">
+						<input type="text" placeholder="Nombre de la cuenta" id="nombre" class="campo-edicion" />
 					</div>
-					<div v-if="editar" class="user-details">
-						<div class="user-name"><input type="text" placeholder="Nombre de la cuenta" id="nombre"></div>
-						<div v-if="false" class="user-pronouns">
-							<section><option value=""></option></section>
-						</div>
-						<div class="user-real-name"><input type="text" id="apodo" placeholder="apodo"></div>
-						<div class="user-bio"><input type="text" id="descripcion" placeholder="descripcion"></div>
+					<div v-if="false" class="user-pronouns">
+						<section><option value=""></option></section>
 					</div>
+					<div class="user-real-name">
+						<input type="text" id="apodo" placeholder="apodo" class="campo-edicion" />
+					</div>
+					<div class="user-bio">
+						<input type="text" id="descripcion" placeholder="descripcion" class="campo-edicion" />
+						<div class="user-bio">
+							</div>
+							<p id="error-msg" class="error-text" style="display: none;">
+								⚠️ Por favor, completa todos
+								 los campos antes de guardar.
+							</p>
+					</div>
+				</div>
+
 				</div>
 
 				<div class="stats-container">
@@ -374,9 +420,19 @@
 				</div>
 			</div>
 
-			<div v-else class="empty-content">
-				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
+			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
+  				<div class="comunidades-grid">
+    				<CommunityCard
+      					v-for="comunidad in comunidades"
+      					:key="comunidad.id"
+      					:titulo="comunidad.titulo"
+      					:descripcion="comunidad.descripcion"
+      					:imagen="comunidad.imagen"
+     					:usuarios="comunidad.usuarios"
+    				/>
+  				</div>
 			</div>
+
 		</div>
 	</div>
 </template>
@@ -497,7 +553,7 @@
 	.lista-title {
 		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
-		text-align: left;
+		text-align: center;
 	}
 
 	.lista-description {
@@ -514,6 +570,8 @@
 		justify-content: center;
 		text-align: center;
 		min-height: 350px;
+		height: 565px;
+		width: 300px;
 	}
 
 	.create-card:hover {
@@ -606,6 +664,31 @@
 	.modal-close {
 		color: #ffffff;
 	}
+	.campo-edicion {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    width: 220px;
+    box-sizing: border-box;
+}
+
+.campo-edicion::placeholder {
+    color: #94a3b8;
+}
+
+.campo-edicion:focus {
+    outline: none;
+    border-color: #60a5fa;
+}
+	.error-text {
+		font-size: 12px;
+		margin-top: 8px;
+		width: 220px;
+	}
+
 
 	.solicitudes-table {
 		width: 100%;
@@ -717,6 +800,13 @@
 		color: #9ca3af;
 		font-size: 16px;
 		font-family: "Poppins-Regular", sans-serif;
+	}
+	.comunidades-grid {
+  	display: flex;
+  	flex-wrap: wrap;
+ 	gap: 1.5rem;
+  	justify-content: center;
+  	padding: 1rem 0;
 	}
 
 
