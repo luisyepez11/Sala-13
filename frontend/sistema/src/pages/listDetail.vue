@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import MovieCartList from '../components/MovieCardList.vue'
 import ListCoverGrid from '../components/ListCoverGrid.vue'
+import Footer from '../components/Footer.vue'
 
 const route = useRoute()
 axios.defaults.withCredentials = true
@@ -107,6 +108,7 @@ const getposters = (posters) => {
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style scoped>
