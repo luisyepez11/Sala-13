@@ -2,6 +2,7 @@
 import Nav from '../components/navegacio.vue'
 import searchresultsection from '../components/searchresultsection.vue'
 import popularfilmsectionListas from '../components/popularfilmsectionListas.vue'
+import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
 
@@ -114,6 +115,7 @@ const buscar = (nombre) => {
       </div>
     </main>
   </div>
+  <Footer />
 </template>
 
 

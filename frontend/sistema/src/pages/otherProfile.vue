@@ -3,6 +3,7 @@
   import Nav from "../components/navegacio.vue"
   import popularfilmsection from '../components/popularfilmsection.vue'
   import Modal from "../components/modal.vue";
+  import Footer from '../components/Footer.vue'
   import axios from 'axios';
   import { useRouter,useRoute } from 'vue-router';
   const router = useRouter()
@@ -187,6 +188,7 @@ const closeModal = () => {
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style>
