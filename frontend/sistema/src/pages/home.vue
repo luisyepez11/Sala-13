@@ -75,9 +75,9 @@ const buscar = (nombre)=>{
           <h3 class="footer-title">Películas</h3>
           <ul class="footer-links">
             <li><a href="#" class="footer-link">Populares</a></li>
-            <li><a href="#" class="footer-link">Estrenos</a></li>
-            <li><a href="#" class="footer-link">Clásicos</a></li>
-            <li><a href="#" class="footer-link">Documentales</a></li>
+            <li><a href="#" class="footer-link">Acción</a></li>
+            <li><a href="#" class="footer-link">Aventura</a></li>
+            <li><a href="#" class="footer-link">Animación</a></li>
           </ul>
         </div>
         
@@ -86,8 +86,7 @@ const buscar = (nombre)=>{
           <ul class="footer-links">
             <li><a href="#" class="footer-link">Listas</a></li>
             <li><a href="#" class="footer-link">Reseñas</a></li>
-            <li><a href="#" class="footer-link">Discusiones</a></li>
-            <li><a href="#" class="footer-link">Eventos</a></li>
+            <li><a href="#" class="footer-link">Comunidades</a></li>
           </ul>
         </div>
         
@@ -117,13 +116,6 @@ const buscar = (nombre)=>{
       
       <div class="footer-bottom">
         <p class="copyright-text">© 2025 Sala 13. Todos los derechos reservados.</p>
-        <div class="footer-bottom-links">
-          <a href="#" class="footer-bottom-link">Política de Privacidad</a>
-          <span class="separator">•</span>
-          <a href="#" class="footer-bottom-link">Términos de Servicio</a>
-          <span class="separator">•</span>
-          <a href="#" class="footer-bottom-link">Cookies</a>
-        </div>
       </div>
     </footer>
   </div>
