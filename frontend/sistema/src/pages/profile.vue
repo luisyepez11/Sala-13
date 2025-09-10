@@ -7,6 +7,7 @@
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
+	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
 
@@ -20,7 +21,22 @@
 	const descripcion = ref("")
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
-
+	const comunidades = ref([
+  {
+    id: 1,
+    titulo: 'Cinéfilos Latinos',
+    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
+    imagen: 'https://example.com/latinos.jpg',
+    usuarios: 1245
+  },
+  {
+    id: 2,
+    titulo: 'Sci-Fi Lovers',
+    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
+    imagen: 'https://example.com/scifi.jpg',
+    usuarios: 893
+  }
+])
 	const editData = ref({
 		nombre: '',
 		apodo: '',
@@ -438,7 +454,18 @@
 					<UserReviewCard v-for="review in mockReviews" :key="review.id" :review="review" />
 				</div>
 			</div>
-
+			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
+  				<div class="comunidades-grid">
+    				<CommunityCard
+      					v-for="comunidad in comunidades"
+      					:key="comunidad.id"
+      					:titulo="comunidad.titulo"
+      					:descripcion="comunidad.descripcion"
+      					:imagen="comunidad.imagen"
+     					:usuarios="comunidad.usuarios"
+    				/>
+  				</div>
+				</div>
 			<div v-else class="empty-content">
 				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
 			</div>
@@ -1108,6 +1135,13 @@
 		.stat-item {
 			margin: 0 4px;
 		}
+	}
+	.comunidades-grid {
+  	display: flex;
+  	flex-wrap: wrap;
+ 	gap: 1.5rem;
+  	justify-content: center;
+  	padding: 1rem 0;
 	}
 </style>
 
