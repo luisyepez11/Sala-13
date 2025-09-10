@@ -4,6 +4,7 @@ import Nav from '../components/navegacio.vue'
 import ReviewComment from '../components/ReviewComment.vue'
 import { useRouter, useRoute } from 'vue-router'
 import Modal from "../components/modal.vue";
+import Footer from '../components/Footer.vue'
 import axios from 'axios'
 
 const router = useRouter()
@@ -273,6 +274,7 @@ const agregar_lista = async () =>{
     </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style scoped>
