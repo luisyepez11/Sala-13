@@ -8,7 +8,7 @@ defineProps({
   isOpen: Boolean
 });
 
-const emit = defineEmits(['close', 'movie-selected']);
+const emit = defineEmits(['close', 'poster-selected']);
 
 const searchQuery = ref('');
 const searchResults = ref([]);
@@ -39,16 +39,15 @@ const performSearch = async () => {
   }
 };
 
-function selectMovie(movie) {
-  emit('movie-selected', movie);
+function selectPoster(posterUrl) {
+  emit('poster-selected', posterUrl);
 }
 </script>
 
 <template>
   <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
     <div class="modal-content">
-      <h2 class="modal-title">Busca tu película favorita</h2>
-      
+      <h2 class="modal-title">Elige una foto de perfil</h2>
       <form class="search-bar-container" @submit.prevent="performSearch">
         <input
           type="text"
@@ -60,16 +59,14 @@ function selectMovie(movie) {
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
       </form>
-      
       <div class="search-results-container">
         <div v-if="searchResults.length > 0" class="results-grid">
-           <div v-for="movie in searchResults" :key="movie.id" class="result-item" @click="selectMovie(movie)">
-             <img :src="movie.poster" :alt="movie.title" class="result-poster">
-             <span class="result-title">{{ movie.title }}</span>
+           <div v-for="movie in searchResults" :key="movie.id" class="result-item" @click="selectPoster(movie.poster)">
+             <img :src="movie.poster" :alt="movie.title" class="result-poster-circular">
            </div>
         </div>
         <div v-else class="no-results">
-          <p>Escribe en la barra para buscar una película.</p>
+          <p>Busca una película para seleccionar un póster.</p>
         </div>
       </div>
     </div>
@@ -96,7 +93,7 @@ function selectMovie(movie) {
   padding: 2rem;
   border-radius: 1rem;
   width: 90%;
-  max-width: 800px;
+  max-width: 500px;
   height: 80vh;
   display: flex;
   flex-direction: column;
@@ -152,31 +149,29 @@ function selectMovie(movie) {
 
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 0.5rem;
 }
 
 .result-item {
     cursor: pointer;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.result-poster {
-    width: 100%;
-    border-radius: 8px;
-    transition: transform 0.2s, border 0.2s;
+.result-poster-circular {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid transparent;
+    transition: border-color 0.3s ease;
 }
 
-.result-item:hover .result-poster {
-    transform: scale(1.05);
-    border: 2px solid #3b82f6;
-}
-
-.result-title {
-    color: #d1d5db;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-    display: block;
+.result-item:hover .result-poster-circular {
+    border-color: #3b82f6;
 }
 
 .no-results {
