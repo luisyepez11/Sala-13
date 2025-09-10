@@ -2,6 +2,7 @@
 import Nav from '../components/navegacio.vue'
 import carousel from '../components/carousel.vue'
 import popularfilmsection from '../components/popularfilmsection.vue'
+import Footer from '../components/Footer.vue'
 import CommunityChat from '../components/CommunityChat.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
@@ -78,6 +79,7 @@ const buscar = (nombre)=>{
         
     </section>
   </div>
+  <Footer />
 </template>
 
 <style scoped>

@@ -3,9 +3,8 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 export const insertLikes= async(req,res) =>{
     try {
-        const {idCuenta,idPelicula,fecha,nombrePelicula} = req.body
-        console.log(nombrePelicula)
-        const data = await pool.query(`INSERT INTO comentarios (idCuenta,idPelicula,comentario,fecha,nombrePelicula) VALUES (?,?,?,?,?)`,[idCuenta,idPelicula,comentario,fecha,nombrePelicula])
+        const {idCuenta,idPelicula} = req.body
+        const data = await pool.query(`INSERT INTO likes (idCuenta,idPelicula) VALUES (?,?)`,[idCuenta,idPelicula])
         res.status(201).json({
             message:"ok"
         })

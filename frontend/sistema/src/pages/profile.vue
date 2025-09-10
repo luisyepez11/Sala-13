@@ -1,11 +1,12 @@
 <script setup>
-	import { ref } from "vue"
+	import { ref, onMounted, watch } from "vue"
 	import Nav from "../components/navegacio.vue"
 	import Modal from "../components/modal.vue";
 	import UserReviewCard from "../components/UserReviewCard.vue";
 	import FavoriteMovies from "../components/FavoriteMovies.vue";
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
-	import CommunityCard from '../components/CommunityCard.vue'
+	import Footer from '../components/Footer.vue'
+	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
 
@@ -17,22 +18,32 @@
 	const usuarioId = ref("")
 	const nombreLista = ref("")
 	const descripcion = ref("")
-	const comunidades = ref([
-  {
-    id: 1,
-    titulo: 'Cinéfilos Latinos',
-    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-    imagen: 'https://example.com/latinos.jpg',
-    usuarios: 1245
-  },
-  {
-    id: 2,
-    titulo: 'Sci-Fi Lovers',
-    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-    imagen: 'https://example.com/scifi.jpg',
-    usuarios: 893
-  }
-])
+	const isProfileModalOpen = ref(false);
+	const profilePictureUrl = ref(null);
+
+	const editData = ref({
+		nombre: '',
+		apodo: '',
+		descripcion: ''
+	});
+
+	const PROFILE_PIC_KEY = 'user_profile_picture';
+
+	onMounted(() => {
+		const storedPic = localStorage.getItem(PROFILE_PIC_KEY);
+		if (storedPic) {
+			profilePictureUrl.value = storedPic;
+		}
+		data();
+	});
+
+	watch(profilePictureUrl, (newUrl) => {
+		if (newUrl) {
+			localStorage.setItem(PROFILE_PIC_KEY, newUrl);
+		} else {
+			localStorage.removeItem(PROFILE_PIC_KEY);
+		}
+	});
 
 	const mockReviews = ref([
 		{
@@ -64,34 +75,54 @@
 			likes: 97
 		}
 	]);
+	
+	const usuario = ref({
+		nombre: "",
+		pronombres: "",
+		nombreReal: "",
+		biografia: "",
+		cantidad_solicitudes: 0,
+		total_seguidos: 0,
+		total_seguidores: 0,
+		total_comentarios: 0
+	});
 
 	const data = async () => {
 		try {
 			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
 			if (usarioId.data.message == "no registrado") {
 				router.push('/');
+				return;
 			}
-			const datosSolicitudes = await axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usarioId.data.id}`)
-			listaSolicitudes.value = datosSolicitudes.data
-			const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-			const listasRes = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
-			usuarioId.value = usarioId.data.id
-			const datos = cuenta.data.resultCuenta[0]
+			usuarioId.value = usarioId.data.id;
+
+			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
+				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usuarioId.value}`),
+				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usuarioId.value}`),
+				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usuarioId.value}`)
+			]);
+			
+			const datos = cuenta.data.resultCuenta[0];
+			usuario.value = {
+				nombre: datos.nombreCuenta,
+				pronombres: datos.pronombres,
+				nombreReal: datos.nombreReal,
+				biografia: datos.descripcionCuenta,
+				cantidad_solicitudes: datos.total_solicitudes,
+				total_seguidos: datos.total_seguidos,
+				total_seguidores: datos.total_seguidores,
+				total_comentarios: datos.total_comentarios
+			};
 
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
 						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
-						
-						const peliculas = Array.isArray(peliculasRes.data) 
-							? peliculasRes.data 
-							: (peliculasRes.data.results || []);
-
+						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
 							.map(p => `https://image.tmdb.org/t/p/w500${p.poster_path}`)
 							.filter(Boolean);
-
 						return { ...listaItem, posters };
 					} catch (e) {
 						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
@@ -101,36 +132,17 @@
 			);
 			lista.value = listasConPosters;
 
-
 			const unicas = datosSolicitudes.data.filter(
 				(item, index, self) =>
 					index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
 			);
 			listaSolicitudes.value = unicas;
-			usuarioId.value = usarioId.data.id
-			usuario.value = {
-				...usuario.value,
-				nombre: datos.nombreCuenta,
-				pronombres: datos.pronombres,
-				nombreReal: datos.nombreReal,
-				biografia: datos.descripcionCuenta,
-				cantidad_solicitudes: datos.total_solicitudes,
-				total_seguidos: datos.total_seguidos,
-				total_seguidores: datos.total_seguidores,
-				total_comentarios: datos.total_comentarios
-			}
+			
 		} catch (error) {
 			console.log("error", error)
 		}
 	}
-	data()
-	const usuario = ref({
-		nombre: "Usuario1",
-		pronombres: "He/Him",
-		nombreReal: "Real Name",
-		biografia: "Bio del usuario"
-	});
-
+	
 	const activeTab = ref("Favoritas")
 	const tabs = ["Favoritas", "Listas", "Likes", "Reseñas", "Comunidades", "Vistas"]
 
@@ -143,37 +155,28 @@
 		requests: 0
 	})
 	function editarPerfil() {
-    editar.value = true
-        document.getElementById('nombre').value = usuario.value.nombre
-        document.getElementById('apodo').value = usuario.value.nombreReal
-        document.getElementById('descripcion').value = usuario.value.biografia
-    }
-
+		editData.value.nombre = usuario.value.nombre;
+		editData.value.apodo = usuario.value.nombreReal;
+		editData.value.descripcion = usuario.value.biografia;
+		editar.value = true;
+	}
 	async function aceptareditar() {
-		try {
-        	const nombre = document.getElementById('nombre').value.trim()
-        	const apodo = document.getElementById('apodo').value.trim()
-        	const descripcion = document.getElementById('descripcion').value.trim()
+		if (editData.value.nombre.trim() === '') {
+			editData.value.nombre = usuario.value.nombre;
+		}
 
-        	if (!nombre || !apodo || !descripcion) {
-            	 document.getElementById("error-msg").style.display = "block"
-					return
-				} else {
-					document.getElementById("error-msg").style.display = "none"
-				}
+		try {
 			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
 			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
-				nombreReal: document.getElementById('nombre').value
-				, descripcionCuenta: document.getElementById('descripcion').value
-				, nombreCuenta: document.getElementById('apodo').value
+				nombreReal: editData.value.nombre,
+				descripcionCuenta: editData.value.descripcion,
+				nombreCuenta: editData.value.apodo
 			})
+			await data();
 		} catch (error) {
-			console.error("Error al editar el perfil:", error)
-		    errorMsg.textContent = "Hubo un problema al guardar los cambios."
-		    errorMsg.style.display = 'block'
+			console.error("Error al actualizar el perfil:", error);
 		}
-		editar.value = false
-		data()
+		editar.value = false;
 	}
 	function cambiarTab(tab) {
 		activeTab.value = tab
@@ -235,25 +238,37 @@
 			router.push("/search/"+nombre)
 		}
 	}
+	
+	function openProfileModal() {
+        if (editar.value) {
+            isProfileModalOpen.value = true;
+        }
+    }
+
+    function closeProfileModal() {
+        isProfileModalOpen.value = false;
+    }
+
+    function handlePosterSelected(posterUrl) {
+        profilePictureUrl.value = posterUrl;
+        closeProfileModal();
+    }
 </script>
 
 <template>
 	<Modal :isOpen="modalCrearListas" @close="cerrarModal">
 		<div class="modal-crear-lista">
 			<h2 class="modal-title">Crear nueva lista</h2>
-
 			<div class="form-group">
 				<label class="user-bio" for="nombreLista">Nombre de la lista</label>
 				<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Terror"
 					class="input-field" />
 			</div>
-
 			<div class="form-group">
 				<label class="user-bio" for="descripcion">Descripción</label>
 				<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu lista..."
 					class="input-field textarea"></textarea>
 			</div>
-
 			<div class="modal-btn">
 				<button class="btn-cancel" @click="cerrarModal">Cancelar</button>
 				<button class="btn-crear" @click="crearLista">Crear</button>
@@ -281,13 +296,18 @@
 				</tbody>
 			</table>
 		</template>
-
 		<template v-else>
 			<div class="sin-solicitudes">
 				<p>No tienes solicitudes pendientes</p>
 			</div>
 		</template>
 	</Modal>
+
+	<ProfilePictureModal
+		:isOpen="isProfileModalOpen"
+		@close="closeProfileModal"
+		@poster-selected="handlePosterSelected"
+	/>
 
 	<div class="perfil-container">
 		<Nav :buscar="buscar" />
@@ -296,11 +316,20 @@
 			<div class="profile-section">
 				<div class="profile-info">
 					<div class="avatar-section">
-						<div class="avatar-container">
-							<svg class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
+						<div 
+							class="avatar-container" 
+							:class="{ 'editable': editar }"
+							@click="openProfileModal"
+							:aria-label="editar ? 'Cambiar foto de perfil' : 'Foto de perfil'"
+						>
+							<img v-if="profilePictureUrl" :src="profilePictureUrl" alt="Foto de perfil" class="avatar-image">
+							<svg v-else class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd"
 									d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
 							</svg>
+							<div v-if="editar" class="edit-overlay">
+								<span class="edit-overlay-text">Editar</span>
+							</div>
 						</div>
 						<button v-if="!editar" class="edit-button" @click="editarPerfil">
 							<div class="edit-text">Editar</div>
@@ -311,32 +340,22 @@
 					</div>
 
 					<div v-if="!editar" class="user-details">
-    <div class="user-name">{{ usuario.nombre }}</div>
-    <div v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
-    <div class="user-real-name">{{ usuario.nombreReal }}</div>
-    <div class="user-bio">{{ usuario.biografia }}</div>
-				</div>
-				<div v-if="editar" class="user-details">
-					<div class="user-name">
-						<input type="text" placeholder="Nombre de la cuenta" id="nombre" class="campo-edicion" />
+						<div class="user-name">{{ usuario.nombre }}</div>
+						<div v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
+						<div class="user-real-name">{{ usuario.nombreReal }}</div>
+						<div class="user-bio">{{ usuario.biografia }}</div>
 					</div>
-					<div v-if="false" class="user-pronouns">
-						<section><option value=""></option></section>
-					</div>
-					<div class="user-real-name">
-						<input type="text" id="apodo" placeholder="apodo" class="campo-edicion" />
-					</div>
-					<div class="user-bio">
-						<input type="text" id="descripcion" placeholder="descripcion" class="campo-edicion" />
+					<div v-if="editar" class="user-details">
+						<div class="user-name">
+							<input type="text" v-model="editData.nombre" class="edit-input" placeholder="Nombre de usuario">
+						</div>
+						<div class="user-real-name">
+							<input type="text" v-model="editData.apodo" class="edit-input" placeholder="Apodo">
+						</div>
 						<div class="user-bio">
-							</div>
-							<p id="error-msg" class="error-text" style="display: none;">
-								⚠️ Por favor, completa todos
-								 los campos antes de guardar.
-							</p>
+							<textarea v-model="editData.descripcion" class="edit-input edit-textarea" placeholder="Biografía"></textarea>
+						</div>
 					</div>
-				</div>
-
 				</div>
 
 				<div class="stats-container">
@@ -420,21 +439,12 @@
 				</div>
 			</div>
 
-			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
-  				<div class="comunidades-grid">
-    				<CommunityCard
-      					v-for="comunidad in comunidades"
-      					:key="comunidad.id"
-      					:titulo="comunidad.titulo"
-      					:descripcion="comunidad.descripcion"
-      					:imagen="comunidad.imagen"
-     					:usuarios="comunidad.usuarios"
-    				/>
-  				</div>
+			<div v-else class="empty-content">
+				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
 			</div>
-
 		</div>
 	</div>
+	<Footer />
 </template>
 
 
@@ -487,6 +497,7 @@
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
+		position: relative;
 	}
 
 	.lista-portada {
@@ -553,7 +564,7 @@
 	.lista-title {
 		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
-		text-align: center;
+		text-align: left;
 	}
 
 	.lista-description {
@@ -570,8 +581,6 @@
 		justify-content: center;
 		text-align: center;
 		min-height: 350px;
-		height: 565px;
-		width: 300px;
 	}
 
 	.create-card:hover {
@@ -664,31 +673,6 @@
 	.modal-close {
 		color: #ffffff;
 	}
-	.campo-edicion {
-    background-color: #0f172a;
-    color: #ffffff;
-    border: 1px solid #3b82f6;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    width: 220px;
-    box-sizing: border-box;
-}
-
-.campo-edicion::placeholder {
-    color: #94a3b8;
-}
-
-.campo-edicion:focus {
-    outline: none;
-    border-color: #60a5fa;
-}
-	.error-text {
-		font-size: 12px;
-		margin-top: 8px;
-		width: 220px;
-	}
-
 
 	.solicitudes-table {
 		width: 100%;
@@ -800,13 +784,6 @@
 		color: #9ca3af;
 		font-size: 16px;
 		font-family: "Poppins-Regular", sans-serif;
-	}
-	.comunidades-grid {
-  	display: flex;
-  	flex-wrap: wrap;
- 	gap: 1.5rem;
-  	justify-content: center;
-  	padding: 1rem 0;
 	}
 
 
@@ -988,6 +965,59 @@
 	.btn-crear-lista-inline {
 		height: fit-content;
 		align-self: center;
+	}
+
+	.avatar-container.editable {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .edit-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 50%;
+    }
+
+    .avatar-container.editable:hover .edit-overlay {
+        opacity: 1;
+    }
+
+    .edit-overlay-text {
+        font-weight: 600;
+        font-family: "Poppins", sans-serif;
+    }
+
+	.edit-input {
+		width: 100%;
+		padding: 8px 12px;
+		font-size: 1rem;
+		border-radius: 6px;
+		border: 1px solid #4b5563;
+		background-color: #374151;
+		color: #ffffff;
+		font-family: "Poppins-Regular", sans-serif;
+		outline: none;
+	}
+
+	.edit-textarea {
+		min-height: 80px;
+		resize: vertical;
 	}
 
 

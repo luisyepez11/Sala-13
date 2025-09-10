@@ -4,6 +4,7 @@ import Nav from '../components/navegacio.vue'
 import ReviewComment from '../components/ReviewComment.vue'
 import { useRouter, useRoute } from 'vue-router'
 import Modal from "../components/modal.vue";
+import Footer from '../components/Footer.vue'
 import axios from 'axios'
 
 const router = useRouter()
@@ -14,6 +15,14 @@ const movie = ref(null)
 const nombrePelicula=ref("")
 
 const error = ref(null)
+const insertLike = async () =>{
+      try {
+        const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+        const like = await axios.post("http://localhost:3300/api/like",{idCuenta:usarioId.data.id,idPelicula:route.params.id})
+      } catch (error) {
+        console.log(error)
+      }
+}
 const loadReviews = async () => {
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -106,8 +115,9 @@ const newReview = ref({
 })
 const isLiked = ref(false)
 
-const like = () => {
+const like = async () => {
   isLiked.value = !isLiked.value
+  await insertLike()
   const likeButton = document.querySelector('.btn-like')
   if (isLiked.value) {
       likeButton.classList.add('btn-click-like')
@@ -264,6 +274,7 @@ const agregar_lista = async () =>{
     </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style scoped>
