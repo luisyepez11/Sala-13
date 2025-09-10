@@ -58,6 +58,20 @@ export const getPeliculasDeLista = async (req, res) => {
     }
 };
 
+export const getLista = async (req, res) => {
+    const listaId = req.params.id;
+    try {
+        const [peliculas] = await pool.query(
+            `SELECT l.*,c.* FROM listas l INNER JOIN cuentas c ON c.idcuenta=l.idCuenta WHERE idlista = ?`,
+            [listaId]
+        );
+        res.status(200).json(peliculas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al obtener las películas de la lista" });
+    }
+};
+
 export const crearLista = async (req, res) => {
     const { nombreLista, descripcion, idCuenta } = req.body;
     try {
