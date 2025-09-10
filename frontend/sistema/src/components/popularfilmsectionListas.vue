@@ -94,7 +94,7 @@ watch(movies, () => {
   <section class="popular-section">
     <div class="section-header">
       <h2 class="section-title"
-       @click="$router.push('/listDetail/' + props.idLista)"
+       @click="$router.push('/listDetailOther/' + props.idLista)"
        >{{ props.titulo }}</h2>
       <button class="see-all-btn" @click="toggleShowAll" v-if="movies.length > 6">
         {{ showAll ? 'Ver Menos' : 'See All' }}
