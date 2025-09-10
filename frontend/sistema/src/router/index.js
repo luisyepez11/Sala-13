@@ -10,6 +10,7 @@ import Community from "../pages/Community.vue";
 import ListDetail from "../pages/listDetail.vue";
 import Lading_page from "../pages/lading_page.vue";
 import homeBusquedaListas from "../pages/homeBusquedaListas.vue";
+import Comunidades from "./../pages/Comunidades.vue"
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -53,6 +54,12 @@ const router = createRouter({
             path:"/community",
             name:"community",
             component:Community
+
+        },
+        {
+            path:"/comunidades",
+            name:"comunidades",
+            component:Comunidades
 
         }
         ,
