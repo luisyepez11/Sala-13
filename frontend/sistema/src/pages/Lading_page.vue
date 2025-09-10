@@ -2,6 +2,7 @@
 import Nav from '../components/navegacio.vue'
 import popularfilmsection from "../components/popularfilmsection.vue"
 import carousel from "../components/carousel.vue";
+import Footer from '../components/Footer.vue'
 import {ref, onMounted, onUnmounted, watch} from "vue";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
@@ -308,15 +309,8 @@ fill="currentColor" viewBox="0 0 24 24" >
             </div>
         </div>
     </section>
-    <section class="cta-section">
-      <h2>¿Listo para Sumergirte en el Mundo del Cine?</h2>
-      <p>Únete a nuestra comunidad y descubre una nueva forma de vivir el cine</p>
-      <div>
-        <button class="btn">Crear mi cuenta</button>
-      </div>
-      <small>¿Ya tienes cuenta? <a href="#">Inicia sesión</a></small>
-    </section>
-    
+
+    <Footer />
 
 
 

@@ -1,6 +1,7 @@
 <script setup>
 import Nav from '../components/navegacio.vue'
 import Popularfilmsection from "../components/popularfilmsectionListas.vue"
+import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
 
@@ -57,6 +58,7 @@ const buscar = (nombre) => {
     </main>
 
   </div>
+  <Footer />
 </template>
 
 <style scoped>
