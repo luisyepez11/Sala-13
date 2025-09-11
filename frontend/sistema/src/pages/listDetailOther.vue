@@ -16,6 +16,7 @@ const error = ref(null)
 const lista = ref({
   nombre: "Cargando nombre...",
   descripcion: "Cargando descripción...",
+  nombreCreador:"Cargando........",
   like: false,
   favorito: false
 });
@@ -28,8 +29,10 @@ onMounted(async () => {
     const datosLista = await respLista.json()
     const datos = await resp.json()
     lista.value = {
+  idLista:datosLista[0].idlista,
   nombre: datosLista[0].nombreLista,
   descripcion: datosLista[0].descripcion,
+  nombreCreador: datosLista[0].nombreCuenta,
   like: false,
   favorito: false
 }
@@ -41,7 +44,7 @@ onMounted(async () => {
     fetchListaDetails(listaId);
 
     peliculas.value = datos.map(p => ({
-      id: p.id,
+      id: p.idPelicula,
       title: p.title,
       year: p.release_date,
       genre: p.genre || 'Sin género',
@@ -65,7 +68,29 @@ const fetchListaDetails = async (listaId) => {
     }
 }
 
-
+const addListe = async () =>{
+        try {
+          const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+          const dataLista = await axios.post(`http://localhost:3300/api/lista`, {
+				nombreLista: lista.value.nombre,
+				descripcion: lista.value.descripcion,
+				idCuenta: usarioId.data.id
+			});
+      const idLista = await dataLista
+      console.log(peliculas.value)
+          peliculas.value.forEach(async pelicula =>{
+            
+                const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula',{
+            idLista:idLista.data.id, 
+            idPelicula:pelicula.id
+          })
+          })
+          alert("lista agregada a perfil")
+          lista.favorito = !lista.favorito
+        } catch (error) {
+          console.log(error)
+        }
+}
 const eliminarDeLista = async (movie) => {
   try {
     const listaId = route.params.id;
@@ -100,11 +125,12 @@ const getposters = (posters) => {
           <div class="movie-info">
             <h1 class="movie-title">{{ lista.nombre }}</h1>
             <p class="synopsis">{{ lista.descripcion }}</p>
+            <p class="synopsis">Creada por : {{ lista.nombreCreador }}</p>
             <div class="action-buttons">
               <button class="btn-like" :class="{ 'btn-click-like': lista.like }" @click="lista.like = !lista.like">
                 <i class='bx bx-like'></i>
               </button>
-              <button class="btn-list" :class="{ 'btn-click-like': lista.favorito }" @click="lista.favorito = !lista.favorito">
+              <button class="btn-list" :class="{ 'btn-click-like': lista.favorito }" @click="addListe">
                 <i class='bx bx-bookmark-plus-alt'></i>
               </button>
             </div>

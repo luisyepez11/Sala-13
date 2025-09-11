@@ -15,6 +15,8 @@ import solicitudesRouter from "./Solicitudes/routers/solicitudes.router.js";
 import amigosRouter from "./Amigos/routers/amigos.router.js";
 //Listas
 import listaRouter from "./Listas/routers/lista.router.js";
+//Like
+import likeRouter from "./Likes/routers/likes.router.js"
 
 const app = express()
 
@@ -40,5 +42,6 @@ app.use("/api/solicitud",solicitudesRouter)
 app.use("/api/amigo",amigosRouter)
 //Listas
 app.use("/api/lista", listaRouter) 
-
+//Like
+app.use("/api/like", likeRouter) 
 export default app;

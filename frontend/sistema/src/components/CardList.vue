@@ -45,7 +45,7 @@ const eliminar = async() =>{
 
 <template>
   <div v-if="movie" class="pelicula-card"  style="cursor:pointer">
-    <img :src="movie.poster" :alt="movie.title" class="pelicula-poster" />
+    <img :src="movie.poster" :alt="movie.title" class="pelicula-poster" @click="$router.push('/details/' + props.idPelicula)"/>
     <div class="pelicula-info">
       <h2 class="pelicula-title">{{ movie.title }}</h2>
       <span class="pelicula-year">{{ movie.year }}</span>
