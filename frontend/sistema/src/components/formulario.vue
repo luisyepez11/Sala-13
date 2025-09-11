@@ -17,7 +17,9 @@ const opcion = props.opcion;
 async function saludar() {
   const nombre = document.getElementById("user").value;
   const contraseña = document.getElementById("password").value;
-
+  if(opcion !== 'create'){
+    !aceptaTerminos.value
+  }
   if (opcion === "login") {
     try {
       await axios.post(
@@ -48,6 +50,7 @@ const newPasswordModalIsOpen = ref(false);
 const newPassword = ref('');
 const confirmPassword = ref('');
 const passwordMismatch = ref(false);
+const aceptaTerminos = ref(false)
 
 const openModal = () => {
   modalIsOpen.value = true;
@@ -79,6 +82,9 @@ const updatePassword = () => {
   console.log("Nueva contraseña:", newPassword.value);
   alert("Contraseña actualizada con éxito!");
   closeNewPasswordModal();
+};
+const terminos = () => {
+  
 };
 </script>
 
@@ -182,12 +188,22 @@ const updatePassword = () => {
           <input type="text" class="input-text2" placeholder="Respuesta">
         </div>
       </div>
-    </div>
-    
+      <div class="terms-section">
+        <label class="terms-label">
+          <input type="checkbox" v-model="aceptaTerminos" class="terms-checkbox" />
+          <span>Acepto los <a href="/terminos" class="terms-link">términos y condiciones</a></span>
+        </label>
+      </div>
+      </div>
     <div class="form-actions">
-      <button class="button" @click="saludar">
-        <div class="login-now">{{ opcion === "login" ? "Iniciar Sesión" : "Registrar" }}</div>
-      </button>
+      <button 
+  class="button" 
+  @click="saludar" 
+  :disabled="terminos"
+  :class="{ 'button-disabled': !aceptaTerminos }"
+>
+  <div class="login-now">{{ opcion === "login" ? "Iniciar Sesión" : "Registrar" }}</div>
+</button>
       <div class="account-links">
         <div class="don-t-have-an-account">{{ opcion === "login" ? "¿No tienes una cuenta?" : "¿Ya tienes una cuenta?" }}</div>
         <a class="sign-up" :href="opcion === 'login' ? '/register' : '/login'">{{ opcion === "login" ? "Regístrate" : "Inicia Sesión" }}</a>
@@ -260,6 +276,57 @@ const updatePassword = () => {
 
 .modal-content .button {
   align-self: stretch;
+}
+.terms-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+}
+
+.terms-label {
+  color: #98a2b3;
+  font-family: "Poppins-Regular", sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 2px
+}
+
+.terms-checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #94b4c1;
+  border-radius: 4px;
+  background-color: transparent;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.terms-checkbox:checked {
+  background-color: #94b4c1;
+  border-color: #94b4c1;
+}
+
+.terms-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 9px;
+  border: solid #213448;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.terms-link {
+  color: #ecefca;
+  text-decoration: underline;
+  cursor: pointer;
+  align-items: center;
 }
 
 
@@ -472,6 +539,12 @@ const updatePassword = () => {
   outline: none;
   border-color: #94b4c1;
 }
+.button-disabled {
+  background-color: #5f7a89 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
 
 .custom-select option {
   background: #213448;
@@ -492,6 +565,7 @@ const updatePassword = () => {
   background: #94b4c1;
   border-radius: 4px;
 }
+
 
 .form-actions {
   display: flex;

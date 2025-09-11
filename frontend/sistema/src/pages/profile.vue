@@ -1025,6 +1025,12 @@
 		align-items: center;
 		min-height: 200px;
 	}
+	.comunidades-vacias {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 200px;
+	}
 
 	.listas-contenedor {
 		display: flex;
