@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Nav from '../components/navegacio.vue'
-import { useRoute } from 'vue-router'
 import axios from 'axios'
 import MovieCartList from '../components/MovieCardList.vue'
 import ListCoverGrid from '../components/ListCoverGrid.vue'
 import Footer from '../components/Footer.vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter() 
 
 const route = useRoute()
 axios.defaults.withCredentials = true
@@ -80,12 +82,19 @@ const eliminarDeLista = async (movie) => {
 const getposters = (posters) => {
   portadaLista.value = posters;
 }
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 </script>
 
 <template>
   <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
   <div class="movie-page">
-    <Nav />
+    <Nav :buscar="buscar"/>
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
