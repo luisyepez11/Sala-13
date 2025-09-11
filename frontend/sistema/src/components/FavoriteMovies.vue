@@ -55,7 +55,7 @@ function selectMovie(movie) {
   }
 
   const movieWithStats = {
-    ...movie,
+    movie,
     rating: movie.vote_average ? (movie.vote_average / 2).toFixed(2) : 'N/A',
     views: Math.floor(Math.random() * 5000),
     likes: movie.vote_count ? Math.floor(movie.vote_count / 10) : 0,

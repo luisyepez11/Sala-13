@@ -156,9 +156,16 @@ const navigateToLogin = () => {
 const navigateToRegister = () => {
   router.push('/register');
 };
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 </script>
 <template>
-    <Nav />
+    <Nav :buscar="buscar"></Nav>/>
     <section class="hero-section">
         <div class="hero-left">
             <img src="/src/assets/logo.png" alt="Sala 13 Logo" class="hero-logo" />
