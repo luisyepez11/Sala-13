@@ -36,7 +36,6 @@ export const getComentarios = async(req,res) =>{
 	}
 }
 
-<<<<<<< HEAD
 export const getComentariosUsuario = async(req,res) =>{
     try {
         const id = req.params.id
@@ -50,8 +49,6 @@ export const getComentariosUsuario = async(req,res) =>{
         })
     }
 }
-=======
->>>>>>> f5edd7c27db2a597702325f49dc93b4379b5b31f
 export const getComentariosLanding = async(req,res) =>{
 	let connection;
 	try {
