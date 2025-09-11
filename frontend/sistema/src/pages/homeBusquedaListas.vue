@@ -49,15 +49,16 @@ const buscar = (nombre) => {
 </script>
 
 <template>
-  <div class="home-page-container">
-    <Nav :buscar="buscar" />
+  <Nav :buscar="buscar" />
+  <main class="home-page-container">
     
-    <main class="main-content">
+    
+    <div class="main-content">
 
       <Popularfilmsection v-for="value in data" :titulo="value.nombreLista" :idLista="value.idlista"></Popularfilmsection>
-    </main>
+    </div>
 
-  </div>
+  </main>
   <Footer />
 </template>
 
@@ -67,6 +68,7 @@ const buscar = (nombre) => {
   min-height: 100vh;
   color: #ffffff;
   font-family: "Poppins", sans-serif;
+  margin: -1.5rem 0 0 0;
 }
 
 .main-content {
@@ -166,7 +168,7 @@ const buscar = (nombre) => {
 .page-footer {
   background: #0f172a;
   border-top: 1px solid #334155;
-  margin-top: 4rem;
+  
 }
 
 .footer-content {
