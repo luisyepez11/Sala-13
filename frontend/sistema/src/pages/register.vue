@@ -15,7 +15,7 @@ import Footer from '../components/Footer.vue'
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh; 
+  height: 130vh; 
   width: 100%;
 }
 </style>

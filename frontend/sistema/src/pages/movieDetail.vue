@@ -150,6 +150,13 @@ const agregar_lista = async () =>{
         }
       })
 }
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 </script>
 
 <template>
@@ -196,7 +203,7 @@ const agregar_lista = async () =>{
 
   <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
   <div class="movie-page">
-      <Nav />
+      <Nav :buscar="buscar" />
     <div v-if="error" class="error-message">
       {{ error }}
     </div>

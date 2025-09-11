@@ -1,11 +1,22 @@
 <script setup>
 import Nav from '../components/navegacio.vue'
 import Footer from '../components/Footer.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter() 
+
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 </script>
 
 <template>
 	<div class="contact-page-container">
-		<Nav />
+		<Nav :buscar="buscar" />
 		<main class="main-content">
 			<div class="contact-card">
 				<h1 class="page-title">Contacto de Soporte</h1>

@@ -1,6 +1,5 @@
 <script setup>
 import Form from '../components/formulario.vue'
-import Nav from '../components/navegacio.vue'
 import Footer from '../components/Footer.vue'
 </script>
 
