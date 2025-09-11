@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps({
   review: {
     type: Object,
     required: true
-  }
+  },
 });
 
 const isLiked = ref(false);
@@ -19,19 +19,42 @@ function toggleLike() {
     likeCount.value--;
   }
 }
+
+const movie = ref(null)
+
+onMounted(async () => {
+  try {
+    console.log(props.review.movie.idPelicula)
+    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${props.review.movie.idPelicula}`)
+    const datos = await resp.json()
+    console.log(datos)
+    movie.value = {
+      id: datos.id,
+      title: datos.title,
+      year: datos.release_date,
+      genre: datos.genre || 'Sin género',
+      synopsis: datos.overview,
+      rating: (datos.vote_average / 2).toFixed(1),
+      poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
+    }
+    
+  } catch (e) {
+    console.error('Error al cargar la película:', e)
+  }
+})
 </script>
 
 <template>
-  <div class="review-entry-card">
+  <div v-if="movie" class="review-entry-card">
     <div class="movie-poster-container">
-      <img :src="review.movie.poster" :alt="`Póster de ${review.movie.title}`" class="movie-poster">
+      <img :src="movie.poster" :alt="`Póster de ${movie.title}`" class="movie-poster">
     </div>
     <div class="review-content">
       <div class="review-header">
         <img :src="review.user.avatar" alt="Avatar del usuario" class="user-avatar">
         <div class="header-text">
           <span class="user-name">{{ review.user.name }}</span>
-          <span class="watched-movie">vio: <strong>{{ review.movie.title }}</strong></span>
+          <span class="watched-movie">vio: <strong>{{ movie.title }}</strong></span>
         </div>
       </div>
       <div class="rating-stars">
@@ -55,6 +78,7 @@ function toggleLike() {
 </template>
 
 <style scoped>
+/* Tus estilos permanecen igual */
 .review-entry-card {
   display: flex;
   gap: 1.5rem;
@@ -179,4 +203,3 @@ function toggleLike() {
   }
 }
 </style>
-

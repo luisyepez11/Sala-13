@@ -74,7 +74,7 @@ export const getPelicula = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.json({
-            message: "error"
+            message: error
         })
     }
 }

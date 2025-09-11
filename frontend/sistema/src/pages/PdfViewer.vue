@@ -1,6 +1,7 @@
 <script setup>
 import Nav from '../components/navegacio.vue'
 import Footer from '../components/Footer.vue'
+
 </script>
 
 <template>
