@@ -57,7 +57,7 @@
 .page-footer {
 	background: #0f172a;
 	border-top: 1px solid #334155;
-	margin-top: 4rem;
+	
 }
 
 .footer-content {
