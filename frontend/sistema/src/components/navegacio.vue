@@ -142,8 +142,10 @@ const navigateToHome = () => {
   margin: 0 auto;
   padding: 20px 24px;
   display: flex;
+  gap:5rem;
   align-items: center;
   justify-content: space-between;
+
   height: max-content;
 }
 
@@ -260,7 +262,7 @@ const navigateToHome = () => {
 
 .search-button {
   position: absolute;
-  right: 8px;
+  right: -3rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
