@@ -1,43 +1,46 @@
+<script setup>
+</script>
+
 <template>
 	<footer class="page-footer">
 		<div class="footer-content">
 			<div class="footer-section">
 				<h3 class="footer-title">Películas</h3>
 				<ul class="footer-links">
-					<li><a href="#" class="footer-link">Populares</a></li>
-					<li><a href="#" class="footer-link">Acción</a></li>
-					<li><a href="#" class="footer-link">Aventura</a></li>
-					<li><a href="#" class="footer-link">Animación</a></li>
+					<li><router-link to="/home/#seccion-populares" class="footer-link">Populares</router-link></li>
+					<li><router-link to="/home/#seccion-accion" class="footer-link">Acción</router-link></li>
+					<li><router-link to="/home/#seccion-aventura" class="footer-link">Aventura</router-link></li>
+					<li><router-link to="/home/#seccion-animacion" class="footer-link">Animación</router-link></li>
 				</ul>
 			</div>
 			
 			<div class="footer-section">
 				<h3 class="footer-title">Comunidad</h3>
 				<ul class="footer-links">
-					<li><a href="#" class="footer-link">Listas</a></li>
-					<li><a href="#" class="footer-link">Reseñas</a></li>
-					<li><a href="#" class="footer-link">Comunidades</a></li>
+					<li><router-link to="/homeListas" class="footer-link">Listas</router-link></li>
+					<li><router-link to="/timeline" class="footer-link">Reseñas</router-link></li>
+					<li><router-link to="/community" class="footer-link">Comunidades</router-link></li>
 				</ul>
 			</div>
 			
 			<div class="footer-section">
 				<h3 class="footer-title">Soporte</h3>
 				<ul class="footer-links">
-					<li><a href="#" class="footer-link">Ayuda</a></li>
-					<li><a href="#" class="footer-link">Contacto</a></li>
+					<li><router-link to="/ayuda" class="footer-link">Ayuda</router-link></li>
+					<li><router-link to="/contacto" class="footer-link">Contacto</router-link></li>
 				</ul>
 			</div>
 			
 			<div class="footer-section">
 				<h3 class="footer-title">Síguenos</h3>
 				<div class="social-links">
-					<a href="#" class="social-link">
+					<a href="https://www.tiktok.com/@sala13_tiktok?is_from_webapp=1&sender_device=pc" class="social-link" target="_blank" rel="noopener noreferrer">
 						<img src="/src/assets/tiktoklogo.png" alt="Logo de tiktok" class="social-icon">
 					</a>
-					<a href="#" class="social-link">
+					<a href="https://x.com/sala13991245" class="social-link" target="_blank" rel="noopener noreferrer">
 						<img src="/src/assets/xlogo.png" alt="Logo de X" class="social-icon">
 					</a>
-					<a href="#" class="social-link">
+					<a href="https://www.instagram.com/sala13_ig" class="social-link" target="_blank" rel="noopener noreferrer">
 						<img src="/src/assets/iglogo2.png" alt="Logo de instagram" class="social-icon">
 					</a>
 				</div>
@@ -55,8 +58,6 @@
 	background: #0f172a;
 	border-top: 1px solid #334155;
 	margin-top: 4rem;
-	font-family: "Poppins", sans-serif;
-	color: #ffffff;
 }
 
 .footer-content {
@@ -143,31 +144,6 @@
 	color: #6b7280;
 	font-size: 0.875rem;
 	margin: 0;
-}
-
-@media (max-width: 768px) {
-	.footer-content {
-		padding: 2rem 1rem 1.5rem;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 1.5rem;
-	}
-	
-	.footer-bottom {
-		flex-direction: column;
-		text-align: center;
-	}
-}
-
-@media (max-width: 480px) {
-	.footer-content {
-		grid-template-columns: 1fr;
-		text-align: center;
-		gap: 2rem;
-	}
-	
-	.social-links {
-		justify-content: center;
-	}
 }
 </style>
 
