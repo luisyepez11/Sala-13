@@ -2,95 +2,101 @@ import { pool } from "../../db.js";
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken";
 import { SALT } from "../../config.js";
-import cookieParser from 'cookie-parser';
 
-export const insertUser= async(req,res) =>{
-    try {
-        const {user,password} = req.body;
-        const passwordCryp = await bcrypt.hash(password,10)
-        const [resultCuenta] = await pool.query(`INSERT INTO cuentas (nombreCuenta,descripcionCuenta) VALUES(?,?)`,[user,""])
-        const [resultUser] = await pool.query(`INSERT INTO usuarios (nombreUsuario,contraseñaUsuario,idCuenta) VALUES(?,?,?)`,[user,passwordCryp,resultCuenta.insertId]);
-        res.status(201).json({
-            message:"cuenta y usuario creado"
-        })
-        console.log("creado")
-    } catch (error) {
-        res.json({
-            message:"error"
-        })
-    }
+export const insertUser = async (req, res) => {
+	let connection;
+	try {
+		const { user, password } = req.body;
+		const passwordCryp = await bcrypt.hash(password, 10)
+		
+		connection = await pool.getConnection();
+		
+		const [resultCuenta] = await connection.query(`INSERT INTO cuentas (nombreCuenta,descripcionCuenta) VALUES(?,?)`, [user, ""])
+		await connection.query(`INSERT INTO usuarios (nombreUsuario,contraseñaUsuario,idCuenta) VALUES(?,?,?)`, [user, passwordCryp, resultCuenta.insertId]);
+		
+		res.status(201).json({
+			message: "cuenta y usuario creado"
+		})
+	} catch (error) {
+		res.status(500).json({
+			message: "error al crear usuario"
+		})
+	} finally {
+		if (connection) connection.release();
+	}
 }
 
-export const loginUser = async(req,res) =>{
-    try {
-        const {user,password} = req.body
-        
-        const [result] = await pool.query("SELECT * FROM usuarios WHERE nombreUsuario=?",[user])
-        const validacion = result?.length ? bcrypt.compareSync(password,(result[0]).contraseñaUsuario) : false
+export const loginUser = async (req, res) => {
+	let connection;
+	try {
+		const { user, password } = req.body
+		
+		connection = await pool.getConnection();
+		const [result] = await connection.query("SELECT * FROM usuarios WHERE nombreUsuario=?", [user])
+		
+		const validacion = result?.length ? bcrypt.compareSync(password, (result[0]).contraseñaUsuario) : false
 
-        if (validacion){
-            const token = jwt.sign({ idUser:(result[0]).idCuenta }, SALT)
+		if (validacion) {
+			const token = jwt.sign({ idUser: (result[0]).idCuenta }, SALT)
 
-            // === OPCIONES DE COOKIE SEGÚN ENTORNO ===
-            const isProd = process.env.NODE_ENV === 'production'
-            const cookieOptions = {
-                httpOnly: true,
-                secure: isProd ? true : false,   // en dev (localhost) -> false
-                sameSite: isProd ? 'none' : 'lax', // en dev -> 'lax'
-                maxAge: 60 * 60 * 24 * 1000,    // 1 día
-                path: '/',                      // asegura que sea válida para todo el sitio
-            }
+			const isProd = process.env.NODE_ENV === 'production'
+			const cookieOptions = {
+				httpOnly: true,
+				secure: isProd ? true : false,
+				sameSite: isProd ? 'none' : 'lax',
+				maxAge: 60 * 60 * 24 * 1000,
+				path: '/',
+			}
 
-            res.cookie("Login", token, cookieOptions)
-        }
+			res.cookie("Login", token, cookieOptions)
+		}
 
-        res.json({
-            message:""
-        })
-    } catch (error) {
-        console.log("no funcion")
-        res.json({
-            message:"error"
-        })
-    }
+		res.json({
+			message: ""
+		})
+	} catch (error) {
+		res.status(500).json({
+			message: "error en el login"
+		})
+	} finally {
+		if (connection) connection.release();
+	}
 }
 
-export const getUser = async(req,res) =>{
-    try {
-        const tokend = req.cookies.Login
-        if (tokend == undefined){
-            return res.json({
-                message:"no registrado"
-            })
-        }
-        const validar = jwt.verify(tokend, SALT)
-        console.log(validar.idUser)
-        return res.json({
-            id: validar.idUser
-        })
-    } catch (error) {
-        return res.json({
-            message:error
-        })
-    }
+export const getUser = async (req, res) => {
+	try {
+		const tokend = req.cookies.Login
+		if (tokend == undefined) {
+			return res.json({
+				message: "no registrado"
+			})
+		}
+		const validar = jwt.verify(tokend, SALT)
+		return res.json({
+			id: validar.idUser
+		})
+	} catch (error) {
+		return res.json({
+			message: "token invalido"
+		})
+	}
 }
 
-export const deleteCookie = async(req,res) =>{
-    try {
-        const isProd = process.env.NODE_ENV === 'production'
-        res.clearCookie('Login', {
-            httpOnly: true,
-            secure: isProd ? true : false,     
-            sameSite: isProd ? 'none' : 'lax', 
-            path: '/',                      
-        })
-        res.json({
-            message:"funcionando"
-        })
-    } catch (error) {
-        console.log("error")
-        res.json({
-            message:error
-        }) 
-    }
+export const deleteCookie = async (req, res) => {
+	try {
+		const isProd = process.env.NODE_ENV === 'production'
+		res.clearCookie('Login', {
+			httpOnly: true,
+			secure: isProd ? true : false,
+			sameSite: isProd ? 'none' : 'lax',
+			path: '/',
+		})
+		res.json({
+			message: "cookie eliminada"
+		})
+	} catch (error) {
+		res.status(500).json({
+			message: "error al eliminar cookie"
+		})
+	}
 }
