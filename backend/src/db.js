@@ -6,7 +6,7 @@ export const pool = createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
-  port: DB_PORT,
+  port: 33051,
   database: DB_DATABASE,
 });
 // Probar la conexión y manejar errores
