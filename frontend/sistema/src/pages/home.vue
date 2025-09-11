@@ -2,9 +2,9 @@
 import Nav from '../components/navegacio.vue'
 import carousel from '../components/carousel.vue'
 import popularfilmsection from '../components/popularfilmsection.vue'
-import Footer from '../components/Footer.vue' // Se importa el nuevo componente
+import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
 
 const data = {
 	"generos": [
@@ -40,6 +40,28 @@ const buscar = (nombre)=>{
 		router.push("/search/"+nombre)
 	}
 }
+
+const formatId = (name) => {
+  return `seccion-${name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-')}`;
+}
+
+const scrollToHash = async (hash) => {
+  if (hash) {
+    await nextTick(); 
+    const element = document.querySelector(hash);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+
+watch(() => route.hash, (newHash) => {
+  scrollToHash(newHash);
+});
+
+onMounted(() => {
+  scrollToHash(route.hash);
+});
 </script>
 
 <template>
@@ -56,17 +78,18 @@ const buscar = (nombre)=>{
 					<carousel />
 				</section>
 				
-				<popularfilmsection titulo="Populares" genero=""/>
+				<popularfilmsection titulo="Populares" genero="" id="seccion-populares"/>
+				
 				<popularfilmsection 
 					v-for="(item, index) in data.generos" 
 					:key="index"
 					:genero='"/genero/"+item.id'
 					:titulo="item.name"
+					:id="formatId(item.name)"
 				/>
 			</div>
 		</main>
 		
-		<!-- Se reemplaza todo el código del footer por el nuevo componente -->
 		<Footer />
 	</div>
 </template>
@@ -88,8 +111,6 @@ const buscar = (nombre)=>{
 .hero-section {
 	margin-bottom: 3rem;
 }
-
-/* Se eliminaron todos los estilos del footer de este archivo */
 
 @media (max-width: 1024px) {
 	.main-content {
@@ -118,8 +139,5 @@ const buscar = (nombre)=>{
 		padding: 1rem 0.75rem;
 	}
 }
-
-@media (max-width: 360px) {
-	/* No specific styles needed here now */
-}
 </style>
+

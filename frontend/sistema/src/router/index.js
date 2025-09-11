@@ -10,6 +10,8 @@ import Community from "../pages/Community.vue";
 import ListDetail from "../pages/listDetail.vue";
 import Lading_page from "../pages/lading_page.vue";
 import homeBusquedaListas from "../pages/homeBusquedaListas.vue";
+import PdfViewer from "../pages/PdfViewer.vue";
+import ContactPage from "../pages/ContactPage.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -81,6 +83,21 @@ const router = createRouter({
             path:"/homeListas",
             name:"homeListas",
             component:homeBusquedaListas
+        },
+        {
+            path:"/ayuda",
+            name:"manual",
+            component:PdfViewer
+        },
+        {
+            path:"/timeline",
+            name:"timeline",
+            component:PdfViewer
+        },
+        {
+            path:"/contacto",
+            name:"contacto",
+            component:ContactPage
         }
     ]
 })

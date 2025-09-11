@@ -84,9 +84,9 @@ const navigateToHome = () => {
       </div>
       <div class="nav-links">
         <button @click="navigateToHome" class="nav-link nav-button-link">Inicio</button>
-        <a href="#" class="nav-link">Timeline</a>
+        <a href="/timeline" class="nav-link">Timeline</a>
         <a href="/homeListas" class="nav-link">Listas</a>
-        <a href="#" class="nav-link">Comunidades</a>
+        <a href="/community" class="nav-link">Comunidades</a>
       </div>
     </div>
     
