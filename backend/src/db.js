@@ -6,7 +6,7 @@ export const pool = createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
-  port: DB_PORT,
+  port: 33051,
   database: DB_DATABASE,
 });
 // Probar la conexión y manejar errores
@@ -21,20 +21,20 @@ pool
 
     switch (err.code) {
         case "ECONNREFUSED":
-            console.error(`No se pudo conectar al servidor MySQL en ${DB_HOST}:${DB_PORT}.`);
+            console.error("No se pudo conectar al servidor MySQL en ${DB_HOST}:${DB_PORT}.");
             console.error("Verifica que el servidor MySQL esté en ejecución y que el puerto sea correcto.");
             break;
 
         case "ER_ACCESS_DENIED_ERROR":
-            console.error(`Error de autenticación: Verifica el usuario (${DB_USER}) y la contraseña (${DB_PASSWORD}).`);
+            console.error("Error de autenticación: Verifica el usuario (${DB_USER}) y la contraseña (${DB_PASSWORD}).");
             break;
 
         case "ER_BAD_DB_ERROR":
-            console.error(`La base de datos '${DB_DATABASE}' no existe. Verifica el nombre de la base de datos.`);
+            console.error("La base de datos '${DB_DATABASE}' no existe. Verifica el nombre de la base de datos.");
             break;
 
         case "ETIMEDOUT":
-            console.error(`Tiempo de espera agotado al intentar conectarse a ${DB_HOST}:${DB_PORT}.`);
+            console.error("Tiempo de espera agotado al intentar conectarse a ${DB_HOST}:${DB_PORT}.");
             console.error("Verifica tu conexión a internet, el firewall y que el servidor MySQL esté accesible.");
             break;
     

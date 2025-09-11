@@ -33,7 +33,7 @@ defineProps({
   border-radius: 12px;
   overflow: hidden;
   height: 565px;
-  width: 300px;
+  width: 270px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
   cursor: pointer;
