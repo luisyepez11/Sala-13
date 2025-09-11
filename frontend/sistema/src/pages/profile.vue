@@ -4,6 +4,7 @@
 	import Modal from "../components/modal.vue";
 	import UserReviewCard from "../components/UserReviewCard.vue";
 	import FavoriteMovies from "../components/FavoriteMovies.vue";
+	import MovieGrid from '../components/searchresultsection.vue'
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
@@ -226,11 +227,18 @@
 		}
 	}
 	const modalCrearListas = ref(false);
-	const abrirModal = () => {
+	const abrirModalListas = () => {
 		modalCrearListas.value = true
 	}
-	const cerrarModal = () => {
+	const cerrarModalLista = () => {
 		modalCrearListas.value = false
+	}
+	const modalCrearComunidades = ref(false);
+	const abrirModalComunidades = () => {
+		modalCrearComunidades.value = true
+	}
+	const cerrarModalComunidades = () => {
+		modalCrearComunidades.value = false
 	}
 	const crearLista = async () => {
 		try {
@@ -247,6 +255,7 @@
 			console.error("Error creando lista:", error);
 		}
 	}
+	
 	const buscar = (nombre)=>{
 		if (nombre==""){
 			router.push("/")
@@ -272,7 +281,7 @@
 </script>
 
 <template>
-	<Modal :isOpen="modalCrearListas" @close="cerrarModal">
+	<Modal :isOpen="modalCrearListas" @close="cerrarModalLista">
 		<div class="modal-crear-lista">
 			<h2 class="modal-title">Crear nueva lista</h2>
 			<div class="form-group">
@@ -286,8 +295,27 @@
 					class="input-field textarea"></textarea>
 			</div>
 			<div class="modal-btn">
-				<button class="btn-cancel" @click="cerrarModal">Cancelar</button>
+				<button class="btn-cancel" @click="cerrarModalLista">Cancelar</button>
 				<button class="btn-crear" @click="crearLista">Crear</button>
+			</div>
+		</div>
+	</Modal>
+	<Modal :isOpen="modalCrearComunidades" @close="cerrarModalComunidades">
+		<div class="modal-crear-lista">
+			<h2 class="modal-title">Crear nueva Comunidad</h2>
+			<div class="form-group">
+				<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
+				<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
+					class="input-field" />
+			</div>
+			<div class="form-group">
+				<label class="user-bio" for="descripcion">Descripción</label>
+				<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu comunidad..."
+					class="input-field textarea"></textarea>
+			</div>
+			<div class="modal-btn">
+				<button class="btn-cancel" @click="cerrarModalComunidades">Cancelar</button>
+				<button class="btn-crear" @click="">Crear</button>
 			</div>
 		</div>
 	</Modal>
@@ -422,7 +450,7 @@
 
 			<div v-else-if="activeTab === 'Listas'" class="content-area">
 				<div v-if="!lista || lista.length === 0" class="listas-vacias">
-					<div class="lista-card create-card" @click="abrirModal">
+					<div class="lista-card create-card" @click="abrirModalListas">
 						<div class="lista-info">
 							<h2 class="lista-title">+ Crear nueva lista</h2>
 							<p class="lista-description">Empieza a organizar tus películas</p>
@@ -440,7 +468,7 @@
 							<p class="lista-description">{{ item.descripcion }}</p>
 						</div>
 					</div>
-					<div class="lista-card create-card" @click="abrirModal">
+					<div class="lista-card create-card" @click="abrirModalListas">
 						<div class="lista-info">
 							<h2 class="lista-title">+ Crear nueva lista</h2>
 							<p class="lista-description">Empieza a organizar tus películas</p>
@@ -448,24 +476,45 @@
 					</div>
 				</div>
 			</div>
-
+			<div v-else-if="activeTab === 'Likes'" class="content-area">
+				<MovieGrid 
+					genero="/likes" 
+					titulo="Películas que te gustaron" 
+				/>
+			</div>
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
 				<div class="reviews-container">
 					<UserReviewCard v-for="review in mockReviews" :key="review.id" :review="review" />
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
-  				<div class="comunidades-grid">
-    				<CommunityCard
-      					v-for="comunidad in comunidades"
-      					:key="comunidad.id"
-      					:titulo="comunidad.titulo"
-      					:descripcion="comunidad.descripcion"
-      					:imagen="comunidad.imagen"
-     					:usuarios="comunidad.usuarios"
-    				/>
-  				</div>
+				<div v-if="!comunidades || comunidades.length === 0" class="comunidades-vacias">
+					<div class="lista-card create-card" @click="abrirModalComunidades">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva comunidad</h2>
+							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
+						</div>
+					</div>
 				</div>
+				<div v-else class="comunidades-grid">
+					<CommunityCard
+						v-for="comunidad in comunidades"
+						:key="comunidad.id"
+						:titulo="comunidad.titulo"
+						:descripcion="comunidad.descripcion"
+						:imagen="comunidad.imagen"
+						:usuarios="comunidad.usuarios"
+					/>
+
+					<div class="lista-card create-card" @click="abrirModalComunidades">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva comunidad</h2>
+							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div v-else class="empty-content">
 				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
 			</div>
@@ -591,7 +640,7 @@
 	.lista-title {
 		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
-		text-align: left;
+		text-align: center;
 	}
 
 	.lista-description {
@@ -601,6 +650,8 @@
 	}
 
 	.create-card {
+		height: 565px;
+		width: 270px;
 		background: rgba(75, 85, 99, 0.3);
 		border: 2px dashed #6b7280;
 		display: flex;
