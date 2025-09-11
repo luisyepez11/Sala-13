@@ -29,6 +29,20 @@ export const getComentarios = async(req,res) =>{
         })
     }
 }
+
+export const getComentariosUsuario = async(req,res) =>{
+    try {
+        const id = req.params.id
+        console.log(id)
+        const data = await pool.query(`SELECT * FROM comentarios LEFT JOIN cuentas ON comentarios.idCuenta = cuentas.idcuenta WHERE cuentas.idcuenta=?`,[id])
+        res.status(201).json(data[0])
+    } catch (error) {
+        console.log(error)
+        res.json({
+            message:error
+        })
+    }
+}
 export const getComentariosLanding = async(req,res) =>{
     try {
         const data = await pool.query(`SELECT comentarios.*,cuentas.nombreCuenta,cuentas.nombreReal FROM comentarios INNER JOIN cuentas ON comentarios.idCuenta=cuentas.idcuenta;`)

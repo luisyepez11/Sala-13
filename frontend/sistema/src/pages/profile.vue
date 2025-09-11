@@ -45,6 +45,9 @@
 
 	const PROFILE_PIC_KEY = 'user_profile_picture';
 
+	// Variable para almacenar las reseñas reales
+	const userReviews = ref([]);
+
 	onMounted(() => {
 		const storedPic = localStorage.getItem(PROFILE_PIC_KEY);
 		if (storedPic) {
@@ -61,7 +64,8 @@
 		}
 	});
 
-	const mockReviews = ref([
+	// Eliminamos los mockReviews ya que usaremos datos reales
+	/* const mockReviews = ref([
 		{
 			id: 1,
 			user: {
@@ -90,7 +94,7 @@
 			reviewText: "Un clásico atemporal. La actuación de Marlon Brando es legendaria. Aunque el ritmo es lento, la historia te atrapa por completo.",
 			likes: 97
 		}
-	]);
+	]); */
 	
 	const usuario = ref({
 		nombre: "",
@@ -102,6 +106,36 @@
 		total_seguidores: 0,
 		total_comentarios: 0
 	});
+
+	// Función para obtener las reseñas del usuario
+	const obtenerResenasUsuario = async (idUsuario) => {
+		try {
+			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${idUsuario}`);
+			// Transformar los datos del endpoint al formato que espera UserReviewCard
+			const reseñasTransformadas = response.data.map(comentario => ({
+				id: comentario.idcomentario,
+				user: {
+					name: comentario.nombreCuenta,
+					avatar: profilePictureUrl.value || "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
+				},
+				movie: {
+					title: comentario.nombrePelicula,
+					poster: `https://image.tmdb.org/t/p/w500`,
+					idPelicula:comentario.idPelicula
+
+				},
+				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				reviewText: comentario.comentario,
+				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				fecha: comentario.fecha
+			}));
+			
+			userReviews.value = reseñasTransformadas;
+		} catch (error) {
+			console.error("Error al obtener las reseñas del usuario:", error);
+			userReviews.value = [];
+		}
+	};
 
 	const data = async () => {
 		try {
@@ -153,6 +187,9 @@
 					index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
 			);
 			listaSolicitudes.value = unicas;
+			
+			// Obtener las reseñas del usuario después de tener su ID
+			obtenerResenasUsuario(usuarioId.value);
 			
 		} catch (error) {
 			console.log("error", error)
@@ -450,8 +487,11 @@
 			</div>
 
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
-				<div class="reviews-container">
-					<UserReviewCard v-for="review in mockReviews" :key="review.id" :review="review" />
+				<div v-if="userReviews.length === 0" class="empty-content">
+					<div class="empty-text">No tienes reseñas todavía</div>
+				</div>
+				<div v-else class="reviews-container">
+					<UserReviewCard v-for="review in userReviews" :key="review.id" :review="review"  />
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Comunidades'" class="content-area">

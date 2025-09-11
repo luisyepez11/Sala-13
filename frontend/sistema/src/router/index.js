@@ -15,6 +15,7 @@ import PdfViewer from "../pages/PdfViewer.vue";
 import ContactPage from "../pages/ContactPage.vue";
 import Comunidades from "./../pages/Comunidades.vue"
 import ListDetailOther from "../pages/listDetailOther.vue";
+import TimeLine from "../pages/TimeLine.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -104,14 +105,20 @@ const router = createRouter({
             component:PdfViewer
         },
         {
-            path:"/timeline",
-            name:"timeline",
+            path:"/pdfViewer",
+            name:"pdfViewer",
             component:PdfViewer
         },
         {
             path:"/contacto",
             name:"contacto",
             component:ContactPage
+        }
+        ,
+        {
+            path:"/timeLine",
+            name:"TimeLine",
+            component:TimeLine
         }
     ]
 })

@@ -28,6 +28,18 @@ export const getAmigos= async(req,res) =>{
         })
     }
 }
+export const getAmigosId= async(req,res) =>{
+    try {
+        const id = req.params.id
+        const data = await pool.query(`SELECT a.*,c.nombreCuenta FROM amigos a  INNER JOIN cuentas c ON c.idcuenta=a.idReceptor WHERE idUsuario=?` ,[id])
+        res.status(201).json(data[0])
+    } catch (error) {
+        console.log(error)
+        res.json({
+            message:"error"
+        })
+    }
+}
 
 
 
