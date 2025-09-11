@@ -88,6 +88,13 @@ const closeModal = () => {
     alert("funcionando")
     openModal()
 };
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 </script>
 
 <template>
@@ -100,7 +107,7 @@ const closeModal = () => {
   </Modal>
   <div class="perfil-container">
     <!-- Header Navigation -->
-    <Nav></Nav>
+    <Nav :buscar="buscar" ></Nav>
 
     <!-- Main Content -->
     <div class="main-content">
