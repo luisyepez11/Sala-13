@@ -11,6 +11,8 @@ import ListDetail from "../pages/listDetail.vue";
 import listDetailOther from "../pages/listDetailOther.vue";
 import Lading_page from "../pages/lading_page.vue";
 import homeBusquedaListas from "../pages/homeBusquedaListas.vue";
+import PdfViewer from "../pages/PdfViewer.vue";
+import ContactPage from "../pages/ContactPage.vue";
 import Comunidades from "./../pages/Comunidades.vue"
 import ListDetailOther from "../pages/listDetailOther.vue";
 const router = createRouter({
@@ -95,6 +97,21 @@ const router = createRouter({
             path:"/homeListas",
             name:"homeListas",
             component:homeBusquedaListas
+        },
+        {
+            path:"/ayuda",
+            name:"manual",
+            component:PdfViewer
+        },
+        {
+            path:"/timeline",
+            name:"timeline",
+            component:PdfViewer
+        },
+        {
+            path:"/contacto",
+            name:"contacto",
+            component:ContactPage
         }
     ]
 })
