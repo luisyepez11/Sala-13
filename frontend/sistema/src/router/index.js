@@ -100,7 +100,7 @@ const router = createRouter({
         {
             path:"/timeline",
             name:"timeline",
-            component:PdfViewer
+            component:TimeLine
         },
         {
             path:"/contacto",
