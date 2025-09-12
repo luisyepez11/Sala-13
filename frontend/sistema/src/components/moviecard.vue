@@ -116,15 +116,19 @@ const handleWatch = () => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: left;
   height: 100%;
-  min-height: 300px;
+  min-height: 320px;
   padding-bottom: 1rem;
   box-sizing: border-box;
 }
 
-.delete-button-wrapper{
+
+.delete-button-wrapper {
+  margin-top: auto;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .movie-card:hover {
@@ -208,7 +212,7 @@ const handleWatch = () => {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  display: flex;
+  display: ;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -271,6 +275,7 @@ const handleWatch = () => {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  justify-content: flex-end
 }
 
 .btn-delete:hover {
