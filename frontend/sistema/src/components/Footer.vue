@@ -37,7 +37,7 @@
 					<a href="https://www.tiktok.com/@sala13_tiktok?is_from_webapp=1&sender_device=pc" class="social-link" target="_blank" rel="noopener noreferrer">
 						<img src="/src/assets/tiktoklogo.png" alt="Logo de tiktok" class="social-icon">
 					</a>
-					<a href="https://x.com/sala13991245" class="social-link" target="_blank" rel="noopener noreferrer">
+					<a href="https://x.com/sala13_x" class="social-link" target="_blank" rel="noopener noreferrer">
 						<img src="/src/assets/xlogo.png" alt="Logo de X" class="social-icon">
 					</a>
 					<a href="https://www.instagram.com/sala13_ig" class="social-link" target="_blank" rel="noopener noreferrer">
