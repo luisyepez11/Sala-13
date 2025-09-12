@@ -8,6 +8,7 @@
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
+	import Popularfilmsection from "../components/popularfilmsectionLike.vue"
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
@@ -514,10 +515,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Likes'" class="content-area">
-				<MovieGrid 
-					genero="/likes" 
-					titulo="Películas que te gustaron" 
-				/>
+				<Popularfilmsection :idUsuario="usuarioId"></Popularfilmsection>
 			</div>
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
 				<div v-if="userReviews.length === 0" class="empty-content">
