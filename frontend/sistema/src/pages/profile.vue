@@ -111,7 +111,7 @@
 	// Función para obtener las reseñas del usuario
 	const obtenerResenasUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${idUsuario}`);
+			const response = await axios.get(`/api/comentario/getComentariosUsuario/${idUsuario}`);
 			// Transformar los datos del endpoint al formato que espera UserReviewCard
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
@@ -140,7 +140,7 @@
 
 	const data = async () => {
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+			const usarioId = await axios.get("/api/usuario/user")
 			if (usarioId.data.message == "no registrado") {
 				router.push('/');
 				return;
@@ -148,9 +148,9 @@
 			usuarioId.value = usarioId.data.id;
 
 			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
-				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usuarioId.value}`),
-				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usuarioId.value}`),
-				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usuarioId.value}`)
+				axios.get(`/api/solicitud/solicitudes/${usuarioId.value}`),
+				axios.get(`/api/cuenta/getCuenta/${usuarioId.value}`),
+				axios.get(`/api/lista/getListasUsuarios/${usuarioId.value}`)
 			]);
 			
 			const datos = cuenta.data.resultCuenta[0];
@@ -168,7 +168,7 @@
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
+						const peliculasRes = await axios.get(`/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
 						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
@@ -220,8 +220,8 @@
 		}
 
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
+			const usarioId = await axios.get("/api/usuario/user")
+			await axios.put(`/api/cuenta/${usarioId.data.id}`, {
 				nombreReal: editData.value.nombre,
 				descripcionCuenta: editData.value.descripcion,
 				nombreCuenta: editData.value.apodo
@@ -247,7 +247,7 @@
 	};
 	const aceptarSolicitud = async (id, nombre, idsolicitudes) => {
 		try {
-			await axios.post(`http://localhost:3300/api/amigo/insertAmigo`, {
+			await axios.post(`/api/amigo/insertAmigo`, {
 				idReceptor: usuarioId.value,
 				idUsuario: id,
 				idsolicitudes: idsolicitudes
@@ -279,7 +279,7 @@
 	}
 	const crearLista = async () => {
 		try {
-			await axios.post(`http://localhost:3300/api/lista`, {
+			await axios.post(`/api/lista`, {
 				nombreLista: nombreLista.value,
 				descripcion: descripcion.value,
 				idCuenta: usuarioId.value

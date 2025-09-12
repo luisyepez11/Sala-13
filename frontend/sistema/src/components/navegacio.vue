@@ -16,7 +16,7 @@ const logueado = ref(false); // Inicializar como false por defecto
 
 const cargar = async () => {
   try {
-    const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
+    const usuarioId = await axios.get("/api/usuario/user");
     logueado.value = usuarioId.data.message !== "no registrado";
     console.log("Estado de autenticación:", logueado.value);
   } catch (error) {
@@ -44,7 +44,7 @@ function reemplazarEspacios(texto) {
 
 const deleteUser = async () => {
   try {
-    await axios.get("http://localhost:3300/api/usuario/delete");
+    await axios.get("/api/usuario/delete");
     router.push('/');
 
   } catch (error) {

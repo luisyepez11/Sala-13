@@ -25,7 +25,7 @@ const movie = ref(null)
 onMounted(async () => {
   try {
     console.log(props.review.movie.idPelicula)
-    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${props.review.movie.idPelicula}`)
+    const resp = await fetch(`/api/pelicula/getPelicula/${props.review.movie.idPelicula}`)
     const datos = await resp.json()
     console.log(datos)
     movie.value = {

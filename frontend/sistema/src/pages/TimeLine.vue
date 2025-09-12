@@ -1,6 +1,7 @@
 <script setup>
 import Nav from '../components/navegacio.vue'
 import Popularfilmsection from "../components/popularfilmsectionListas.vue"
+import UserReviewCard from "../components/UserReviewCard.vue";
 import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
@@ -14,11 +15,13 @@ const movieId = ref(null)
 const componentKey = ref(0)
 const data = ref([])
 const selectedFilter = ref('peliculas')
+const userReviews = ref([]);
+
 
 const listas = async () =>{
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const result = await fetch(`http://localhost:3300/api/amigo/getAmigosId/${usarioId.data.id}`)
+    const usarioId = await axios.get("/api/usuario/user")
+    const result = await fetch(`/api/amigo/getAmigosId/${usarioId.data.id}`)
     const amigos = await result.json()
     data.value = amigos
     console.log(data.value)
@@ -48,6 +51,35 @@ const buscar = (nombre) => {
       router.push("/search/"+nombre)
     }
 }
+const obtenerResenasUsuario = async (idUsuario) => {
+		try {
+			const response = await axios.get(`/api/comentario/getComentariosUsuario/${idUsuario}`);
+            console.log(response)
+			// Transformar los datos del endpoint al formato que espera UserReviewCard
+			const reseñasTransformadas = response.data.map(comentario => ({
+				id: comentario.idcomentario,
+				user: {
+					name: comentario.nombreCuenta,
+					avatar: profilePictureUrl.value || "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
+				},
+				movie: {
+					title: comentario.nombrePelicula,
+					poster: `https://image.tmdb.org/t/p/w500`,
+					idPelicula:comentario.idPelicula
+
+				},
+				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				reviewText: comentario.comentario,
+				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				fecha: comentario.fecha
+			}));
+			
+			userReviews.value = reseñasTransformadas;
+		} catch (error) {
+			console.error("Error al obtener las reseñas del usuario:", error);
+			userReviews.value = [];
+		}
+	};
 </script>
 
 <template>
@@ -57,7 +89,7 @@ const buscar = (nombre) => {
     <main class="main-content">
         <div  v-for="value in data">
             <h2>{{ value.nombreCuenta }}</h2>
-            
+					<UserReviewCard v-for="review in userReviews" :key="review.id" :review="review"  />
         </div>
     </main>
 

@@ -1,9 +1,14 @@
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import CommunityMessage from './CommunityMessage.vue';
 import io from "socket.io-client"
 
-const socket = io("http://localhost:3300")
+const 
+socket = io("https://sala-13-production.up.railway.app", {
+    transports: ['websocket', 'polling'], 
+    withCredentials: true,
+
+  })
 const props = defineProps({
   title: {
     type: String,

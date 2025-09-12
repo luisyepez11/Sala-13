@@ -16,14 +16,14 @@
   
   const data = async () =>{
     try {
-      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      const usarioId = await axios.get("/api/usuario/user")
       usario.value=usarioId.data.id
       if (usarioId.data.message == "no registrado"){
         router.push('/login');
       }
       
       console.log(id)
-      const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`)
+      const cuenta = await axios.get(`/api/cuenta/getCuenta/${id}`)
       const datos = cuenta.data.resultCuenta[0]
       console.log(usuario.value = {
         ...usuario.value,
@@ -64,7 +64,7 @@
 
   async function seguirPerfil () {
     try {
-      const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
+      const result = await axios.post(`/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
           idUsuario:usario.value
         })

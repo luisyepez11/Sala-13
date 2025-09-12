@@ -34,7 +34,7 @@ watch(() => route.params.id, (newId) => {
 // Función para obtener las listas desde la API
 const fetchLists = async (nombre) => {
   try {
-    const result = await fetch(`http://localhost:3300/api/lista/getListasBusqueda/${nombre}`)
+    const result = await fetch(`/api/lista/getListasBusqueda/${nombre}`)
     const lists = await result.json()
     listsData.value = lists
     console.log("Listas obtenidas:", listsData.value)

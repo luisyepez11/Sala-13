@@ -17,19 +17,19 @@ const nombrePelicula=ref("")
 const error = ref(null)
 const insertLike = async () =>{
       try {
-        const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-        const like = await axios.post("http://localhost:3300/api/like",{idCuenta:usarioId.data.id,idPelicula:route.params.id})
+        const usarioId = await axios.get("/api/usuario/user")
+        const like = await axios.post("/api/like",{idCuenta:usarioId.data.id,idPelicula:route.params.id})
       } catch (error) {
         console.log(error)
       }
 }
 const loadReviews = async () => {
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
+    const usarioId = await axios.get("/api/usuario/user")
+    const listas = await axios.get(`/api/lista/getListasUsuarios/${usarioId.data.id}`)
     lista.value = listas.data
     const movieId = route.params.id;
-    const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
+    const response = await axios.get(`/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
     reviews.value = comentarios.map(comentario => ({
       idCuenta:comentario.idCuenta,
@@ -48,13 +48,13 @@ const loadReviews = async () => {
 const submitReview = async()=>{
     try {
     const movieId = route.params.id
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
+    const usarioId = await axios.get("/api/usuario/user")
+    const cuenta = await axios.get(`/api/cuenta/getCuenta/${usarioId.data.id}`)
     const idcuenta =cuenta.data.resultCuenta[0].idcuenta
     const comentario = document.getElementById('comentario').value
     const fechaISO = new Date().toISOString(); 
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
-    const result = await axios.post(`http://localhost:3300/api/comentario`,{
+    const result = await axios.post(`/api/comentario`,{
           idCuenta:idcuenta,
           idPelicula:movieId,
           comentario:comentario,
@@ -71,7 +71,7 @@ const submitReview = async()=>{
 onMounted(async () => {
   try {
     const movieId = route.params.id
-    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
+    const resp = await fetch(`/api/pelicula/getPelicula/${movieId}`)
     const datos = await resp.json();
     console.log(datos)
     if (!movieId) {
@@ -139,7 +139,7 @@ const selecionado = (lista) =>{
 const agregar_lista = async () =>{
       listas.value.map(async id =>{
         try {
-          const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula',{
+          const result = await axios.post('/api/lista/agregarPelicula',{
             idLista:id, 
             idPelicula:route.params.id
           })
