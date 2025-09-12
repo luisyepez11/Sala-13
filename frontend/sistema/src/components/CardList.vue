@@ -37,6 +37,7 @@ const eliminar = async() =>{
         idPelicula: props.idPelicula
       }
     })
+    router.go(0)
   } catch (error) {
     console.log(error)
   }
