@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
+
 const props = defineProps({
   movie: {
     type: Object,
@@ -14,10 +16,15 @@ const props = defineProps({
       views: 1200,
       likes: 89,
       year: 2024,
-      adult: false // Añadimos la propiedad adult con valor por defecto
+      adult: false
     })
+  },
+  opcion: {
+    type: String,
+    default: ''
   }
 })
+
 
 const isHovered = ref(false)
 const isLiked = ref(false)
@@ -25,20 +32,22 @@ const isLiked = ref(false)
 const handleLike = () => {
   isLiked.value = !isLiked.value
 }
+
 const seeDetail = (event) => {
-  event.stopPropagation();
+  event.stopPropagation()
   router.push({
     name: "details",
     params: {
       id: props.movie.id
     }
   })
-};
+}
+
 const handleWatch = () => {
   console.log(`Watching movie: ${props.movie.title}`)
 }
-const vista = ref()
 </script>
+
 
 <template>
   <div 
@@ -72,7 +81,6 @@ const vista = ref()
     
     <!-- Movie Title -->
     <h3 class="movie-title">{{ movie.title }}</h3>
-    
     <!-- Movie Stats -->
     <div class="movie-stats">
       <span class="stat">
@@ -97,6 +105,9 @@ const vista = ref()
         {{ movie.rating }}
       </span>
     </div>
+    <div v-if="props.opcion === 'profile'" class="delete-button-wrapper">
+      <button class="btn-delete">Eliminar</button>
+    </div>
   </div>
 </template>
 
@@ -104,8 +115,20 @@ const vista = ref()
 .movie-card {
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease;
-  cursor: pointer;
+  justify-content: space-between;
+  align-items: left;
+  height: 100%;
+  min-height: 320px;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+
+.delete-button-wrapper {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .movie-card:hover {
@@ -189,7 +212,7 @@ const vista = ref()
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  display: flex;
+  display: ;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -216,8 +239,6 @@ const vista = ref()
   margin: 0 0 0.5rem 0;
   line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: left;
 }
@@ -242,6 +263,23 @@ const vista = ref()
   width: 0.875rem;
   height: 0.875rem;
   opacity: 0.8;
+}
+.btn-delete {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  justify-content: flex-end
+}
+
+.btn-delete:hover {
+  background-color: #2563eb;
 }
 
 /* Responsive Design */
