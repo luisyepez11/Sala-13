@@ -141,7 +141,7 @@
 
 
 
-  const activeTab = ref("Profile")
+  const activeTab = ref("Favoritas")
   const tabs = ["Favoritas", "Listas", "Likes", "Reseñas", "Comunidades", "Vistas"]
 
   const stats = ref({
