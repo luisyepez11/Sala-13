@@ -16,7 +16,9 @@ import amigosRouter from "./Amigos/routers/amigos.router.js";
 //Listas
 import listaRouter from "./Listas/routers/lista.router.js";
 //Like
-import likeRouter from "./Likes/routers/likes.router.js"
+import likeRouter from "./Likes/routers/likes.router.js";
+//Vistas
+import vistasRouter from "./Vistas/routers/vistas.router.js";
 
 const app = express()
 
@@ -44,4 +46,6 @@ app.use("/api/amigo",amigosRouter)
 app.use("/api/lista", listaRouter) 
 //Like
 app.use("/api/like", likeRouter) 
+//Vistas
+app.use("/api/vistas", vistasRouter) 
 export default app;
