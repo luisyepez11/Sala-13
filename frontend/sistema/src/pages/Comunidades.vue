@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Navegacio from '../components/navegacio.vue';
 import ComunidadesGrid from '../components/ComunidadesGrid.vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 
@@ -12,6 +13,42 @@ const viewMode = ref('grid'); // 'grid' o 'full'
 // Estado para filtros
 const filtroActual = ref('Todas');
 const busquedaTexto = ref('');
+
+// Estado para almacenar las comunidades
+const comunidades = ref([]);
+const comunidadesCargando = ref(true);
+const comunidadesError = ref(null);
+
+// Función para cargar comunidades desde la API
+const cargarComunidades = async () => {
+  comunidadesCargando.value = true;
+  comunidadesError.value = null;
+  
+  try {
+    const response = await axios.get('http://localhost:3300/api/comunidades');
+    
+    // Transformar los datos de la API al formato esperado
+    comunidades.value = response.data.map(comunidad => ({
+      id: comunidad.idcominidad,
+      nombre: comunidad.nombreComunidad,
+      descripcion: comunidad.descripcionCominidad || 'Sin descripción',
+      imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+      usuarios: Math.floor(Math.random() * 1000) + 100, // Placeholder
+      esMiembro: false // Puedes ajustar esto según tu lógica
+    }));
+    
+  } catch (error) {
+    console.error('Error al cargar comunidades:', error);
+    comunidadesError.value = 'No se pudieron cargar las comunidades. Intenta nuevamente.';
+  } finally {
+    comunidadesCargando.value = false;
+  }
+};
+
+// Cargar comunidades al montar el componente
+onMounted(() => {
+  cargarComunidades();
+});
 
 // Función de búsqueda que se pasa al componente navegacio
 const buscar = async (termino) => {
@@ -29,12 +66,34 @@ const toggleViewMode = () => {
 const cambiarFiltro = (filtro) => {
   filtroActual.value = filtro;
   console.log('Filtro cambiado a:', filtro);
+  
+  // Aquí puedes implementar la lógica de filtrado
+  if (filtro === 'Mis comunidades') {
+    // Filtrar comunidades donde el usuario es miembro
+    console.log('Filtrando mis comunidades');
+  } else if (filtro === 'Populares') {
+    // Ordenar por número de usuarios
+    console.log('Filtrando comunidades populares');
+  }
 };
 
 // Manejar eventos del grid de comunidades
-const handleUnirse = (comunidad) => {
+const handleUnirse = async (comunidad) => {
   console.log('Unirse a comunidad:', comunidad.nombre);
-  // Aquí puedes implementar la lógica para unirse a una comunidad
+  try {
+    // Aquí puedes implementar la lógica para unirse a una comunidad
+    // Ejemplo: await axios.post(`/api/comunidades/${comunidad.id}/unirse`);
+    
+    // Actualizar el estado local
+    comunidades.value = comunidades.value.map(c => 
+      c.id === comunidad.id ? { ...c, esMiembro: true } : c
+    );
+    
+    alert(`Te has unido a la comunidad "${comunidad.nombre}"`);
+  } catch (error) {
+    console.error('Error al unirse a la comunidad:', error);
+    alert('No se pudo unir a la comunidad. Intenta nuevamente.');
+  }
 };
 
 const handleVerDetalles = (comunidad) => {
@@ -103,8 +162,34 @@ const handleVerDetalles = (comunidad) => {
         </div>
       </div>
       
+      <!-- Estados de carga y error -->
+      <div v-if="comunidadesCargando" class="loading-section">
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <p>Cargando comunidades...</p>
+        </div>
+      </div>
+      
+      <div v-else-if="comunidadesError" class="error-section">
+        <div class="error-content">
+          <p>{{ comunidadesError }}</p>
+          <button @click="cargarComunidades" class="retry-button">
+            Reintentar
+          </button>
+        </div>
+      </div>
+      
+      <div v-else-if="comunidades.length === 0" class="empty-section">
+        <div class="empty-content">
+          <p>No hay comunidades disponibles</p>
+          <p class="empty-subtext">Sé el primero en crear una comunidad</p>
+        </div>
+      </div>
+      
       <!-- Grid de comunidades -->
       <ComunidadesGrid 
+        v-else
+        :comunidades="comunidades"
         :view-mode="viewMode"
         @unirse="handleUnirse"
         @ver-detalles="handleVerDetalles"
@@ -246,6 +331,59 @@ const handleVerDetalles = (comunidad) => {
   background: #3b82f6;
   border-color: #3b82f6;
   color: #ffffff;
+}
+
+/* Estados de carga y error */
+.loading-section,
+.error-section,
+.empty-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.loading-content,
+.error-content,
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #3b82f6;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.retry-button {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #2563eb;
+}
+
+.empty-subtext {
+  color: #9ca3af;
+  font-size: 0.9rem;
 }
 
 /* Responsive design */
