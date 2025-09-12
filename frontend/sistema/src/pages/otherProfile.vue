@@ -7,6 +7,8 @@
 	import MovieGrid from '../components/searchresultsection.vue'
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
+  import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue";
+  import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
@@ -273,7 +275,13 @@ const buscar = (nombre) => {
       <div v-if="activeTab === 'Favoritas'" class="content-area">
 				<FavoriteMovies />
 			</div>
-
+<div v-else-if="activeTab === 'Likes'" class="content-area">
+		  <PopularfilmsectionLike :idUsuario="route.params.id" opcion="other-profile"></PopularfilmsectionLike>
+</div>
+<div v-else-if="activeTab === 'Vistas'" class="content-area">
+		  <PopularfilmsectionVistas :idUsuario="route.params.id"></PopularfilmsectionVistas>
+</div>
+      
 			<div v-else-if="activeTab === 'Listas'" class="content-area">
 				<div v-if="!lista || lista.length === 0" class="listas-vacias">
 					<div class="lista-card create-card" @click="abrirModalListas">
