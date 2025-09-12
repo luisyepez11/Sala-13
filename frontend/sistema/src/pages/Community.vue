@@ -5,7 +5,19 @@ import popularfilmsection from '../components/popularfilmsection.vue'
 import Footer from '../components/Footer.vue'
 import CommunityChat from '../components/CommunityChat.vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+axios.defaults.withCredentials = true;
+
+const router = useRouter()
+const route = useRoute()
+const buscador = ref("")
+const mostrar = ref(true)
+const comunidadesUsuario = ref([])
+const cargandoComunidades = ref(true)
+const comunidadSeleccionada = ref(null) 
+
 const data = {
   "generos": [
     {"id": 28, "name": "Acción"},
@@ -29,10 +41,38 @@ const data = {
     {"id": 37, "name": "Western"}
   ]
 }
-const router = useRouter()
-const route = useRoute()
-const buscador = ref("")
-const mostrar = ref(true)
+
+// Función para obtener las comunidades del usuario
+const obtenerComunidadesUsuario = async () => {
+  try {
+    cargandoComunidades.value = true;
+    
+    // Primero obtener el ID del usuario
+    const usuarioResponse = await axios.get("/api/usuario/user");
+    const idUsuario = usuarioResponse.data.id;
+    
+    // Luego obtener las comunidades del usuario
+    const response = await axios.get(`/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+    
+    comunidadesUsuario.value = response.data;
+    
+    // Seleccionar la primera comunidad por defecto si existe
+    if (comunidadesUsuario.value.length > 0) {
+      comunidadSeleccionada.value = comunidadesUsuario.value[0];
+    }
+  } catch (error) {
+    console.error('Error al obtener las comunidades del usuario:', error);
+    comunidadesUsuario.value = [];
+  } finally {
+    cargandoComunidades.value = false;
+  }
+};
+
+// Función para manejar el clic en una comunidad
+const handleComunidadClick = (comunidad) => {
+  comunidadSeleccionada.value = comunidad;
+  // alert(`ID de la comunidad: ${comunidad.idcominidad}\nNombre: ${comunidad.nombreComunidad}`);
+};
 
 const buscar = (nombre)=>{
     if (nombre==""){
@@ -41,6 +81,11 @@ const buscar = (nombre)=>{
       router.push("/search/"+nombre)
     }
 }
+
+// Cargar comunidades al montar el componente
+onMounted(() => {
+  obtenerComunidadesUsuario();
+});
 </script>
 
 <template>
@@ -52,30 +97,54 @@ const buscar = (nombre)=>{
             <!-- Main Content -->
         <aside class="sidebar">
             <div class="user-list">
-                <div class="user-item active">
-                    <div class="avatar-container">
-                        <div class="avatar-placeholder">G</div>
-                    </div>
-                    <div class="user-info">
-                        <span class="username">Grupo</span>
-                        <span class="group-name">Fans del Terror</span>
-                    </div>
+                <!-- Título de la sección -->
+                <div class="section-header">
+                    <h3 class="section-title">Mis Comunidades</h3>
                 </div>
                 
-                <div class="user-item">
+                <!-- Estado de carga -->
+                <div v-if="cargandoComunidades" class="loading-state">
+                    <p>Cargando comunidades...</p>
+                </div>
+                
+                <!-- Estado vacío -->
+                <div v-else-if="comunidadesUsuario.length === 0" class="empty-state">
+                    <p>No estás en ninguna comunidad</p>
+                </div>
+                
+                <!-- Lista de comunidades -->
+                <div 
+                    v-for="comunidad in comunidadesUsuario" 
+                    :key="comunidad.idcomunidadecuenta"
+                    class="user-item"
+                    :class="{ 'active': comunidadSeleccionada && comunidadSeleccionada.idcominidad === comunidad.idcominidad }"
+                    @click="handleComunidadClick(comunidad)"
+                >
                     <div class="avatar-container">
-                        <div class="avatar-placeholder">R</div>
+                        <div class="avatar-placeholder">{{ comunidad.nombreComunidad.charAt(0).toUpperCase() }}</div>
                     </div>
                     <div class="user-info">
-                        <span class="username">Renzo</span>
-                        <span class="last-message">Último mensaje...</span>
+                        <span class="username">{{ comunidad.nombreComunidad }}</span>
+                        <span class="group-name" v-if="comunidad.descripcionCominidad">
+                            {{ comunidad.descripcionCominidad }}
+                        </span>
+                        <span class="group-name" v-else>
+                            Sin descripción
+                        </span>
                     </div>
                 </div>
             </div>
         </aside>
             <!-- Community Chat Section -->
             
-            <CommunityChat />
+            <CommunityChat 
+              v-if="comunidadSeleccionada"
+              :title="comunidadSeleccionada.nombreComunidad"
+              :comunidadId="comunidadSeleccionada.idcominidad"
+            />
+            <div v-else class="no-chat-selected">
+              <p>Selecciona una comunidad para comenzar a chatear</p>
+            </div>
         
     </section>
   </div>
@@ -105,8 +174,6 @@ const buscar = (nombre)=>{
   margin-bottom: 3rem;
 }
 
-
-
 .community-container {
   display: flex;
   flex-direction: row;
@@ -125,6 +192,26 @@ const buscar = (nombre)=>{
 .user-list {
   display: flex;
   flex-direction: column;
+}
+
+.section-header {
+  padding: 1rem;
+  border-bottom: 1px solid #374151;
+  background: #111827;
+}
+
+.section-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.loading-state, .empty-state {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.9rem;
 }
 
 .user-item {
@@ -156,12 +243,12 @@ const buscar = (nombre)=>{
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: #374151;
+  background: #3b82f6;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -182,7 +269,7 @@ const buscar = (nombre)=>{
   text-overflow: ellipsis;
 }
 
-.group-name, .last-message {
+.group-name {
   color: #9ca3af;
   font-size: 0.8rem;
   white-space: nowrap;
@@ -235,47 +322,6 @@ const buscar = (nombre)=>{
 .trending-section {
   margin-top: 4rem;
   padding: 2rem 0;
-}
-
-.section-title {
-  color: #ffffff;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.coming-soon-message {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: rgba(43, 58, 110, 0.3);
-  border-radius: 16px;
-  border: 1px solid #334155;
-  backdrop-filter: blur(10px);
-}
-
-.coming-soon-icon {
-  margin-bottom: 1.5rem;
-}
-
-.clock-icon {
-  width: 3rem;
-  height: 3rem;
-  color: #3b82f6;
-  margin: 0 auto;
-}
-
-.coming-soon-text {
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-}
-
-.coming-soon-subtitle {
-  color: #9ca3af;
-  font-size: 1rem;
-  margin: 0;
 }
 
 .page-footer {
@@ -421,14 +467,6 @@ const buscar = (nombre)=>{
     margin-bottom: 2rem;
   }
   
-  .section-title {
-    font-size: 1.75rem;
-  }
-  
-  .coming-soon-message {
-    padding: 3rem 1.5rem;
-  }
-  
   .footer-content {
     padding: 2rem 1rem 1.5rem;
     grid-template-columns: repeat(2, 1fr);
@@ -442,30 +480,6 @@ const buscar = (nombre)=>{
 }
 
 @media (max-width: 640px) {
-  
-  .section-title {
-    font-size: 1.5rem;
-  }
-  
-  .coming-soon-message {
-    padding: 2.5rem 1rem;
-  }
-  
-  .coming-soon-text {
-    font-size: 1.125rem;
-  }
-  
-  .clock-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  
-  .section-title {
-    font-size: 1.375rem;
-  }
   
   .footer-content {
     grid-template-columns: 1fr;
@@ -488,10 +502,6 @@ const buscar = (nombre)=>{
 }
 
 @media (max-width: 360px) {
-  .coming-soon-message {
-    padding: 2rem 0.75rem;
-  }
-  
   .footer-content {
     padding: 1.5rem 0.75rem 1rem;
   }

@@ -15,7 +15,7 @@ const loading = ref(false)
 
 const datosPeliculas = async (movieId) => {
   try {
-    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
+    const resp = await fetch(`/api/pelicula/getPelicula/${movieId}`)
     if (!resp.ok) throw new Error('Error al obtener datos de la película')
     
     const datos = await resp.json();
@@ -49,7 +49,7 @@ const datosPeliculas = async (movieId) => {
 const fetchMovies = async () => {
   try {
     loading.value = true
-    const resp = await fetch(`http://localhost:3300/api/like/getUsuarioLike/${props.idUsuario}`)
+    const resp = await fetch(`/api/like/getUsuarioLike/${props.idUsuario}`)
     if (!resp.ok) throw new Error('Error al obtener la lista de películas')
     
     const datos = await resp.json()

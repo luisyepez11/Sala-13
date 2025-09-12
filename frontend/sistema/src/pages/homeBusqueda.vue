@@ -8,7 +8,7 @@ import popularfilmsectionListas from '../components/popularfilmsectionListas.vue
 import UserSearchResult from '../components/UserSearchResult.vue';
 import CommunitySearchResult from '../components/CommunitySearchResult.vue';
 import Footer from '../components/Footer.vue';
-
+import Comunidades from './Comunidades.vue';
 const router = useRouter();
 const route = useRoute();
 
@@ -23,6 +23,9 @@ const performSearch = (query) => {
 
   if (selectedFilter.value === 'listas') {
     fetchLists(query);
+  }
+  if (selectedFilter.value === 'comunidades') {
+    router.push(`/comunidades`);
   }
 };
 
@@ -98,7 +101,7 @@ const buscar = (query) => {
 
         <UserSearchResult v-else-if="selectedFilter === 'usuarios'" />
 
-        <CommunitySearchResult v-else-if="selectedFilter === 'comunidades'" />
+        <Comunidades v-else-if="selectedFilter === 'comunidades'" />
 
       </div>
 

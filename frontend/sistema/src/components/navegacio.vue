@@ -98,7 +98,7 @@ onMounted(() => {
                 <button @click="navigateToHome" class="nav-link nav-button-link">Inicio</button>
                 <a href="/timeline" class="nav-link">Timeline</a>
                 <a href="/homeListas" class="nav-link">Listas</a>
-                <a href="/comunidades" class="nav-link">Comunidades</a>
+                <a href="/Community" class="nav-link">Comunidades</a>
             </div>
         </div>
         

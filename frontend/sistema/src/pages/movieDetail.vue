@@ -27,8 +27,8 @@ const insertLike = async () =>{
 const insertVistas = async () => {
 	
 	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+		const usarioId = await axios.get("/api/usuario/user")
+		const viste = await axios.post("/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}

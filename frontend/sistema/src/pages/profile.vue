@@ -67,7 +67,7 @@
 
 	const obtenerComunidadesUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+			const response = await axios.get(`/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
 			
 			const comunidadesTransformadas = response.data.map(comunidad => ({
 				id: comunidad.idcominidad,
@@ -271,7 +271,7 @@
             return;
         }
 
-        const response = await axios.post('http://localhost:3300/api/comunidades', {
+        const response = await axios.post('/api/comunidades', {
             nombreComunidad: nombreLista.value,
             descripcionCominidad: descripcion.value,
             idCreador: usuarioId.value
