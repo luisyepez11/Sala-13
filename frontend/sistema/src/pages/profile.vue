@@ -8,8 +8,8 @@
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
-	import Popularfilmsection from "../components/popularfilmsectionLike.vue"
-	import PopularfilmsectionVistas from "../components/popularfilmsectionVistas.vue"
+	import Popularfilmsection from "../components/PopularfilmsectionLike.vue"
+	import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue"
 	import MovieCartList from '../components/MovieCardList.vue'
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
@@ -488,7 +488,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Likes'" class="content-area">
-				<Popularfilmsection :idUsuario="usuarioId"></Popularfilmsection>
+				<Popularfilmsection :idUsuario="usuarioId" opcion="profile"></Popularfilmsection>
 			</div>
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
 				<div v-if="userReviews.length === 0" class="empty-content">
@@ -526,7 +526,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Vistas'" class="content-area">
-				<PopularfilmsectionVistas :idUsuario="usuarioId"></PopularfilmsectionVistas>
+				<PopularfilmsectionVistas :idUsuario="usuarioId" opcion="profile"></PopularfilmsectionVistas>
 			</div>
 			<div v-else class="empty-content">
 				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
