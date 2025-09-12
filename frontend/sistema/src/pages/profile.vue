@@ -8,6 +8,9 @@
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
+	import Popularfilmsection from "../components/PopularfilmsectionLike.vue"
+	import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue"
+	import MovieCartList from '../components/MovieCardList.vue'
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
@@ -22,22 +25,9 @@
 	const descripcion = ref("")
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
-	const comunidades = ref([
-  {
-    id: 1,
-    titulo: 'Cinéfilos Latinos',
-    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-    imagen: 'https://example.com/latinos.jpg',
-    usuarios: 1245
-  },
-  {
-    id: 2,
-    titulo: 'Sci-Fi Lovers',
-    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-    imagen: 'https://example.com/scifi.jpg',
-    usuarios: 893
-  }
-])
+
+	const comunidades = ref([])
+	
 	const editData = ref({
 		nombre: '',
 		apodo: '',
@@ -46,7 +36,6 @@
 
 	const PROFILE_PIC_KEY = 'user_profile_picture';
 
-	// Variable para almacenar las reseñas reales
 	const userReviews = ref([]);
 
 	onMounted(() => {
@@ -65,38 +54,6 @@
 		}
 	});
 
-	// Eliminamos los mockReviews ya que usaremos datos reales
-	/* const mockReviews = ref([
-		{
-			id: 1,
-			user: {
-				name: "Usuario1",
-				avatar: "https://placehold.co/40x40/4A5568/E2E8F0?text=U1"
-			},
-			movie: {
-				title: "Dune: Part Two",
-				poster: "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg"
-			},
-			rating: 5,
-			reviewText: "Una obra maestra cinematográfica. La escala es inmensa y cada fotograma es arte puro. Denis Villeneuve lo ha vuelto a hacer.",
-			likes: 128
-		},
-		{
-			id: 2,
-			user: {
-				name: "Usuario1",
-				avatar: "https://placehold.co/40x40/4A5568/E2E8F0?text=U1"
-			},
-			movie: {
-				title: "The Godfather",
-				poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg"
-			},
-			rating: 4,
-			reviewText: "Un clásico atemporal. La actuación de Marlon Brando es legendaria. Aunque el ritmo es lento, la historia te atrapa por completo.",
-			likes: 97
-		}
-	]); */
-	
 	const usuario = ref({
 		nombre: "",
 		pronombres: "",
@@ -108,7 +65,25 @@
 		total_comentarios: 0
 	});
 
-	// Función para obtener las reseñas del usuario
+	const obtenerComunidadesUsuario = async (idUsuario) => {
+		try {
+			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+			
+			const comunidadesTransformadas = response.data.map(comunidad => ({
+				id: comunidad.idcominidad,
+				titulo: comunidad.nombreComunidad,
+				descripcion: comunidad.descripcionCominidad,
+				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+				usuarios: Math.floor(Math.random() * 1000) + 100 
+			}));
+			
+			comunidades.value = comunidadesTransformadas;
+		} catch (error) {
+			console.error("Error al obtener las comunidades del usuario:", error);
+			comunidades.value = [];
+		}
+	};
+
 	const obtenerResenasUsuario = async (idUsuario) => {
 		try {
 			const response = await axios.get(`/api/comentario/getComentariosUsuario/${idUsuario}`);
@@ -123,15 +98,18 @@
 					title: comentario.nombrePelicula,
 					poster: `https://image.tmdb.org/t/p/w500`,
 					idPelicula:comentario.idPelicula
-
 				},
-				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				rating: 0, 
 				reviewText: comentario.comentario,
-				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				likes: 0, 
 				fecha: comentario.fecha
 			}));
 			
-			userReviews.value = reseñasTransformadas;
+			const reseñasOrdenadas = reseñasTransformadas.sort((a, b) => {
+				return new Date(b.fecha) - new Date(a.fecha);
+			});
+			
+			userReviews.value = reseñasOrdenadas;
 		} catch (error) {
 			console.error("Error al obtener las reseñas del usuario:", error);
 			userReviews.value = [];
@@ -189,8 +167,10 @@
 			);
 			listaSolicitudes.value = unicas;
 			
-			// Obtener las reseñas del usuario después de tener su ID
-			obtenerResenasUsuario(usuarioId.value);
+			await Promise.all([
+				obtenerResenasUsuario(usuarioId.value),
+				obtenerComunidadesUsuario(usuarioId.value)
+			]);
 			
 		} catch (error) {
 			console.log("error", error)
@@ -234,6 +214,9 @@
 	}
 	function cambiarTab(tab) {
 		activeTab.value = tab
+		if (tab === 'Comunidades') {
+			obtenerComunidadesUsuario(usuarioId.value);
+		}
 	}
 	const modalIsOpen = ref(false);
 	const openModal = () => {
@@ -245,6 +228,10 @@
 	const solicitudes = () => {
 		openModal()
 	};
+	const portadaLista = ref({})
+	const getposters = (posters, idLista) => {
+  portadaLista.value[idLista] = posters;
+}
 	const aceptarSolicitud = async (id, nombre, idsolicitudes) => {
 		try {
 			await axios.post(`/api/amigo/insertAmigo`, {
@@ -277,6 +264,32 @@
 	const cerrarModalComunidades = () => {
 		modalCrearComunidades.value = false
 	}
+	const crearComunidad = async () => {
+    try {
+        if (!nombreLista.value.trim() || !descripcion.value.trim()) {
+            alert('Por favor, completa todos los campos');
+            return;
+        }
+
+        const response = await axios.post('http://localhost:3300/api/comunidades', {
+            nombreComunidad: nombreLista.value,
+            descripcionCominidad: descripcion.value,
+            idCreador: usuarioId.value
+        });
+
+        cerrarModalComunidades();
+        nombreLista.value = "";
+        descripcion.value = "";
+
+        alert('Comunidad creada exitosamente');
+
+        obtenerComunidadesUsuario(usuarioId.value);
+        
+    } catch (error) {
+        console.error("Error al crear la comunidad:", error);
+        alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
+    }
+}
 	const crearLista = async () => {
 		try {
 			await axios.post(`/api/lista`, {
@@ -284,7 +297,7 @@
 				descripcion: descripcion.value,
 				idCuenta: usuarioId.value
 			});
-			cerrarModal();
+			cerrarModalLista(); 
 			nombreLista.value = "";
 			descripcion.value = "";
 			data();
@@ -338,24 +351,24 @@
 		</div>
 	</Modal>
 	<Modal :isOpen="modalCrearComunidades" @close="cerrarModalComunidades">
-		<div class="modal-crear-lista">
-			<h2 class="modal-title">Crear nueva Comunidad</h2>
-			<div class="form-group">
-				<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
-				<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
-					class="input-field" />
-			</div>
-			<div class="form-group">
-				<label class="user-bio" for="descripcion">Descripción</label>
-				<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu comunidad..."
-					class="input-field textarea"></textarea>
-			</div>
-			<div class="modal-btn">
-				<button class="btn-cancel" @click="cerrarModalComunidades">Cancelar</button>
-				<button class="btn-crear" @click="">Crear</button>
-			</div>
+	<div class="modal-crear-lista">
+		<h2 class="modal-title">Crear nueva Comunidad</h2>
+		<div class="form-group">
+			<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
+			<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
+				class="input-field" />
 		</div>
-	</Modal>
+		<div class="form-group">
+			<label class="user-bio" for="descripcion">Descripción</label>
+			<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu comunidad..."
+				class="input-field textarea"></textarea>
+		</div>
+		<div class="modal-btn">
+			<button class="btn-cancel" @click="cerrarModalComunidades">Cancelar</button>
+			<button class="btn-crear" @click="crearComunidad">Crear</button>
+		</div>
+	</div>
+</Modal>
 	<Modal :isOpen="modalIsOpen" @close="closeModal">
 		<template v-if="listaSolicitudes && listaSolicitudes.length > 0">
 			<table class="solicitudes-table">
@@ -495,11 +508,10 @@
 					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
+					<div v-for="(item, index) in lista" :key="item.idlista" class="lista-card"
 						@click="$router.push('/listDetail/' + item.idlista)">
-						
-						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
-
+						<MovieCartList v-show="false" :idLista="item.idlista" @listaPoster="(posters) => getposters(posters, item.idlista)" ></MovieCartList>
+						<ListCoverGrid :posters="portadaLista[item.idlista] || []" class="lista-portada"/>
 						<div class="lista-info">
 							<h2 class="lista-title">{{ item.nombreLista }}</h2>
 							<p class="lista-description">{{ item.descripcion }}</p>
@@ -514,10 +526,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Likes'" class="content-area">
-				<MovieGrid 
-					genero="/likes" 
-					titulo="Películas que te gustaron" 
-				/>
+				<Popularfilmsection :idUsuario="usuarioId" opcion="profile"></Popularfilmsection>
 			</div>
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
 				<div v-if="userReviews.length === 0" class="empty-content">
@@ -554,7 +563,9 @@
 					</div>
 				</div>
 			</div>
-
+			<div v-else-if="activeTab === 'Vistas'" class="content-area">
+				<PopularfilmsectionVistas :idUsuario="usuarioId" opcion="profile"></PopularfilmsectionVistas>
+			</div>
 			<div v-else class="empty-content">
 				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
 			</div>
@@ -843,8 +854,6 @@
 		border-bottom: 1px solid #334155;
 		transition: background-color 0.2s;
 	}
-
-
 
 	.table-row:last-child {
 		border-bottom: none;
@@ -1235,4 +1244,3 @@
   	padding: 1rem 0;
 	}
 </style>
-

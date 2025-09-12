@@ -1,45 +1,139 @@
 <script setup>
-  import { ref } from "vue"
-  import Nav from "../components/navegacio.vue"
-  import popularfilmsection from '../components/popularfilmsection.vue'
-  import Modal from "../components/modal.vue";
-  import Footer from '../components/Footer.vue'
-  import axios from 'axios';
-  import { useRouter,useRoute } from 'vue-router';
+  import { ref, onMounted, watch } from "vue"
+	import Nav from "../components/navegacio.vue"
+	import Modal from "../components/modal.vue";
+	import UserReviewCard from "../components/UserReviewCard.vue";
+	import FavoriteMovies from "../components/FavoriteMovies.vue";
+	import MovieGrid from '../components/searchresultsection.vue'
+	import ListCoverGrid from "../components/ListCoverGrid.vue";
+	import Footer from '../components/Footer.vue'
+  import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue";
+  import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
+	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
+	import CommunityCard from '../components/CommunityCard.vue'
+	import axios from 'axios';
+	import { useRouter,useRoute } from 'vue-router';
+
   const router = useRouter()
   const route = useRoute()
+	axios.defaults.withCredentials = true;
+	const listaSolicitudes = ref()
+	const lista = ref([])
+	const usuarioId = ref("")
+	const nombreLista = ref("")
+	const descripcion = ref("")
+	const isProfileModalOpen = ref(false);
+	const profilePictureUrl = ref(null);
+  const userReviews = ref([]);
+	const comunidades = ref([
+  {
+    id: 1,
+    titulo: 'Cinéfilos Latinos',
+    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
+    imagen: 'https://example.com/latinos.jpg',
+    usuarios: 1245
+  },
+  {
+    id: 2,
+    titulo: 'Sci-Fi Lovers',
+    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
+    imagen: 'https://example.com/scifi.jpg',
+    usuarios: 893
+  }
+])
 
   axios.defaults.withCredentials = true;
   const editar=ref(false)
   const id = route.params.id;
   const usario = ref("")
   
-  const data = async () =>{
-    try {
-      const usarioId = await axios.get("/api/usuario/user")
-      usario.value=usarioId.data.id
-      if (usarioId.data.message == "no registrado"){
-        router.push('/login');
-      }
-      
-      console.log(id)
-      const cuenta = await axios.get(`/api/cuenta/getCuenta/${id}`)
-      const datos = cuenta.data.resultCuenta[0]
-      console.log(usuario.value = {
-        ...usuario.value,
-          nombre: datos.nombreCuenta,
-          pronombres: datos.pronombres,
-          nombreReal: datos.nombreReal, 
-          biografia: datos.descripcionCuenta,
-          cantidad_solicitudes:datos.total_solicitudes,
-          total_seguidos:datos.total_seguidos,
-          total_seguidores:datos.total_seguidores,
-          total_comentarios:datos.total_comentarios
-      })
-    } catch (error) {
-      console.log(error)
-    }  
-  }
+
+  const obtenerResenasUsuario = async (idUsuario) => {
+		try {
+			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${id}`);
+			// Transformar los datos del endpoint al formato que espera UserReviewCard
+			const reseñasTransformadas = response.data.map(comentario => ({
+				id: comentario.idcomentario,
+				user: {
+					name: comentario.nombreCuenta,
+					avatar: profilePictureUrl.value || "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
+				},
+				movie: {
+					title: comentario.nombrePelicula,
+					poster: `https://image.tmdb.org/t/p/w500`,
+					idPelicula:comentario.idPelicula
+
+				},
+				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				reviewText: comentario.comentario,
+				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				fecha: comentario.fecha
+			}));
+			
+			userReviews.value = reseñasTransformadas;
+		} catch (error) {
+			console.error("Error al obtener las reseñas del usuario:", error);
+			userReviews.value = [];
+		}
+	};
+
+  const data = async () => {
+		try {
+			const usarioId = await axios.get("/api/usuario/user")
+			if (usarioId.data.message == "no registrado") {
+				router.push('/');
+				return;
+			}
+
+			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
+				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${id}`),
+				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`),
+				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
+			]);
+			
+			const datos = cuenta.data.resultCuenta[0];
+			usuario.value = {
+				nombre: datos.nombreCuenta,
+				pronombres: datos.pronombres,
+				nombreReal: datos.nombreReal,
+				biografia: datos.descripcionCuenta,
+				cantidad_solicitudes: datos.total_solicitudes,
+				total_seguidos: datos.total_seguidos,
+				total_seguidores: datos.total_seguidores,
+				total_comentarios: datos.total_comentarios
+			};
+
+			const listasConPosters = await Promise.all(
+				listasRes.data.map(async (listaItem) => {
+					try {
+						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
+						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
+						const posters = peliculas
+							.slice(0, 4)
+							.map(p => `https://image.tmdb.org/t/p/w500${p.poster_path}`)
+							.filter(Boolean);
+						return { ...listaItem, posters };
+					} catch (e) {
+						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
+						return { ...listaItem, posters: [] };
+					}
+				})
+			);
+			lista.value = listasConPosters;
+
+			const unicas = datosSolicitudes.data.filter(
+				(item, index, self) =>
+					index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
+			);
+			listaSolicitudes.value = unicas;
+			
+			// Obtener las reseñas del usuario después de tener su ID
+			obtenerResenasUsuario(id);
+			
+		} catch (error) {
+			console.log("error", error)
+		}
+	}
   data()
   const usuario = ref({
   nombre: "Usuario1",
@@ -50,8 +144,8 @@
 
 
 
-  const activeTab = ref("Profile")
-  const tabs = ["Profile", "Lists", "Likes", "Reviews", "Communities", "Watched"]
+  const activeTab = ref("Favoritas")
+  const tabs = ["Favoritas", "Listas", "Likes", "Reseñas", "Comunidades", "Vistas"]
 
   const stats = ref({
     watched: 0,
@@ -171,28 +265,97 @@ const buscar = (nombre) => {
 
       <!-- Navigation Tabs -->
       <div class="tabs-nav">
-        <div class="tabs-container">
-          <button 
-            v-for="tab in tabs" 
-            :key="tab"
-            @click="cambiarTab(tab)"
-            :class="['tab-button', activeTab === tab ? 'tab-active' : 'tab-inactive']"
-          >
-            {{ tab }}
-          </button>
-        </div>
-      </div>
+				<div class="tabs-container">
+					<button v-for="tab in tabs" :key="tab" @click="cambiarTab(tab)"
+						:class="['tab-button', activeTab === tab ? 'tab-active' : 'tab-inactive']">
+						{{ tab }}
+					</button>
+				</div>
+			</div>
 
-      <!-- Content Area -->
-      <div v-if="activeTab === 'Profile'" class="content-area">
-        <!-- Popular Films Section - Igual que en Home -->
-        <popularfilmsection />
-      </div>
+      <div v-if="activeTab === 'Favoritas'" class="content-area">
+				<FavoriteMovies />
+			</div>
+<div v-else-if="activeTab === 'Likes'" class="content-area">
+		  <PopularfilmsectionLike :idUsuario="route.params.id" opcion="other-profile"></PopularfilmsectionLike>
+</div>
+<div v-else-if="activeTab === 'Vistas'" class="content-area">
+		  <PopularfilmsectionVistas :idUsuario="route.params.id"></PopularfilmsectionVistas>
+</div>
+      
+			<div v-else-if="activeTab === 'Listas'" class="content-area">
+				<div v-if="!lista || lista.length === 0" class="listas-vacias">
+					<div class="lista-card create-card" @click="abrirModalListas">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva lista</h2>
+							<p class="lista-description">Empieza a organizar tus películas</p>
+						</div>
+					</div>
+				</div>
+				<div v-else class="listas-contenedor">
+					<div v-for="item in lista" :key="item.idlista" class="lista-card"
+						@click="$router.push('/listDetail/' + item.idlista)">
+						
+						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
 
-      <!-- Other tab content -->
-      <div v-else class="empty-content">
-        <div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
-      </div>
+						<div class="lista-info">
+							<h2 class="lista-title">{{ item.nombreLista }}</h2>
+							<p class="lista-description">{{ item.descripcion }}</p>
+						</div>
+					</div>
+					<div class="lista-card create-card" @click="abrirModalListas">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva lista</h2>
+							<p class="lista-description">Empieza a organizar tus películas</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div v-else-if="activeTab === 'Likes'" class="content-area">
+				<MovieGrid 
+					genero="/likes" 
+					titulo="Películas que te gustaron" 
+				/>
+			</div>
+			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
+				<div v-if="userReviews.length === 0" class="empty-content">
+					<div class="empty-text">No tienes reseñas todavía</div>
+				</div>
+				<div v-else class="reviews-container">
+					<UserReviewCard v-for="review in userReviews" :key="review.id" :review="review"  />
+				</div>
+			</div>
+			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
+				<div v-if="!comunidades || comunidades.length === 0" class="comunidades-vacias">
+					<div class="lista-card create-card" @click="abrirModalComunidades">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva comunidad</h2>
+							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
+						</div>
+					</div>
+				</div>
+				<div v-else class="comunidades-grid">
+					<CommunityCard
+						v-for="comunidad in comunidades"
+						:key="comunidad.id"
+						:titulo="comunidad.titulo"
+						:descripcion="comunidad.descripcion"
+						:imagen="comunidad.imagen"
+						:usuarios="comunidad.usuarios"
+					/>
+
+					<div class="lista-card create-card" @click="abrirModalComunidades">
+						<div class="lista-info">
+							<h2 class="lista-title">+ Crear nueva comunidad</h2>
+							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div v-else class="empty-content">
+				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
+			</div>
     </div>
   </div>
   <Footer />

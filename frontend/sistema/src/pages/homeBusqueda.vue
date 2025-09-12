@@ -1,35 +1,41 @@
 <script setup>
-import Nav from '../components/navegacio.vue'
-import searchresultsection from '../components/searchresultsection.vue'
-import popularfilmsectionListas from '../components/popularfilmsectionListas.vue'
-import Footer from '../components/Footer.vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import axios from 'axios';
+import Nav from '../components/navegacio.vue';
+import searchresultsection from '../components/searchresultsection.vue';
+import popularfilmsectionListas from '../components/popularfilmsectionListas.vue';
+import UserSearchResult from '../components/UserSearchResult.vue';
+import CommunitySearchResult from '../components/CommunitySearchResult.vue';
+import Footer from '../components/Footer.vue';
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
-const movieId = ref(null)
-const componentKey = ref(0)
-const selectedFilter = ref('peliculas')
+const searchQuery = ref('');
+const componentKey = ref(0);
+const selectedFilter = ref('peliculas');
+const listsData = ref([]);
 
-const showLists = ref(false)
-const listsData = ref([])
+
+const performSearch = (query) => {
+  if (!query) return;
+
+  if (selectedFilter.value === 'listas') {
+    fetchLists(query);
+  }
+};
 
 onMounted(() => {
-  movieId.value = route.params.id
-  if (selectedFilter.value === "listas" && movieId.value) {
-    fetchLists(movieId.value)
-  }
-})
+  searchQuery.value = route.params.id || '';
+  performSearch(searchQuery.value);
+});
 
-watch(() => route.params.id, (newId) => {
-  movieId.value = newId
-  componentKey.value++
-  if (selectedFilter.value === "listas" && newId) {
-    fetchLists(newId)
-  }
-})
+watch(() => route.params.id, (newQuery) => {
+  searchQuery.value = newQuery || '';
+  componentKey.value++; 
+  performSearch(searchQuery.value);
+});
 
 // Función para obtener las listas desde la API
 const fetchLists = async (nombre) => {
@@ -43,37 +49,19 @@ const fetchLists = async (nombre) => {
   }
 }
 
-watch(selectedFilter, async (newFilter) => {
-  showLists.value = newFilter === 'listas'
-
-  if (showLists.value && movieId.value) {
-    await fetchLists(movieId.value)
-  }
-
-  console.log(`El filtro ha cambiado a: ${newFilter}`)
-})
-
-
-const buscar = (nombre) => {
-  if (!nombre) {
-    router.push("/")
-    return
-  }
-
-  if (showLists.value) {
-    fetchLists(nombre)
+const buscar = (query) => {
+  if (!query) {
+    router.push("/");
   } else {
-    router.push("/search/" + nombre)
+    router.push("/search/" + query);
   }
-}
+};
 </script>
 
 <template>
   <div class="home-page-container">
     <Nav :buscar="buscar" />
-
     <main class="main-content">
-      <!-- Filtro -->
       <div class="filter-container">
         <label for="filter-select" class="filter-label">Filtrar por:</label>
         <div class="select-wrapper">
@@ -86,38 +74,41 @@ const buscar = (nombre) => {
         </div>
       </div>
 
-      <!-- Resultados de búsqueda -->
-      <searchresultsection
-        v-if="movieId && !showLists"
-        :key="componentKey"
-        titulo="Resultados"
-        :genero="'/busqueda/' + movieId"
-      />
+      <div v-if="searchQuery">
+        <searchresultsection
+          v-if="selectedFilter === 'peliculas'"
+          :key="componentKey"
+          titulo="Resultados"
+          :genero="'/busqueda/' + searchQuery"
+        />
 
-      <!-- Listas -->
-      <div v-if="showLists" class="lists-container">
-        <div v-if="listsData.length > 0">
-          <popularfilmsectionListas
-            v-for="list in listsData"
-            :key="list.idlista"
-            :titulo="list.nombreLista"
-            :idLista="list.idlista"
-          />
+        <div v-else-if="selectedFilter === 'listas'">
+          <div v-if="listsData.length > 0">
+            <popularfilmsectionListas
+              v-for="list in listsData"
+              :key="list.idlista"
+              :titulo="list.nombreLista"
+              :idLista="list.idlista"
+            />
+          </div>
+          <div v-else class="loading-message">
+            No se encontraron listas.
+          </div>
         </div>
-        <div v-else class="loading-message">
-          No se encontraron listas.
-        </div>
+
+        <UserSearchResult v-else-if="selectedFilter === 'usuarios'" />
+
+        <CommunitySearchResult v-else-if="selectedFilter === 'comunidades'" />
+
       </div>
 
-      <!-- Mensaje inicial -->
-      <div v-if="!movieId && !showLists" class="loading-message">
+      <div v-else class="loading-message">
         Realice una búsqueda para ver resultados
       </div>
     </main>
   </div>
   <Footer />
 </template>
-
 
 <style scoped>
 .home-page-container {
@@ -126,14 +117,11 @@ const buscar = (nombre) => {
   color: #ffffff;
   font-family: "Poppins", sans-serif;
 }
-
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
-
-/* Estilos para el nuevo filtro */
 .filter-container {
   display: flex;
   justify-content: flex-end;
@@ -141,23 +129,20 @@ const buscar = (nombre) => {
   margin-bottom: 2rem;
   gap: 1rem;
 }
-
 .filter-label {
   color: #ffffff;
   font-size: 1rem;
   font-weight: 500;
 }
-
 .select-wrapper {
   position: relative;
   display: inline-block;
 }
-
 .filter-select {
   background-color: #3b82f6;
   color: white;
   border: none;
-  border-radius: 8px; /* Para forma de píldora */
+  border-radius: 8px;
   padding: 0.5rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -166,50 +151,15 @@ const buscar = (nombre) => {
   -moz-appearance: none;
   appearance: none;
 }
-
 .filter-select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
-
-.lists-container {
-  margin-top: 2rem;
-}
-
-.section-title {
-  color: #ffffff;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
 .loading-message {
   text-align: center;
   padding: 3rem;
   color: #9ca3af;
   font-size: 1.2rem;
 }
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-  .filter-container {
-    justify-content: center;
-  }
-  
-  .section-title {
-    font-size: 1.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .filter-container {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .section-title {
-    font-size: 1.5rem;
-  }
-}
 </style>
+

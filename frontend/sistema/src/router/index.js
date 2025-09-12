@@ -74,12 +74,6 @@ const router = createRouter({
             component: OtherProfile
         },
         {
-            path:"/community",
-            name:"community",
-            component:Community
-
-        },
-        {
             path:"/listDetail/:id",
             name:"listDetail",
             component:ListDetail
@@ -105,20 +99,14 @@ const router = createRouter({
             component:PdfViewer
         },
         {
-            path:"/pdfViewer",
-            name:"pdfViewer",
-            component:PdfViewer
+            path:"/timeline",
+            name:"timeline",
+            component:TimeLine
         },
         {
             path:"/contacto",
             name:"contacto",
             component:ContactPage
-        }
-        ,
-        {
-            path:"/timeLine",
-            name:"TimeLine",
-            component:TimeLine
         }
     ]
 })
