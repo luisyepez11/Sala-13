@@ -10,19 +10,29 @@ import axios from 'axios'
 const router = useRouter()
 const route = useRoute()
 axios.defaults.withCredentials = true
- const  lista = ref({})
+const lista = ref({})
 const movie = ref(null)
-const nombrePelicula=ref("")
+const nombrePelicula = ref("")
 
 const error = ref(null)
-const insertLike = async () =>{
-      try {
-        const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-        const like = await axios.post("http://localhost:3300/api/like",{idCuenta:usarioId.data.id,idPelicula:route.params.id})
-      } catch (error) {
-        console.log(error)
-      }
+const reviews = ref([])
+const newReview = ref({
+  rating: 0,
+  comment: ''
+})
+const isLiked = ref(false)
+const modalIsOpen = ref(false);
+const listas = ref([])
+
+const insertLike = async () => {
+  try {
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    const like = await axios.post("http://localhost:3300/api/like", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+  } catch (error) {
+    console.log(error)
+  }
 }
+
 const loadReviews = async () => {
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -31,43 +41,98 @@ const loadReviews = async () => {
     const movieId = route.params.id;
     const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
-    reviews.value = comentarios.map(comentario => ({
-      idCuenta:comentario.idCuenta,
+    const reviewsData = comentarios.map(comentario => ({
+      idCuenta: comentario.idCuenta,
       userName: comentario.nombreCuenta,
       rating: 4,
       date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
       comment: comentario.comentario,
       realName: comentario.nombreReal,
       description: comentario.descripcionCuenta,
-      pronouns: comentario.pronombres
+      pronouns: comentario.pronombres,
+      fechaOriginal: comentario.fecha 
     }));
+
+    const reviewsOrdenadas = reviewsData.sort((a, b) => {
+      return new Date(b.fechaOriginal) - new Date(a.fechaOriginal);
+    });
+
+    reviews.value = reviewsOrdenadas;
   } catch (e) {
     console.error('Error al cargar las reseñas:', e);
   }
 };
-const submitReview = async()=>{
-    try {
+
+const submitReview = async () => {
+  try {
     const movieId = route.params.id
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
     const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-    const idcuenta =cuenta.data.resultCuenta[0].idcuenta
+    const idcuenta = cuenta.data.resultCuenta[0].idcuenta
     const comentario = document.getElementById('comentario').value
-    const fechaISO = new Date().toISOString(); 
+    const fechaISO = new Date().toISOString();
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
-    const result = await axios.post(`http://localhost:3300/api/comentario`,{
-          idCuenta:idcuenta,
-          idPelicula:movieId,
-          comentario:comentario,
-          fecha:fecha,
-          nombrePelicula:nombrePelicula.value
-        })
+    const result = await axios.post(`http://localhost:3300/api/comentario`, {
+      idCuenta: idcuenta,
+      idPelicula: movieId,
+      comentario: comentario,
+      fecha: fecha,
+      nombrePelicula: nombrePelicula.value
+    })
     loadReviews()
-    document.getElementById("comentario").value=""
+    document.getElementById("comentario").value = ""
   } catch (e) {
     error.value = 'Error al cargar los detalles de la película: ' + e.message
     console.error('Error:', e)
   }
 }
+
+const like = async () => {
+  isLiked.value = !isLiked.value
+  await insertLike()
+  const likeButton = document.querySelector('.btn-like')
+  if (isLiked.value) {
+    likeButton.classList.add('btn-click-like')
+  } else {
+    likeButton.classList.remove('btn-click-like')
+  }
+}
+
+const openModal = () => {
+  modalIsOpen.value = true;
+};
+
+const closeModal = () => {
+  modalIsOpen.value = false;
+};
+
+const selecionado = (lista) => {
+  listas.value.push(lista)
+}
+
+const agregar_lista = async () => {
+  listas.value.map(async id => {
+    try {
+      const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula', {
+        idLista: id,
+        idPelicula: route.params.id
+      })
+      alert("agregado a la lista")
+      closeModal()
+    } catch (error) {
+
+    }
+  })
+}
+
+const buscar = (nombre) => {
+  if (nombre === "") {
+    router.push("/")
+  } else {
+    router.push("/search/" + nombre)
+  }
+}
+
 onMounted(async () => {
   try {
     const movieId = route.params.id
@@ -78,15 +143,15 @@ onMounted(async () => {
       router.push('/')
       return
     }
-    
-    nombrePelicula.value=datos.title
+
+    nombrePelicula.value = datos.title
     movie.value = {
-  title: datos.title,
-  year: datos.release_date,
-  genre: 'Terror/Ciencia ficción',
-  synopsis: datos.overview,
-  rating: (datos.vote_average/2).toFixed(1),
-  poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
+      title: datos.title,
+      year: datos.release_date,
+      genre: 'Terror/Ciencia ficción',
+      synopsis: datos.overview,
+      rating: (datos.vote_average / 2).toFixed(1),
+      poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
     }
     loadReviews()
   } catch (e) {
@@ -94,116 +159,51 @@ onMounted(async () => {
     console.error('Error:', e)
   }
 })
-
-const reviews = ref([
-  {
-    userName: 'Ana Morgan',
-    rating: 4,
-    date: '23/02',
-    comment: 'A gripping thriller with stunning visuals and a compelling performance from Olivia Hayes. The suspense builds steadily, keeping you on the edge of your seat until the very end.'
-  },
-  {
-    userName: 'Liam Fisher',
-    rating: 3,
-    date: '26/02',
-    comment: 'While the cinematography is impressive, the plot felt predictable and the pacing dragged in the second half. The ending was somewhat anticlimactic.'
-  }
-])
-const newReview = ref({
-  rating: 0,
-  comment: ''
-})
-const isLiked = ref(false)
-
-const like = async () => {
-  isLiked.value = !isLiked.value
-  await insertLike()
-  const likeButton = document.querySelector('.btn-like')
-  if (isLiked.value) {
-      likeButton.classList.add('btn-click-like')
-  } else {
-      likeButton.classList.remove('btn-click-like')
-  }
-}
-const modalIsOpen = ref(false);
-const openModal = () => {
-  modalIsOpen.value = true;
-};
-const closeModal = () => {
-  modalIsOpen.value = false;
-};
-const listas = ref([])
-const selecionado = (lista) =>{
-    listas.value.push(lista)
-}
-const agregar_lista = async () =>{
-      listas.value.map(async id =>{
-        try {
-          const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula',{
-            idLista:id, 
-            idPelicula:route.params.id
-          })
-          alert("agregado a la lista")
-          closeModal()
-        } catch (error) {
-          
-        }
-      })
-}
-const buscar = (nombre) => {
-	if (nombre === "") {
-		router.push("/")
-	} else {
-		router.push("/search/" + nombre)
-	}
-}
 </script>
 
 <template>
- <Modal 
-  :isOpen="modalIsOpen" 
-  @close="closeModal"
-  @confirm="handleConfirm"
->
-  <div class="modal-listas">
-    <table class="listas-table">
-      <thead>
-        <tr>
-          <th colspan="2" class="table-header">
-            Agregar Película a la Lista...
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr 
-          v-for="listas in lista" 
-          :key="listas.idlista" 
-          class="list-item"
-        >
-          <td class="list-name">{{ listas.nombreLista }}</td>
-          <td class="list-check">
-  <input 
-    type="checkbox"  
-    class="styled-checkbox"
-    @change="selecionado(listas.idlista)"
+  <Modal
+    :isOpen="modalIsOpen"
+    @close="closeModal"
+    @confirm="handleConfirm"
   >
-</td>
+    <div class="modal-listas">
+      <table class="listas-table">
+        <thead>
+          <tr>
+            <th colspan="2" class="table-header">
+              Agregar Película a la Lista...
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="listas in lista"
+            :key="listas.idlista"
+            class="list-item"
+          >
+            <td class="list-name">{{ listas.nombreLista }}</td>
+            <td class="list-check">
+              <input
+                type="checkbox"
+                class="styled-checkbox"
+                @change="selecionado(listas.idlista)"
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="modal-actions">
-      <button class="btn-cancelar" @click="closeModal">Cancelar</button>
-      <button class="btn-confirmar" @click="agregar_lista">Confirmar</button>
+      <div class="modal-actions">
+        <button class="btn-cancelar" @click="closeModal">Cancelar</button>
+        <button class="btn-confirmar" @click="agregar_lista">Confirmar</button>
+      </div>
     </div>
-  </div>
-</Modal>
-
+  </Modal>
 
   <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
   <div class="movie-page">
-      <Nav :buscar="buscar" />
+    <Nav :buscar="buscar" />
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -211,74 +211,72 @@ const buscar = (nombre) => {
       Cargando...
     </div>
     <div v-else>
-    <div class="content-container">
-      <div class="movie-header">
-        <div class="movie-poster">
-          <img :src="movie.poster" :alt="movie.title" class="poster-image">
-        </div>
-        
-        <div class="movie-info">
-          <h1 class="movie-title">{{ movie.title }}</h1>
-          <div class="movie-meta">
-            <span class="year">{{ movie.year }}</span>
-            <span class="genre">{{ movie.genre }}</span>
+      <div class="content-container">
+        <div class="movie-header">
+          <div class="movie-poster">
+            <img :src="movie.poster" :alt="movie.title" class="poster-image">
           </div>
-          <div class="rating">
-            <div class="stars">
-              <span v-for="n in 5" :key="n" class="star"
-                    :class="{ 'filled': n <= movie.rating }">
+
+          <div class="movie-info">
+            <h1 class="movie-title">{{ movie.title }}</h1>
+            <div class="movie-meta">
+              <span class="year">{{ movie.year }}</span>
+              <span class="genre">{{ movie.genre }}</span>
+            </div>
+            <div class="rating">
+              <div class="stars">
+                <span v-for="n in 5" :key="n" class="star"
+                      :class="{ 'filled': n <= movie.rating }">
+                  ★
+                </span>
+              </div>
+              <span class="rating-number">{{ movie.rating }}/5</span>
+            </div>
+            <p class="synopsis">{{ movie.synopsis }}</p>
+
+            <div class="action-buttons">
+              <button class="btn-like" @click="like"><i class='bx bx-like'></i></button>
+              <button class="btn-list" @click="openModal"><i class='bx bx-bookmark-plus-alt'></i></button>
+              <button class="btn-eye"><i class='bx bx-eye-alt'></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="reviews-section">
+          <h2 class="section-title">Reseñas</h2>
+
+          <div class="write-review">
+            <h3>Escribe tu reseña</h3>
+            <div class="rating-input">
+              <span v-for="n in 5" :key="n"
+                    @click="newReview.rating = n"
+                    class="star-input"
+                    :class="{ 'filled': n <= newReview.rating }">
                 ★
               </span>
             </div>
-            <span class="rating-number">{{ movie.rating }}/5</span>
+            <textarea
+              v-model="newReview.comment"
+              placeholder="Comparte tu opinión sobre la película..."
+              class="review-textarea"
+              id="comentario"
+            ></textarea>
+            <button @click="submitReview" class="btn-submit">Publicar reseña</button>
           </div>
-          <p class="synopsis">{{ movie.synopsis }}</p>
-          
-          <div class="action-buttons">
-            <button class="btn-like" @click="like"><i class='bx bx-like'></i></button>
-            <button class="btn-list" @click="openModal"><i class='bx  bx-bookmark-plus-alt'  ></i> </button>
-            <button class="btn-eye"><i class='bx bx-eye-alt'></i></button>
-            
-            
+
+          <div class="reviews-list">
+            <ReviewComment
+              v-for="review in reviews"
+              :key="review.userName"
+              :idCuenta="review.idCuenta"
+              :userName="review.userName"
+              :rating="review.rating"
+              :date="review.date"
+              :comment="review.comment"
+            />
           </div>
         </div>
       </div>
-
-      <div class="reviews-section">
-        <h2 class="section-title">Reseñas</h2>
-        
-        <div class="write-review">
-          <h3>Escribe tu reseña</h3>
-          <div class="rating-input">
-            <span v-for="n in 5" :key="n" 
-                  @click="newReview.rating = n"
-                  class="star-input"
-                  :class="{ 'filled': n <= newReview.rating }">
-              ★
-            </span>
-          </div>
-          <textarea 
-            v-model="newReview.comment"
-            placeholder="Comparte tu opinión sobre la película..."
-            class="review-textarea"
-            id="comentario"
-          ></textarea>
-          <button @click="submitReview" class="btn-submit">Publicar reseña</button>
-        </div>
-
-        <div class="reviews-list">
-          <ReviewComment 
-            v-for="review in reviews" 
-            :key="review.userName"
-            :idCuenta="review.idCuenta"
-            :userName="review.userName"
-            :rating="review.rating"
-            :date="review.date"
-            :comment="review.comment"
-          />
-        </div>
-      </div>
-    </div>
     </div>
   </div>
   <Footer />
@@ -383,7 +381,8 @@ const buscar = (nombre) => {
   color: #ffffff;
   transition: all 0.5s;
 }
-.btn-click-like{
+
+.btn-click-like {
   background: #ffffff;
   border: 2px solid #ffffff;
   color: #111827;
@@ -401,8 +400,6 @@ const buscar = (nombre) => {
 .btn-like i {
   font-style: normal;
 }
-
-
 
 .reviews-section {
   margin-top: 3rem;
@@ -465,14 +462,15 @@ const buscar = (nombre) => {
   transition: background 0.3s;
   position: relative;
   z-index: 1;
-  display: block; 
-  width: auto; 
-  margin: 0 auto; 
+  display: block;
+  width: auto;
+  margin: 0 auto;
 }
 
 .btn-submit:hover {
   background: #2563eb;
 }
+
 .table-header {
   text-align: center;
   font-size: 16px;
@@ -517,14 +515,15 @@ const buscar = (nombre) => {
   margin-top: 20px;
 }
 
-.modal-listas{
-width: 400px;
+.modal-listas {
+  width: 400px;
 }
-.modal-container{
-  width: 300px;         
-  max-width: 35px;     
-  max-height: 80vh;     
-  padding: 30px;        
+
+.modal-container {
+  width: 300px;
+  max-width: 35px;
+  max-height: 80vh;
+  padding: 30px;
   border-radius: 16px;
   background-color: #0f172a;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -548,6 +547,7 @@ width: 400px;
   border-bottom: 1px solid #374151;
   color: #f1f5f9;
 }
+
 /* Ocultar el checkbox nativo */
 .styled-checkbox {
   appearance: none;
@@ -587,9 +587,7 @@ width: 400px;
   left: 4px;
 }
 
-
 .listas-table th {
-  
   font-weight: bold;
   text-transform: uppercase;
   font-size: 14px;
@@ -633,7 +631,6 @@ width: 400px;
 .btn-confirmar:hover {
   background: #2563eb;
 }
-
 
 @media (max-width: 768px) {
   .movie-header {

@@ -23,21 +23,21 @@
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
 	const comunidades = ref([
-  {
-    id: 1,
-    titulo: 'Cinéfilos Latinos',
-    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-    imagen: 'https://example.com/latinos.jpg',
-    usuarios: 1245
-  },
-  {
-    id: 2,
-    titulo: 'Sci-Fi Lovers',
-    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-    imagen: 'https://example.com/scifi.jpg',
-    usuarios: 893
-  }
-])
+		{
+			id: 1,
+			titulo: 'Cinéfilos Latinos',
+			descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
+			imagen: 'https://example.com/latinos.jpg',
+			usuarios: 1245
+		},
+		{
+			id: 2,
+			titulo: 'Sci-Fi Lovers',
+			descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
+			imagen: 'https://example.com/scifi.jpg',
+			usuarios: 893
+		}
+	])
 	const editData = ref({
 		nombre: '',
 		apodo: '',
@@ -65,38 +65,6 @@
 		}
 	});
 
-	// Eliminamos los mockReviews ya que usaremos datos reales
-	/* const mockReviews = ref([
-		{
-			id: 1,
-			user: {
-				name: "Usuario1",
-				avatar: "https://placehold.co/40x40/4A5568/E2E8F0?text=U1"
-			},
-			movie: {
-				title: "Dune: Part Two",
-				poster: "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg"
-			},
-			rating: 5,
-			reviewText: "Una obra maestra cinematográfica. La escala es inmensa y cada fotograma es arte puro. Denis Villeneuve lo ha vuelto a hacer.",
-			likes: 128
-		},
-		{
-			id: 2,
-			user: {
-				name: "Usuario1",
-				avatar: "https://placehold.co/40x40/4A5568/E2E8F0?text=U1"
-			},
-			movie: {
-				title: "The Godfather",
-				poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg"
-			},
-			rating: 4,
-			reviewText: "Un clásico atemporal. La actuación de Marlon Brando es legendaria. Aunque el ritmo es lento, la historia te atrapa por completo.",
-			likes: 97
-		}
-	]); */
-	
 	const usuario = ref({
 		nombre: "",
 		pronombres: "",
@@ -108,11 +76,9 @@
 		total_comentarios: 0
 	});
 
-	// Función para obtener las reseñas del usuario
 	const obtenerResenasUsuario = async (idUsuario) => {
 		try {
 			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${idUsuario}`);
-			// Transformar los datos del endpoint al formato que espera UserReviewCard
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
 				user: {
@@ -123,15 +89,18 @@
 					title: comentario.nombrePelicula,
 					poster: `https://image.tmdb.org/t/p/w500`,
 					idPelicula:comentario.idPelicula
-
 				},
-				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				rating: 0, 
 				reviewText: comentario.comentario,
-				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				likes: 0, 
 				fecha: comentario.fecha
 			}));
 			
-			userReviews.value = reseñasTransformadas;
+			const reseñasOrdenadas = reseñasTransformadas.sort((a, b) => {
+				return new Date(b.fecha) - new Date(a.fecha);
+			});
+			
+			userReviews.value = reseñasOrdenadas;
 		} catch (error) {
 			console.error("Error al obtener las reseñas del usuario:", error);
 			userReviews.value = [];
@@ -189,7 +158,6 @@
 			);
 			listaSolicitudes.value = unicas;
 			
-			// Obtener las reseñas del usuario después de tener su ID
 			obtenerResenasUsuario(usuarioId.value);
 			
 		} catch (error) {
@@ -284,7 +252,7 @@
 				descripcion: descripcion.value,
 				idCuenta: usuarioId.value
 			});
-			cerrarModal();
+			cerrarModalLista(); 
 			nombreLista.value = "";
 			descripcion.value = "";
 			data();
@@ -844,8 +812,6 @@
 		transition: background-color 0.2s;
 	}
 
-
-
 	.table-row:last-child {
 		border-bottom: none;
 	}
@@ -1235,4 +1201,3 @@
   	padding: 1rem 0;
 	}
 </style>
-
