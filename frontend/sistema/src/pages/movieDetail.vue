@@ -24,6 +24,17 @@ const insertLike = async () => {
 	}
 }
 
+const insertVistas = async () => {
+	
+	try {
+		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+	} catch (error) {
+		console.log(error)
+	}
+	alert("pelicula vistas")
+}
+
 const loadReviews = async () => {
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -225,7 +236,7 @@ const buscar = (nombre) => {
 						<div class="action-buttons">
 							<button class="btn-like" @click="like"><i class='bx bx-like'></i></button>
 							<button class="btn-list" @click="openModal"><i class='bx bx-bookmark-plus-alt'></i> </button>
-							<button class="btn-eye"><i class='bx bx-eye-alt'></i></button>
+							<button class="btn-eye" @click="insertVistas"><i class='bx bx-eye-alt'></i></button>
 						</div>
 					</div>
 				</div>

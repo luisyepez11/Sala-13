@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import {insertLikes,getLikesUsuario} from '../controllers/likes.controllers.js';
+import {insertVistas,getVistasUsuario} from '../controllers/vistas.controllers.js';
 
 const router = Router();
 
-router.post("/",insertLikes)
-router.get("/getUsuarioLike/:id",getLikesUsuario)
+router.post("/",insertVistas)
+router.get("/getVistasUsuario/:id",getVistasUsuario)
 
 export default router;
