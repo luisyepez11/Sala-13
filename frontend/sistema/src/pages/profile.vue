@@ -10,6 +10,7 @@
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import Popularfilmsection from "../components/popularfilmsectionLike.vue"
 	import PopularfilmsectionVistas from "../components/popularfilmsectionVistas.vue"
+	import MovieCartList from '../components/MovieCardList.vue'
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
 	import { useRouter } from 'vue-router';
@@ -215,6 +216,10 @@
 	const solicitudes = () => {
 		openModal()
 	};
+	const portadaLista = ref({})
+	const getposters = (posters, idLista) => {
+  portadaLista.value[idLista] = posters;
+}
 	const aceptarSolicitud = async (id, nombre, idsolicitudes) => {
 		try {
 			await axios.post(`http://localhost:3300/api/amigo/insertAmigo`, {
@@ -465,11 +470,10 @@
 					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
+					<div v-for="(item, index) in lista" :key="item.idlista" class="lista-card"
 						@click="$router.push('/listDetail/' + item.idlista)">
-						
-						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
-
+						<MovieCartList v-show="false" :idLista="item.idlista" @listaPoster="(posters) => getposters(posters, item.idlista)" ></MovieCartList>
+						<ListCoverGrid :posters="portadaLista[item.idlista] || []" class="lista-portada"/>
 						<div class="lista-info">
 							<h2 class="lista-title">{{ item.nombreLista }}</h2>
 							<p class="lista-description">{{ item.descripcion }}</p>
