@@ -4,6 +4,7 @@ import Popularfilmsection from "../components/popularfilmsectionListas.vue"
 import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
+import Contenedor from '../components/Contenedor.vue'
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
@@ -57,9 +58,7 @@ const buscar = (nombre) => {
     <main class="main-content">
         <div  v-for="value in data">
             <h2>{{ value.nombreCuenta }}</h2>
-            <div value.idUsuario>
-              
-            </div>
+            <Contenedor :idUsuario="value.idReceptor"/>
         </div>
     </main>
 
