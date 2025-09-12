@@ -484,7 +484,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Likes'" class="content-area">
-				<Popularfilmsection :idUsuario="usuarioId"></Popularfilmsection>
+				<Popularfilmsection :idUsuario="usuarioId" opcion="profile"></Popularfilmsection>
 			</div>
 			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
 				<div v-if="userReviews.length === 0" class="empty-content">
@@ -522,7 +522,7 @@
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Vistas'" class="content-area">
-				<PopularfilmsectionVistas :idUsuario="usuarioId"></PopularfilmsectionVistas>
+				<PopularfilmsectionVistas :idUsuario="usuarioId" opcion="profile"></PopularfilmsectionVistas>
 			</div>
 			<div v-else class="empty-content">
 				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>

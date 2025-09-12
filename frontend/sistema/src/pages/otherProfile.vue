@@ -276,7 +276,7 @@ const buscar = (nombre) => {
 				<FavoriteMovies />
 			</div>
 <div v-else-if="activeTab === 'Likes'" class="content-area">
-		  <PopularfilmsectionLike :idUsuario="route.params.id"></PopularfilmsectionLike>
+		  <PopularfilmsectionLike :idUsuario="route.params.id" opcion="other-profile"></PopularfilmsectionLike>
 </div>
 <div v-else-if="activeTab === 'Vistas'" class="content-area">
 		  <PopularfilmsectionVistas :idUsuario="route.params.id"></PopularfilmsectionVistas>

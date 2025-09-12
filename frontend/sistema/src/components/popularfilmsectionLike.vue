@@ -5,11 +5,13 @@ import axios from 'axios'
 
 axios.defaults.withCredentials = true
 
-const props = defineProps({ idUsuario: "", titulo: "Like" })
+const props = defineProps({ idUsuario: "", titulo: "Like" ,opcion:""})
 const movies = ref([])
 const showAll = ref(false)
 const displayedMovies = ref([])
 const loading = ref(false)
+
+
 
 const datosPeliculas = async (movieId) => {
   try {
@@ -113,6 +115,7 @@ watch(movies, () => {
         v-for="movie in displayedMovies"
         :key="movie.id"
         :movie="movie"
+        :opcion="props.opcion"
       />
       
       <div v-if="movies.length === 0" class="no-movies">
