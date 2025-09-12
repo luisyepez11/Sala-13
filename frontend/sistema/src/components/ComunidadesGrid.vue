@@ -175,7 +175,7 @@ const navegationToMessage = ()=>{
         <div class="comunidad-content">
           <div class="comunidad-header">
             <h3 class="comunidad-nombre">{{ comunidad.nombre }}</h3>
-            <p class="comunidad-miembros">{{ comunidad.miembros?.toLocaleString() || 'N/A' }} miembros</p>
+            <p class="comunidad-miembros">{{ comunidad.cantidad_usuarios || 'N/A' }} miembros</p>
           </div>
 
           <!-- Descripción solo en modo full -->

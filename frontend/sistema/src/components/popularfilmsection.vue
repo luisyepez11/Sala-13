@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue'
 import moviecard from './moviecard.vue'
 import axios from 'axios'
-
 axios.defaults.withCredentials = true
 
 const props = defineProps({ genero: "", titulo: "" })

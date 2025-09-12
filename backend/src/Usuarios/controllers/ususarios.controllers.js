@@ -37,8 +37,8 @@ export const loginUser = async (req, res) => {
 		const validacion = result?.length ? bcrypt.compareSync(password, (result[0]).contraseñaUsuario) : false
 
 		if (validacion) {
-			const token = jwt.sign({ idUser: (result[0]).idCuenta }, SALT)
-
+			const token = jwt.sign({ idUser: (result[0]).idCuenta,nombreUsuario: (result[0]).nombreUsuario}, SALT)
+			console.log({ idUser: (result[0]).idCuenta,nombreUsuario: (result[0]).nombreUsuario})
 			const isProd = process.env.NODE_ENV === 'production'
 			const cookieOptions = {
 				httpOnly: true,
@@ -73,7 +73,8 @@ export const getUser = async (req, res) => {
 		}
 		const validar = jwt.verify(tokend, SALT)
 		return res.json({
-			id: validar.idUser
+			id: validar.idUser,
+			nombre:validar.nombreUsuario
 		})
 	} catch (error) {
 		return res.json({
