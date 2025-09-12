@@ -23,51 +23,66 @@ const insertLike = async () => {
 		console.log(error)
 	}
 }
+
 const loadReviews = async () => {
-	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
-		lista.value = listas.data
-		const movieId = route.params.id;
-		const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
-		const comentarios = response.data;
-		reviews.value = comentarios.map(comentario => ({
-			idCuenta: comentario.idCuenta,
-			userName: comentario.nombreCuenta,
-			rating: 4,
-			date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
-			comment: comentario.comentario,
-			realName: comentario.nombreReal,
-			description: comentario.descripcionCuenta,
-			pronouns: comentario.pronombres
-		}));
-	} catch (e) {
-		console.error('Error al cargar las reseñas:', e);
-	}
+  try {
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
+    lista.value = listas.data
+    const movieId = route.params.id;
+    const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
+    const comentarios = response.data;
+    const reviewsData = comentarios.map(comentario => ({
+      idCuenta: comentario.idCuenta,
+      userName: comentario.nombreCuenta,
+      rating: 4,
+      date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
+      comment: comentario.comentario,
+      realName: comentario.nombreReal,
+      description: comentario.descripcionCuenta,
+      pronouns: comentario.pronombres,
+      fechaOriginal: comentario.fecha 
+    }));
+
+    const reviewsOrdenadas = reviewsData.sort((a, b) => {
+      return new Date(b.fechaOriginal) - new Date(a.fechaOriginal);
+    });
+
+    reviews.value = reviewsOrdenadas;
+  } catch (e) {
+    console.error('Error al cargar las reseñas:', e);
+  }
 };
+
 const submitReview = async () => {
-	try {
-		const movieId = route.params.id
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-		const idcuenta = cuenta.data.resultCuenta[0].idcuenta
-		const comentario = document.getElementById('comentario').value
-		const fechaISO = new Date().toISOString();
-		const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
-		const result = await axios.post(`http://localhost:3300/api/comentario`, {
-			idCuenta: idcuenta,
-			idPelicula: movieId,
-			comentario: comentario,
-			fecha: fecha,
-			nombrePelicula: nombrePelicula.value
-		})
-		loadReviews()
-		document.getElementById("comentario").value = ""
-	} catch (e) {
-		error.value = 'Error al cargar los detalles de la película: ' + e.message
-		console.error('Error:', e)
-	}
+  try {
+    const movieId = route.params.id
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
+    const idcuenta = cuenta.data.resultCuenta[0].idcuenta
+    const comentario = document.getElementById('comentario').value
+    const fechaISO = new Date().toISOString();
+    const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
+    const result = await axios.post(`http://localhost:3300/api/comentario`, {
+      idCuenta: idcuenta,
+      idPelicula: movieId,
+      comentario: comentario,
+      fecha: fecha,
+      nombrePelicula: nombrePelicula.value
+    })
+    loadReviews()
+    document.getElementById("comentario").value = ""
+  } catch (e) {
+    error.value = 'Error al cargar los detalles de la película: ' + e.message
+    console.error('Error:', e)
+  }
 }
+
+
+
+
+
+
 onMounted(async () => {
 	try {
 		const movieId = route.params.id
@@ -341,9 +356,9 @@ const buscar = (nombre) => {
 }
 
 .btn-click-like {
-	background: #ffffff;
-	border: 2px solid #ffffff;
-	color: #111827;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  color: #111827;
 }
 
 .btn-eye:hover,
@@ -358,8 +373,6 @@ const buscar = (nombre) => {
 .btn-like i {
 	font-style: normal;
 }
-
-
 
 .reviews-section {
 	margin-top: 3rem;
@@ -508,6 +521,7 @@ const buscar = (nombre) => {
 	color: #f1f5f9;
 }
 
+/* Ocultar el checkbox nativo */
 .styled-checkbox {
 	appearance: none;
 	-webkit-appearance: none;
@@ -542,7 +556,6 @@ const buscar = (nombre) => {
 	top: 1px;
 	left: 4px;
 }
-
 
 .listas-table th {
 
@@ -589,7 +602,6 @@ const buscar = (nombre) => {
 .btn-confirmar:hover {
 	background: #2563eb;
 }
-
 
 @media (max-width: 768px) {
 	.movie-header {
