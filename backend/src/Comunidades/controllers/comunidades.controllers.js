@@ -114,13 +114,13 @@ export const crearComunidades = async (req, res) => {
 };
 
 export const agregarUsuariosAComunidades = async (req, res) => {
-	const { idLista, idPelicula } = req.body;
+	const { idComunidad, idUsuario } = req.body;
 	let connection;
 	try {
 		connection = await pool.getConnection();
 		await connection.query(
-			"INSERT INTO listaspeliculas (idLista, idPelicula) VALUES (?, ?)",
-			[idLista, idPelicula]
+			"INSERT INTO comunidadescuentas (idComunidad, idCuenta) VALUES (?, ?)",
+			[idComunidad, idUsuario]
 		);
 		res.status(201).json({ message: "Película agregada a la lista" });
 	} catch (error) {
