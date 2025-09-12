@@ -4,7 +4,14 @@ export const getComunidades = async (req, res) => {
 	let connection;
 	try {
 		connection = await pool.getConnection();
-		const [listas] = await connection.query("SELECT * FROM cominidades");
+		const [listas] = await connection.query(`
+			SELECT 
+    c.*,
+    COUNT(cc.idcomunidadecuenta) as cantidad_usuarios
+FROM cominidades c
+LEFT JOIN comunidadescuentas cc ON c.idcominidad = cc.idComunidad
+GROUP BY c.idcominidad;
+			`);
 		res.status(200).json(listas);
 	} catch (error) {
 		console.error(error);

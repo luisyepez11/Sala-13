@@ -1,52 +1,110 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, onUnmounted,onMounted} from 'vue';
 import CommunityMessage from './CommunityMessage.vue';
 import io from "socket.io-client"
+import axios from 'axios'
+axios.defaults.withCredentials = true
 
-const socket = io("http://localhost:3300")
+const socket = io("http://localhost:3300");
+
 const props = defineProps({
   title: {
     type: String,
     default: 'Fans del Terror'
+  },
+  comunidadId: {
+    type: Number,
+    default: null
   }
 });
 
 const newMessage = ref("");
-const messages = ref([
-  {
-    id: 1,
-    userName: 'Yo',
-    idCuenta: '1',
-    comment: '¿Ustedes vieron Hereditary más de una vez? No sé por qué, pero me traumó más la segunda vez'
-  },
-  // ... otros mensajes existentes
-]);
+const messages = ref([]);
+const currentRoom = ref(null);
+
+const joinRoom = (roomId) => {
+  if (roomId) {
+
+    if (currentRoom.value) {
+      socket.emit('leaveRoom', currentRoom.value);
+    }
+
+    socket.emit('joinRoom', roomId);
+    currentRoom.value = roomId;
+  
+    messages.value = [];
+    
+    console.log(`Unido a la sala: ${roomId}`);
+  }
+};
+
+
+const loadPreviousMessages = async (roomId) => {
+  try {
+        await datos();
+        console.log(NombreUsuario.value)
+  } catch (error) {
+    console.error('Error al cargar mensajes anteriores:', error);
+  }
+};
+const idUsuario = ref("");
+const NombreUsuario = ref("");
+const datos = async () =>{
+    try {
+      const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
+      idUsuario.value = usuarioResponse.data.id;
+      NombreUsuario.value = usuarioResponse.data.nombre
+    } catch (error) {
+      
+    }
+} 
+
+watch(() => props.comunidadId, (newComunidadId, oldComunidadId) => {
+  if (newComunidadId && newComunidadId !== oldComunidadId) {
+    joinRoom(newComunidadId);
+    loadPreviousMessages(newComunidadId);
+  }
+}, { immediate: true });
+
 
 const submitReview = () => {
-  if (newMessage.value.trim() !== "") {
-    socket.emit("mensaje", {
-      id: messages.value.length + 1, // Mejor generación de ID
-      userName: 'Yo', // Deberías obtener esto de tu sistema de autenticación
-      idCuenta: '1', // Esto también debería venir de tu auth
+  if (newMessage.value.trim() !== "" && currentRoom.value) {
+
+    const userData = {
+      id: Date.now(), 
+      userName: NombreUsuario.value, 
+      idCuenta: idUsuario.value, 
       comment: newMessage.value,
-      sala: 1
-    });
+      sala: currentRoom.value
+    };
+
+    socket.emit("mensaje", userData);
     newMessage.value = "";
   }
 };
 
-// Listener corregido
 socket.on("mensaje", (nuevoMensaje) => {
   console.log("Nuevo mensaje recibido:", nuevoMensaje);
-  // Agregar directamente al array de mensajes
-  messages.value.push({
-    id: messages.value.length > 0 
-      ? Math.max(...messages.value.map(m => m.id)) + 1 
-      : 1,
-    userName: nuevoMensaje.userName,
-    idCuenta: nuevoMensaje.idCuenta,
-    comment: nuevoMensaje.mensaje
-  });
+  
+  if (nuevoMensaje.sala === currentRoom.value) {
+    messages.value.push({
+      id: messages.value.length > 0 
+        ? Math.max(...messages.value.map(m => m.id)) + 1 
+        : 1,
+      userName: nuevoMensaje.userName,
+      idCuenta: nuevoMensaje.idCuenta,
+      comment: nuevoMensaje.mensaje,
+      timestamp: nuevoMensaje.timestamp
+    });
+  }
+});
+
+
+onUnmounted(() => {
+  if (currentRoom.value) {
+    socket.emit('leaveRoom', currentRoom.value);
+  }
+  socket.off("mensaje");
 });
 </script>
 
@@ -57,14 +115,19 @@ socket.on("mensaje", (nuevoMensaje) => {
           <div class="avatar-placeholder">{{ title[0] }}</div>
       </div>
       <h2 class="chat-title">{{ title }}</h2>
+      <span class="room-indicator">Sala: {{ currentRoom }}</span>
     </div>
     <div class="chat-messages">
+      <div v-if="messages.length === 0" class="no-messages">
+        <p>No hay mensajes en esta comunidad</p>
+      </div>
       <CommunityMessage 
         v-for="message in messages" 
         :key="message.id"
         :userName="message.userName"
         :idCuenta="message.idCuenta"
         :comment="message.comment"
+        :timestamp="message.timestamp"
       />
     </div>
     <div class="message-container">
@@ -73,8 +136,9 @@ socket.on("mensaje", (nuevoMensaje) => {
         placeholder="Comparte tu opinión aquí..."
         class="message-textarea"
         id="comentario"
+        @keypress.enter.prevent="submitReview"
       ></textarea>
-      <button @click="submitReview" class="btn-submit">Enviar mensaje</button>    
+      <button @click="submitReview" class="btn-submit">Enviar</button>    
     </div>
   </div>
 </template>
@@ -93,12 +157,14 @@ socket.on("mensaje", (nuevoMensaje) => {
 
 .chat-header {
   display: flex;
-  justify-content:flex-start;
+  justify-content: flex-start;
   align-items: center;
   background: #1F2937;
   padding: 1rem;
   border-bottom: 1px solid #374151;
+  position: relative;
 }
+
 .avatar-container {
   width: 40px;
   height: 40px;
@@ -119,6 +185,7 @@ socket.on("mensaje", (nuevoMensaje) => {
   font-size: 1.25rem;
   font-weight: bold;
 }
+
 .chat-title {
   color: #ffffff;
   font-size: 1.25rem;
@@ -126,10 +193,25 @@ socket.on("mensaje", (nuevoMensaje) => {
   margin: 0;
 }
 
+.room-indicator {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
 .chat-messages {
   padding: 1rem;
   flex: 1;
   overflow-y: auto;
+}
+
+.no-messages {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
 }
 
 /* Estilo para la barra de desplazamiento */
@@ -149,18 +231,20 @@ socket.on("mensaje", (nuevoMensaje) => {
 .chat-messages::-webkit-scrollbar-thumb:hover {
   background: #6B7280;
 }
+
 .message-container {
   padding: 1rem;
   background: #111827;
   border-top: 1px solid #374151;
   display: flex;
   align-items: center;
-  flex-direction: row;
+  gap: 0.5rem;
 }
 
 .message-textarea {
-  width: 100%;
+  flex: 1;
   min-height: 40px;
+  max-height: 120px;
   padding: 0.75rem;
   background: #1F2937;
   color: #ffffff;
@@ -168,7 +252,6 @@ socket.on("mensaje", (nuevoMensaje) => {
   border-radius: 8px;
   resize: vertical;
   font-family: inherit;
-  
 }
 
 .message-textarea:focus {
@@ -178,19 +261,23 @@ socket.on("mensaje", (nuevoMensaje) => {
 }
 
 .btn-submit {
-  
   background: #3b82f6;
-  margin-left: 5px;
   color: #ffffff;
   font-weight: 600;
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  white-space: nowrap;
 }
 
 .btn-submit:hover {
   background: #2563eb;
+}
+
+.btn-submit:disabled {
+  background: #374151;
+  cursor: not-allowed;
 }
 </style>
