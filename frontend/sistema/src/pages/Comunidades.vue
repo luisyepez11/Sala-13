@@ -44,7 +44,7 @@ const cargarComunidades = async () => {
       nombre: comunidad.nombreComunidad,
       descripcion: comunidad.descripcionCominidad || 'Sin descripción',
       imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      usuarios: Math.floor(Math.random() * 1000) + 100, 
+      cantidad_usuarios: comunidad.cantidad_usuarios, 
       esMiembro: comunidad.idCreador==usuarioId.value
     }));
     
@@ -132,7 +132,7 @@ const handleUnirse = async (comunidad) => {
 
 const handleVerDetalles = (comunidad) => {
   console.log('Ver detalles de comunidad:', comunidad.nombre);
-  // router.push(`/comunidad/${comunidad.id}`);
+  router.push(`/ComunidadesDetail/${comunidad.id}`);
 };
 </script>
 
@@ -144,56 +144,10 @@ const handleVerDetalles = (comunidad) => {
     <!-- Contenido principal -->
     <div class="main-content">
       <!-- Header de la página -->
-      <div class="page-header">
-        <div class="header-content">
-          <div class="title-section">
-            <h1 class="page-title">Comunidades</h1>
-            <p class="page-subtitle">Descubre y únete a comunidades de cinéfilos</p>
-          </div>
-          
-          <!-- Controles de vista -->
-          <div class="view-controls">
-            <button 
-              @click="toggleViewMode" 
-              :class="['view-toggle', { 'active': viewMode === 'grid' }]"
-              title="Vista en cuadrícula"
-            >
-              <svg class="view-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              </svg>
-            </button>
-            
-            <button 
-              @click="toggleViewMode" 
-              :class="['view-toggle', { 'active': viewMode === 'full' }]"
-              title="Vista de lista"
-            >
-              <svg class="view-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+      <div class="">
+        
       
-      <!-- Filtros -->
-      <div class="filters-section">
-        <div class="filters-content">
-          <div class="filter-label">
-            <span>Filtrar por:</span>
-          </div>
-          <div class="filter-buttons">
-            <button 
-              v-for="filtro in ['Todas', 'Mis comunidades', 'Recomendadas', 'Populares']" 
-              :key="filtro"
-              @click="cambiarFiltro(filtro)"
-              :class="['filter-button', { 'active': filtroActual === filtro }]"
-            >
-              {{ filtro }}
-            </button>
-          </div>
-        </div>
-      </div>
+
       
       <!-- Estados de carga y error -->
       <div v-if="comunidadesCargando" class="loading-section">
@@ -228,6 +182,7 @@ const handleVerDetalles = (comunidad) => {
         @ver-detalles="handleVerDetalles"
       />
     </div>
+  </div>
   </div>
 </template>
 
