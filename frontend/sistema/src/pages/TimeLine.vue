@@ -57,7 +57,9 @@ const buscar = (nombre) => {
     <main class="main-content">
         <div  v-for="value in data">
             <h2>{{ value.nombreCuenta }}</h2>
-            
+            <div value.idUsuario>
+              
+            </div>
         </div>
     </main>
 

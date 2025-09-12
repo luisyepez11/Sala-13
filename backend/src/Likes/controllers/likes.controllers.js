@@ -36,6 +36,23 @@ export const getLikes = async(req,res) =>{
 	}
 }
 
+export const getLikesUsuario = async(req,res) =>{
+	let connection;
+	try {
+		const id = req.params.id
+		connection = await pool.getConnection();
+		const [data] = await connection.query(`SELECT * FROM likes LEFT JOIN cuentas ON likes.idCuenta = cuentas.idcuenta WHERE cuentas.idcuenta=?`,[id])
+		res.status(200).json(data)
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({
+			message:"error al obtener likes"
+		})
+	} finally {
+		if (connection) connection.release();
+	}
+}
+
 export const getLikesLanding = async(req,res) =>{
 	let connection;
 	try {
