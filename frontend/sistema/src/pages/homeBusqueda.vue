@@ -6,6 +6,7 @@ import Nav from '../components/navegacio.vue';
 import searchresultsection from '../components/searchresultsection.vue';
 import popularfilmsectionListas from '../components/popularfilmsectionListas.vue';
 import UserSearchResult from '../components/UserSearchResult.vue';
+import CommunitySearchResult from '../components/CommunitySearchResult.vue';
 import Footer from '../components/Footer.vue';
 
 const router = useRouter();
@@ -97,6 +98,8 @@ const buscar = (query) => {
         </div>
 
         <UserSearchResult v-else-if="selectedFilter === 'usuarios'" />
+
+        <CommunitySearchResult v-else-if="selectedFilter === 'comunidades'" />
 
       </div>
 
