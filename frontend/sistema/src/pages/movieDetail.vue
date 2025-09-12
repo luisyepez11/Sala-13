@@ -32,7 +32,6 @@ const insertVistas = async () => {
 	} catch (error) {
 		console.log(error)
 	}
-	alert("pelicula vistas")
 }
 
 const loadReviews = async () => {
@@ -160,7 +159,6 @@ const agregar_lista = async () => {
 				idLista: id,
 				idPelicula: route.params.id
 			})
-			alert("agregado a la lista")
 			closeModal()
 		} catch (error) {
 

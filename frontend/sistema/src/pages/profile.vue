@@ -229,6 +229,7 @@
 	};
 	const portadaLista = ref({})
 	const getposters = (posters, idLista) => {
+
   portadaLista.value[idLista] = posters;
 }
 	const aceptarSolicitud = async (id, nombre, idsolicitudes) => {
@@ -280,13 +281,11 @@
         nombreLista.value = "";
         descripcion.value = "";
 
-        alert('Comunidad creada exitosamente');
 
         obtenerComunidadesUsuario(usuarioId.value);
         
     } catch (error) {
         console.error("Error al crear la comunidad:", error);
-        alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
     }
 }
 	const crearLista = async () => {

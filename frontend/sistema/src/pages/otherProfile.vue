@@ -11,6 +11,7 @@
   import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'
+  import MovieCartList from '../components/MovieCardList.vue'
 	import axios from 'axios';
 	import { useRouter,useRoute } from 'vue-router';
 
@@ -170,6 +171,10 @@
   function cambiarTab(tab) {
     activeTab.value = tab
   }
+	const portadaLista = ref({})
+	const getposters = (posters, idLista) => {
+  portadaLista.value[idLista] = posters;
+}
 const modalIsOpen = ref(false);
 const openModal = () => {
   modalIsOpen.value = true;
@@ -178,7 +183,6 @@ const closeModal = () => {
   modalIsOpen.value = false;
 };
   const solicitudes = () =>{
-    alert("funcionando")
     openModal()
 };
 const buscar = (nombre) => {
@@ -292,9 +296,9 @@ const buscar = (nombre) => {
 					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
+					<div v-for="(item, index) in lista" :key="item.idlista" class="lista-card"
 						@click="$router.push('/listDetail/' + item.idlista)">
-						
+						<MovieCartList v-show="false" :idLista="item.idlista" @listaPoster="(posters) => getposters(posters, item.idlista)" ></MovieCartList>
 						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
 
 						<div class="lista-info">
