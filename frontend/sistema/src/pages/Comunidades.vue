@@ -4,7 +4,7 @@ import Navegacio from '../components/navegacio.vue';
 import ComunidadesGrid from '../components/ComunidadesGrid.vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-
+axios.defaults.withCredentials = true;
 const router = useRouter();
 
 // Estado para el modo de visualización
@@ -14,27 +14,38 @@ const viewMode = ref('grid'); // 'grid' o 'full'
 const filtroActual = ref('Todas');
 const busquedaTexto = ref('');
 
-// Estado para almacenar las comunidades
+
 const comunidades = ref([]);
 const comunidadesCargando = ref(true);
 const comunidadesError = ref(null);
+const usuarioId = ref(null);
 
-// Función para cargar comunidades desde la API
 const cargarComunidades = async () => {
   comunidadesCargando.value = true;
   comunidadesError.value = null;
   
   try {
-    const response = await axios.get('http://localhost:3300/api/comunidades');
+
+    const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
+    usuarioId.value = usuarioResponse.data.id;
     
-    // Transformar los datos de la API al formato esperado
+    const response = await axios.get('http://localhost:3300/api/comunidades');
+   
+    let comunidadesUnidas = [];
+    try {
+      const unidasResponse = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${usuarioId.value}`);
+      comunidadesUnidas = unidasResponse.data.map(c => c.idcominidad);
+    } catch (error) {
+      console.log('No se pudieron cargar las comunidades del usuario:', error);
+    }
+
     comunidades.value = response.data.map(comunidad => ({
       id: comunidad.idcominidad,
       nombre: comunidad.nombreComunidad,
       descripcion: comunidad.descripcionCominidad || 'Sin descripción',
       imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      usuarios: Math.floor(Math.random() * 1000) + 100, // Placeholder
-      esMiembro: false // Puedes ajustar esto según tu lógica
+      usuarios: Math.floor(Math.random() * 1000) + 100, 
+      esMiembro: comunidad.idCreador==usuarioId.value
     }));
     
   } catch (error) {
@@ -45,24 +56,20 @@ const cargarComunidades = async () => {
   }
 };
 
-// Cargar comunidades al montar el componente
 onMounted(() => {
   cargarComunidades();
 });
 
-// Función de búsqueda que se pasa al componente navegacio
 const buscar = async (termino) => {
   busquedaTexto.value = termino;
   console.log('Buscando comunidades:', termino);
-  // Aquí puedes implementar la lógica de búsqueda
+
 };
 
-// Cambiar modo de visualización
 const toggleViewMode = () => {
   viewMode.value = viewMode.value === 'grid' ? 'full' : 'grid';
 };
 
-// Cambiar filtro
 const cambiarFiltro = (filtro) => {
   filtroActual.value = filtro;
   console.log('Filtro cambiado a:', filtro);
@@ -77,28 +84,54 @@ const cambiarFiltro = (filtro) => {
   }
 };
 
+// Función para unirse a una comunidad
+const unirseAComunidad = async (idComunidad, idUsuario) => {
+  try {
+    const response = await axios.post('http://localhost:3300/api/comunidades/agregarUsuariosAComunidades', {
+      idComunidad: idComunidad,
+      idUsuario: idUsuario
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error al unirse a la comunidad:', error);
+    throw error;
+  }
+};
+
 // Manejar eventos del grid de comunidades
 const handleUnirse = async (comunidad) => {
   console.log('Unirse a comunidad:', comunidad.nombre);
+  
+  if (!usuarioId.value) {
+    alert('No se pudo identificar al usuario. Intenta recargar la página.');
+    return;
+  }
+  
   try {
-    // Aquí puedes implementar la lógica para unirse a una comunidad
-    // Ejemplo: await axios.post(`/api/comunidades/${comunidad.id}/unirse`);
+    await unirseAComunidad(comunidad.id, usuarioId.value);
     
-    // Actualizar el estado local
     comunidades.value = comunidades.value.map(c => 
-      c.id === comunidad.id ? { ...c, esMiembro: true } : c
+      usuarioId.value === comunidad.idCreador ? { ...c, esMiembro: true } : c
     );
     
     alert(`Te has unido a la comunidad "${comunidad.nombre}"`);
   } catch (error) {
     console.error('Error al unirse a la comunidad:', error);
-    alert('No se pudo unir a la comunidad. Intenta nuevamente.');
+    
+    if (error.response && error.response.status === 409) {
+      alert('Ya eres miembro de esta comunidad.');
+      comunidades.value = comunidades.value.map(c => 
+        c.id === comunidad.id ? { ...c, esMiembro: true } : c
+      );
+    } else {
+      alert('No se pudo unir a la comunidad. Intenta nuevamente.');
+    }
   }
 };
 
 const handleVerDetalles = (comunidad) => {
   console.log('Ver detalles de comunidad:', comunidad.nombre);
-  // Aquí puedes navegar a la página de detalles de la comunidad
   // router.push(`/comunidad/${comunidad.id}`);
 };
 </script>
