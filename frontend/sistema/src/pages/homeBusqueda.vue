@@ -33,6 +33,9 @@ const performSearch = (query) => {
   if (selectedFilter.value === 'listas') {
     fetchLists(query);
   }
+  if (selectedFilter.value === 'comunidades') {
+    router.push(`/comunidades`);
+  }
 };
 
 onMounted(() => {

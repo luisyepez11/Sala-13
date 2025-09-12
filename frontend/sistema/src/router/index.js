@@ -16,6 +16,7 @@ import ContactPage from "../pages/ContactPage.vue";
 import Comunidades from "./../pages/Comunidades.vue"
 import ListDetailOther from "../pages/listDetailOther.vue";
 import TimeLine from "../pages/TimeLine.vue";
+import ComunidadesDetail from "../pages/ComunidadesDetail.vue"
 const router = createRouter({
     history:createWebHistory(),
     routes:[
@@ -107,6 +108,11 @@ const router = createRouter({
             path:"/contacto",
             name:"contacto",
             component:ContactPage
+        },
+        {
+            path:"/ComunidadesDetail/:id",
+            name:"ComunidadesDetail",
+            component:ComunidadesDetail
         }
     ]
 })
