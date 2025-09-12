@@ -19,6 +19,8 @@ import listaRouter from "./Listas/routers/lista.router.js";
 import likeRouter from "./Likes/routers/likes.router.js";
 //Vistas
 import vistasRouter from "./Vistas/routers/vistas.router.js";
+//Comunidades
+import ComunidadesRouter from "./Comunidades/routers/comunidades.router.js";
 
 const app = express()
 
@@ -48,4 +50,6 @@ app.use("/api/lista", listaRouter)
 app.use("/api/like", likeRouter) 
 //Vistas
 app.use("/api/vistas", vistasRouter) 
+//Comunidades
+app.use("/api/comunidades",ComunidadesRouter)
 export default app;

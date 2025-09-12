@@ -25,22 +25,9 @@
 	const descripcion = ref("")
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
-	const comunidades = ref([
-		{
-			id: 1,
-			titulo: 'Cinéfilos Latinos',
-			descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-			imagen: 'https://example.com/latinos.jpg',
-			usuarios: 1245
-		},
-		{
-			id: 2,
-			titulo: 'Sci-Fi Lovers',
-			descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-			imagen: 'https://example.com/scifi.jpg',
-			usuarios: 893
-		}
-	])
+
+	const comunidades = ref([])
+	
 	const editData = ref({
 		nombre: '',
 		apodo: '',
@@ -49,7 +36,6 @@
 
 	const PROFILE_PIC_KEY = 'user_profile_picture';
 
-	// Variable para almacenar las reseñas reales
 	const userReviews = ref([]);
 
 	onMounted(() => {
@@ -78,6 +64,25 @@
 		total_seguidores: 0,
 		total_comentarios: 0
 	});
+
+	const obtenerComunidadesUsuario = async (idUsuario) => {
+		try {
+			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+			
+			const comunidadesTransformadas = response.data.map(comunidad => ({
+				id: comunidad.idcominidad,
+				titulo: comunidad.nombreComunidad,
+				descripcion: comunidad.descripcionCominidad,
+				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+				usuarios: Math.floor(Math.random() * 1000) + 100 
+			}));
+			
+			comunidades.value = comunidadesTransformadas;
+		} catch (error) {
+			console.error("Error al obtener las comunidades del usuario:", error);
+			comunidades.value = [];
+		}
+	};
 
 	const obtenerResenasUsuario = async (idUsuario) => {
 		try {
@@ -161,7 +166,10 @@
 			);
 			listaSolicitudes.value = unicas;
 			
-			obtenerResenasUsuario(usuarioId.value);
+			await Promise.all([
+				obtenerResenasUsuario(usuarioId.value),
+				obtenerComunidadesUsuario(usuarioId.value)
+			]);
 			
 		} catch (error) {
 			console.log("error", error)
@@ -205,6 +213,9 @@
 	}
 	function cambiarTab(tab) {
 		activeTab.value = tab
+		if (tab === 'Comunidades') {
+			obtenerComunidadesUsuario(usuarioId.value);
+		}
 	}
 	const modalIsOpen = ref(false);
 	const openModal = () => {
@@ -252,6 +263,32 @@
 	const cerrarModalComunidades = () => {
 		modalCrearComunidades.value = false
 	}
+	const crearComunidad = async () => {
+    try {
+        if (!nombreLista.value.trim() || !descripcion.value.trim()) {
+            alert('Por favor, completa todos los campos');
+            return;
+        }
+
+        const response = await axios.post('http://localhost:3300/api/comunidades', {
+            nombreComunidad: nombreLista.value,
+            descripcionCominidad: descripcion.value,
+            idCreador: usuarioId.value
+        });
+
+        cerrarModalComunidades();
+        nombreLista.value = "";
+        descripcion.value = "";
+
+        alert('Comunidad creada exitosamente');
+
+        obtenerComunidadesUsuario(usuarioId.value);
+        
+    } catch (error) {
+        console.error("Error al crear la comunidad:", error);
+        alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
+    }
+}
 	const crearLista = async () => {
 		try {
 			await axios.post(`http://localhost:3300/api/lista`, {
@@ -313,24 +350,24 @@
 		</div>
 	</Modal>
 	<Modal :isOpen="modalCrearComunidades" @close="cerrarModalComunidades">
-		<div class="modal-crear-lista">
-			<h2 class="modal-title">Crear nueva Comunidad</h2>
-			<div class="form-group">
-				<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
-				<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
-					class="input-field" />
-			</div>
-			<div class="form-group">
-				<label class="user-bio" for="descripcion">Descripción</label>
-				<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu comunidad..."
-					class="input-field textarea"></textarea>
-			</div>
-			<div class="modal-btn">
-				<button class="btn-cancel" @click="cerrarModalComunidades">Cancelar</button>
-				<button class="btn-crear" @click="">Crear</button>
-			</div>
+	<div class="modal-crear-lista">
+		<h2 class="modal-title">Crear nueva Comunidad</h2>
+		<div class="form-group">
+			<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
+			<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
+				class="input-field" />
 		</div>
-	</Modal>
+		<div class="form-group">
+			<label class="user-bio" for="descripcion">Descripción</label>
+			<textarea id="descripcion" v-model="descripcion" placeholder="Describe tu comunidad..."
+				class="input-field textarea"></textarea>
+		</div>
+		<div class="modal-btn">
+			<button class="btn-cancel" @click="cerrarModalComunidades">Cancelar</button>
+			<button class="btn-crear" @click="crearComunidad">Crear</button>
+		</div>
+	</div>
+</Modal>
 	<Modal :isOpen="modalIsOpen" @close="closeModal">
 		<template v-if="listaSolicitudes && listaSolicitudes.length > 0">
 			<table class="solicitudes-table">
