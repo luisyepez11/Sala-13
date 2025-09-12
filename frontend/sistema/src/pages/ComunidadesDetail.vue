@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import comunidadGrid from "../components/comunidadesGrid.vue"
+import comunidadGrid from "../components/ComunidadesGrid.vue"
 
 // --- Lógica para el carrusel de publicaciones ---
 

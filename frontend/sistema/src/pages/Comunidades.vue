@@ -26,14 +26,14 @@ const cargarComunidades = async () => {
   
   try {
 
-    const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
+    const usuarioResponse = await axios.get("/api/usuario/user");
     usuarioId.value = usuarioResponse.data.id;
     
-    const response = await axios.get('http://localhost:3300/api/comunidades');
+    const response = await axios.get('/api/comunidades');
    
     let comunidadesUnidas = [];
     try {
-      const unidasResponse = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${usuarioId.value}`);
+      const unidasResponse = await axios.get(`/api/comunidades/getComunidadesUsuarios/${usuarioId.value}`);
       comunidadesUnidas = unidasResponse.data.map(c => c.idcominidad);
     } catch (error) {
       console.log('No se pudieron cargar las comunidades del usuario:', error);
@@ -87,7 +87,7 @@ const cambiarFiltro = (filtro) => {
 // Función para unirse a una comunidad
 const unirseAComunidad = async (idComunidad, idUsuario) => {
   try {
-    const response = await axios.post('http://localhost:3300/api/comunidades/agregarUsuariosAComunidades', {
+    const response = await axios.post('/api/comunidades/agregarUsuariosAComunidades', {
       idComunidad: idComunidad,
       idUsuario: idUsuario
     });
@@ -138,7 +138,6 @@ const handleVerDetalles = (comunidad) => {
 <template>
   <div class="comunidades-page">
     <!-- Componente de navegación reutilizable -->
-    <Navegacio :buscar="buscar" />
     
     <!-- Contenido principal -->
     <div class="main-content">

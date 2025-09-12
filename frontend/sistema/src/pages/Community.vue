@@ -48,11 +48,11 @@ const obtenerComunidadesUsuario = async () => {
     cargandoComunidades.value = true;
     
     // Primero obtener el ID del usuario
-    const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
+    const usuarioResponse = await axios.get("/api/usuario/user");
     const idUsuario = usuarioResponse.data.id;
     
     // Luego obtener las comunidades del usuario
-    const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+    const response = await axios.get(`/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
     
     comunidadesUsuario.value = response.data;
     

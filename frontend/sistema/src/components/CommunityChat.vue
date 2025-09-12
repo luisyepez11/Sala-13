@@ -1,283 +1,283 @@
 <script setup>
-import { ref, watch, onUnmounted,onMounted} from 'vue';
+import { ref, watch, onUnmounted, onMounted, nextTick } from 'vue';
 import CommunityMessage from './CommunityMessage.vue';
 import io from "socket.io-client"
 import axios from 'axios'
 axios.defaults.withCredentials = true
 
-const socket = io("http://localhost:3300");
-
+const socket = io("https://sala-13-production.up.railway.app", {
+	transports: ['websocket', 'polling'],
+	withCredentials: true,
+})
 const props = defineProps({
-  title: {
-    type: String,
-    default: 'Fans del Terror'
-  },
-  comunidadId: {
-    type: Number,
-    default: null
-  }
+	title: {
+		type: String,
+		default: 'Fans del Terror'
+	},
+	comunidadId: {
+		type: Number,
+		default: null
+	}
 });
 
 const newMessage = ref("");
 const messages = ref([]);
 const currentRoom = ref(null);
+const chatContainer = ref(null);
 
 const joinRoom = (roomId) => {
-  if (roomId) {
-
-    if (currentRoom.value) {
-      socket.emit('leaveRoom', currentRoom.value);
-    }
-
-    socket.emit('joinRoom', roomId);
-    currentRoom.value = roomId;
-  
-    messages.value = [];
-    
-    console.log(`Unido a la sala: ${roomId}`);
-  }
+	if (roomId) {
+		if (currentRoom.value) {
+			socket.emit('leaveRoom', currentRoom.value);
+		}
+		socket.emit('joinRoom', roomId);
+		currentRoom.value = roomId;
+		messages.value = [];
+		console.log(`Unido a la sala: ${roomId}`);
+	}
 };
 
 
 const loadPreviousMessages = async (roomId) => {
-  try {
-        await datos();
-        console.log(NombreUsuario.value)
-  } catch (error) {
-    console.error('Error al cargar mensajes anteriores:', error);
-  }
+	try {
+		await datos();
+	} catch (error) {
+		console.error('Error al cargar mensajes anteriores:', error);
+	}
 };
 const idUsuario = ref("");
 const NombreUsuario = ref("");
-const datos = async () =>{
-    try {
-      const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
-      idUsuario.value = usuarioResponse.data.id;
-      NombreUsuario.value = usuarioResponse.data.nombre
-    } catch (error) {
-      
-    }
-} 
+const datos = async () => {
+	try {
+		const usuarioResponse = await axios.get("/api/usuario/user");
+		idUsuario.value = usuarioResponse.data.id;
+		NombreUsuario.value = usuarioResponse.data.nombre
+	} catch (error) {
+		console.error("Error al obtener datos del usuario:", error);
+	}
+}
 
 watch(() => props.comunidadId, (newComunidadId, oldComunidadId) => {
-  if (newComunidadId && newComunidadId !== oldComunidadId) {
-    joinRoom(newComunidadId);
-    loadPreviousMessages(newComunidadId);
-  }
+	if (newComunidadId && newComunidadId !== oldComunidadId) {
+		joinRoom(newComunidadId);
+		loadPreviousMessages(newComunidadId);
+	}
 }, { immediate: true });
 
 
 const submitReview = () => {
-  if (newMessage.value.trim() !== "" && currentRoom.value) {
-
-    const userData = {
-      id: Date.now(), 
-      userName: NombreUsuario.value, 
-      idCuenta: idUsuario.value, 
-      comment: newMessage.value,
-      sala: currentRoom.value
-    };
-
-    socket.emit("mensaje", userData);
-    newMessage.value = "";
-  }
+	if (newMessage.value.trim() !== "" && currentRoom.value) {
+		const userData = {
+			id: Date.now(),
+			userName: NombreUsuario.value,
+			idCuenta: idUsuario.value,
+			comment: newMessage.value,
+			sala: currentRoom.value
+		};
+		socket.emit("mensaje", userData);
+		newMessage.value = "";
+	}
 };
 
 socket.on("mensaje", (nuevoMensaje) => {
-  console.log("Nuevo mensaje recibido:", nuevoMensaje);
-  
-  if (nuevoMensaje.sala === currentRoom.value) {
-    messages.value.push({
-      id: messages.value.length > 0 
-        ? Math.max(...messages.value.map(m => m.id)) + 1 
-        : 1,
-      userName: nuevoMensaje.userName,
-      idCuenta: nuevoMensaje.idCuenta,
-      comment: nuevoMensaje.mensaje,
-      timestamp: nuevoMensaje.timestamp
-    });
-  }
+	if (nuevoMensaje.sala === currentRoom.value) {
+		messages.value.push({
+			id: messages.value.length > 0
+				? Math.max(...messages.value.map(m => m.id)) + 1
+				: 1,
+			userName: nuevoMensaje.userName,
+			idCuenta: nuevoMensaje.idCuenta,
+			comment: nuevoMensaje.mensaje,
+			timestamp: nuevoMensaje.timestamp
+		});
+	}
 });
 
+watch(messages, () => {
+	nextTick(() => {
+		if (chatContainer.value) {
+			chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+		}
+	});
+}, { deep: true });
 
 onUnmounted(() => {
-  if (currentRoom.value) {
-    socket.emit('leaveRoom', currentRoom.value);
-  }
-  socket.off("mensaje");
+	if (currentRoom.value) {
+		socket.emit('leaveRoom', currentRoom.value);
+	}
+	socket.off("mensaje");
 });
 </script>
 
 <template>
-  <div class="community-chat">
-    <div class="chat-header">
-      <div class="avatar-container">
-          <div class="avatar-placeholder">{{ title[0] }}</div>
-      </div>
-      <h2 class="chat-title">{{ title }}</h2>
-      <span class="room-indicator">Sala: {{ currentRoom }}</span>
-    </div>
-    <div class="chat-messages">
-      <div v-if="messages.length === 0" class="no-messages">
-        <p>No hay mensajes en esta comunidad</p>
-      </div>
-      <CommunityMessage 
-        v-for="message in messages" 
-        :key="message.id"
-        :userName="message.userName"
-        :idCuenta="message.idCuenta"
-        :comment="message.comment"
-        :timestamp="message.timestamp"
-      />
-    </div>
-    <div class="message-container">
-      <textarea 
-        v-model="newMessage"
-        placeholder="Comparte tu opinión aquí..."
-        class="message-textarea"
-        id="comentario"
-        @keypress.enter.prevent="submitReview"
-      ></textarea>
-      <button @click="submitReview" class="btn-submit">Enviar</button>    
-    </div>
-  </div>
+	<div class="community-chat">
+		<div class="chat-header">
+			<div class="avatar-container">
+				<div class="avatar-placeholder">{{ title[0] }}</div>
+			</div>
+			<h2 class="chat-title">{{ title }}</h2>
+			<span class="room-indicator">Sala: {{ currentRoom }}</span>
+		</div>
+		<div class="chat-messages" ref="chatContainer">
+			<div v-if="messages.length === 0" class="no-messages">
+				<p>No hay mensajes en esta comunidad</p>
+			</div>
+			<CommunityMessage 
+				v-for="message in messages" 
+				:key="message.id"
+				:userName="message.userName"
+				:idCuenta="message.idCuenta"
+				:comment="message.comment"
+				:timestamp="message.timestamp"
+			/>
+		</div>
+		<div class="message-container">
+			<textarea 
+				v-model="newMessage"
+				placeholder="Comparte tu opinión aquí..."
+				class="message-textarea"
+				id="comentario"
+				@keypress.enter.prevent="submitReview"
+			></textarea>
+			<button @click="submitReview" class="btn-submit">Enviar</button>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .community-chat {
-  background: #111827;
-  border-radius: 0;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
+	background: #111827;
+	border-radius: 0;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .chat-header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  background: #1F2937;
-  padding: 1rem;
-  border-bottom: 1px solid #374151;
-  position: relative;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	background: #1F2937;
+	padding: 1rem;
+	border-bottom: 1px solid #374151;
+	position: relative;
 }
 
 .avatar-container {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 0.75rem;
-  flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	overflow: hidden;
+	margin-right: 0.75rem;
+	flex-shrink: 0;
 }
 
 .avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #374151;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: bold;
+	width: 100%;
+	height: 100%;
+	background: #374151;
+	color: #ffffff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.25rem;
+	font-weight: bold;
 }
 
 .chat-title {
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
+	color: #ffffff;
+	font-size: 1.25rem;
+	font-weight: 600;
+	margin: 0;
 }
 
 .room-indicator {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  font-size: 0.8rem;
+	position: absolute;
+	right: 1rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #9ca3af;
+	font-size: 0.8rem;
 }
 
 .chat-messages {
-  padding: 1rem;
-  flex: 1;
-  overflow-y: auto;
+	padding: 1rem;
+	flex: 1;
+	overflow-y: auto;
 }
 
 .no-messages {
-  text-align: center;
-  color: #9ca3af;
-  padding: 2rem;
+	text-align: center;
+	color: #9ca3af;
+	padding: 2rem;
 }
 
-/* Estilo para la barra de desplazamiento */
 .chat-messages::-webkit-scrollbar {
-  width: 6px;
+	width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-track {
-  background: #1F2937;
+	background: #1F2937;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: #4B5563;
-  border-radius: 3px;
+	background: #4B5563;
+	border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
+	background: #6B7280;
 }
 
 .message-container {
-  padding: 1rem;
-  background: #111827;
-  border-top: 1px solid #374151;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+	padding: 1rem;
+	background: #111827;
+	border-top: 1px solid #374151;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .message-textarea {
-  flex: 1;
-  min-height: 40px;
-  max-height: 120px;
-  padding: 0.75rem;
-  background: #1F2937;
-  color: #ffffff;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  resize: vertical;
-  font-family: inherit;
+	flex: 1;
+	min-height: 40px;
+	max-height: 120px;
+	padding: 0.75rem;
+	background: #1F2937;
+	color: #ffffff;
+	border: 1px solid #374151;
+	border-radius: 8px;
+	resize: vertical;
+	font-family: inherit;
 }
 
 .message-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+	outline: none;
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
 .btn-submit {
-  background: #3b82f6;
-  color: #ffffff;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  white-space: nowrap;
+	background: #3b82f6;
+	color: #ffffff;
+	font-weight: 600;
+	padding: 0.5rem 1rem;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	white-space: nowrap;
 }
 
 .btn-submit:hover {
-  background: #2563eb;
+	background: #2563eb;
 }
 
 .btn-submit:disabled {
-  background: #374151;
-  cursor: not-allowed;
+	background: #374151;
+	cursor: not-allowed;
 }
 </style>

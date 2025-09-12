@@ -18,23 +18,14 @@ const profilePictureUrl = ref(null);
 const PROFILE_PIC_KEY = 'user_profile_picture';
 
 const cargar = async () => {
-    try {
-        const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
-        logueado.value = usuarioId.data.message !== "no registrado";
-        
-        if (logueado.value) {
-            const storedPic = localStorage.getItem(PROFILE_PIC_KEY);
-            if (storedPic) {
-                profilePictureUrl.value = storedPic;
-            }
-        } else {
-            profilePictureUrl.value = null;
-        }
-    } catch (error) {
-        console.error("Error al verificar autenticación:", error);
-        logueado.value = false;
-        profilePictureUrl.value = null;
-    }
+  try {
+    const usuarioId = await axios.get("/api/usuario/user");
+    logueado.value = usuarioId.data.message !== "no registrado";
+    console.log("Estado de autenticación:", logueado.value);
+  } catch (error) {
+    console.error("Error al verificar autenticación:", error);
+    logueado.value = false;
+  }
 };
 
 const realizarBusqueda = async () => {
@@ -54,14 +45,13 @@ const reemplazarEspacios = (texto) => {
 };
 
 const deleteUser = async () => {
-    try {
-        await axios.get("http://localhost:3300/api/usuario/delete");
-        profilePictureUrl.value = null;
-        logueado.value = false;
-        router.push('/');
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-    }
+  try {
+    await axios.get("/api/usuario/delete");
+    router.push('/');
+
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const navigateToLogin = () => {

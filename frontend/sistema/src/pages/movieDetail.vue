@@ -15,20 +15,20 @@ const movie = ref(null)
 const nombrePelicula = ref("")
 
 const error = ref(null)
-const insertLike = async () => {
-	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const like = await axios.post("http://localhost:3300/api/like", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
-	} catch (error) {
-		console.log(error)
-	}
+const insertLike = async () =>{
+      try {
+        const usarioId = await axios.get("/api/usuario/user")
+        const like = await axios.post("/api/like",{idCuenta:usarioId.data.id,idPelicula:route.params.id})
+      } catch (error) {
+        console.log(error)
+      }
 }
 
 const insertVistas = async () => {
 	
 	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+		const usarioId = await axios.get("/api/usuario/user")
+		const viste = await axios.post("/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}
@@ -36,11 +36,11 @@ const insertVistas = async () => {
 
 const loadReviews = async () => {
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
+    const usarioId = await axios.get("/api/usuario/user")
+    const listas = await axios.get(`/api/lista/getListasUsuarios/${usarioId.data.id}`)
     lista.value = listas.data
     const movieId = route.params.id;
-    const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
+    const response = await axios.get(`/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
     const reviewsData = comentarios.map(comentario => ({
       idCuenta: comentario.idCuenta,
@@ -67,19 +67,19 @@ const loadReviews = async () => {
 const submitReview = async () => {
   try {
     const movieId = route.params.id
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-    const idcuenta = cuenta.data.resultCuenta[0].idcuenta
+    const usarioId = await axios.get("/api/usuario/user")
+    const cuenta = await axios.get(`/api/cuenta/getCuenta/${usarioId.data.id}`)
+    const idcuenta =cuenta.data.resultCuenta[0].idcuenta
     const comentario = document.getElementById('comentario').value
     const fechaISO = new Date().toISOString();
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
-    const result = await axios.post(`http://localhost:3300/api/comentario`, {
-      idCuenta: idcuenta,
-      idPelicula: movieId,
-      comentario: comentario,
-      fecha: fecha,
-      nombrePelicula: nombrePelicula.value
-    })
+    const result = await axios.post(`/api/comentario`,{
+          idCuenta:idcuenta,
+          idPelicula:movieId,
+          comentario:comentario,
+          fecha:fecha,
+          nombrePelicula:nombrePelicula.value
+        })
     loadReviews()
     document.getElementById("comentario").value = ""
   } catch (e) {
@@ -94,34 +94,30 @@ const submitReview = async () => {
 
 
 onMounted(async () => {
-	try {
-		const movieId = route.params.id
-		if (!movieId) {
-			router.push('/')
-			return
-		}
-		const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
-		const datos = await resp.json();
-		
-		nombrePelicula.value = datos.title
-		
-		const genreNames = datos.genres && datos.genres.length > 0
-			? datos.genres.map(genre => genre.name).join(' / ')
-			: 'Género no disponible';
-
-		movie.value = {
-			title: datos.title,
-			year: datos.release_date,
-			genre: genreNames,
-			synopsis: datos.overview,
-			rating: (datos.vote_average / 2).toFixed(1),
-			poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
-		}
-		loadReviews()
-	} catch (e) {
-		error.value = 'Error al cargar los detalles de la película: ' + e.message
-		console.error('Error:', e)
-	}
+  try {
+    const movieId = route.params.id
+    const resp = await fetch(`/api/pelicula/getPelicula/${movieId}`)
+    const datos = await resp.json();
+    console.log(datos)
+    if (!movieId) {
+      router.push('/')
+      return
+    }
+    
+    nombrePelicula.value=datos.title
+    movie.value = {
+  title: datos.title,
+  year: datos.release_date,
+  genre: 'Terror/Ciencia ficción',
+  synopsis: datos.overview,
+  rating: (datos.vote_average/2).toFixed(1),
+  poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
+    }
+    loadReviews()
+  } catch (e) {
+    error.value = 'Error al cargar los detalles de la película: ' + e.message
+    console.error('Error:', e)
+  }
 })
 
 const reviews = ref([])
@@ -152,18 +148,19 @@ const listas = ref([])
 const selecionado = (lista) => {
 	listas.value.push(lista)
 }
-const agregar_lista = async () => {
-	listas.value.map(async id => {
-		try {
-			const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula', {
-				idLista: id,
-				idPelicula: route.params.id
-			})
-			closeModal()
-		} catch (error) {
-
-		}
-	})
+const agregar_lista = async () =>{
+      listas.value.map(async id =>{
+        try {
+          const result = await axios.post('/api/lista/agregarPelicula',{
+            idLista:id, 
+            idPelicula:route.params.id
+          })
+          alert("agregado a la lista")
+          closeModal()
+        } catch (error) {
+          
+        }
+      })
 }
 const buscar = (nombre) => {
 	if (nombre === "") {

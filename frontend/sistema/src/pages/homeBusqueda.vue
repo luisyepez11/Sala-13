@@ -8,7 +8,7 @@ import popularfilmsectionListas from '../components/popularfilmsectionListas.vue
 import UserSearchResult from '../components/UserSearchResult.vue';
 import CommunitySearchResult from '../components/CommunitySearchResult.vue';
 import Footer from '../components/Footer.vue';
-
+import Comunidades from './Comunidades.vue';
 const router = useRouter();
 const route = useRoute();
 
@@ -17,15 +17,6 @@ const componentKey = ref(0);
 const selectedFilter = ref('peliculas');
 const listsData = ref([]);
 
-const fetchLists = async (query) => {
-  try {
-    const res = await axios.get(`http://localhost:3300/api/lista/getListasBusqueda/${query}`);
-    listsData.value = res.data;
-  } catch (error) {
-    console.error("Error al obtener listas:", error);
-    listsData.value = [];
-  }
-};
 
 const performSearch = (query) => {
   if (!query) return;
@@ -49,9 +40,17 @@ watch(() => route.params.id, (newQuery) => {
   performSearch(searchQuery.value);
 });
 
-watch(selectedFilter, () => {
-  performSearch(searchQuery.value);
-});
+// Función para obtener las listas desde la API
+const fetchLists = async (nombre) => {
+  try {
+    const result = await fetch(`/api/lista/getListasBusqueda/${nombre}`)
+    const lists = await result.json()
+    listsData.value = lists
+    console.log("Listas obtenidas:", listsData.value)
+  } catch (error) {
+    console.log("Error al obtener listas:", error)
+  }
+}
 
 const buscar = (query) => {
   if (!query) {
@@ -102,7 +101,7 @@ const buscar = (query) => {
 
         <UserSearchResult v-else-if="selectedFilter === 'usuarios'" />
 
-        <CommunitySearchResult v-else-if="selectedFilter === 'comunidades'" />
+        <Comunidades v-else-if="selectedFilter === 'comunidades'" />
 
       </div>
 

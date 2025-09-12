@@ -32,22 +32,24 @@ function navigateToDetails() {
 }
 
 onMounted(async () => {
-	try {
-		const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${props.review.movie.idPelicula}`)
-		const datos = await resp.json()
-		movie.value = {
-			id: datos.id,
-			title: datos.title,
-			year: datos.release_date,
-			genre: datos.genre || 'Sin género',
-			synopsis: datos.overview,
-			rating: (datos.vote_average / 2).toFixed(1),
-			poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
-		}
-		
-	} catch (e) {
-		console.error('Error al cargar la película:', e)
-	}
+  try {
+    console.log(props.review.movie.idPelicula)
+    const resp = await fetch(`/api/pelicula/getPelicula/${props.review.movie.idPelicula}`)
+    const datos = await resp.json()
+    console.log(datos)
+    movie.value = {
+      id: datos.id,
+      title: datos.title,
+      year: datos.release_date,
+      genre: datos.genre || 'Sin género',
+      synopsis: datos.overview,
+      rating: (datos.vote_average / 2).toFixed(1),
+      poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
+    }
+    
+  } catch (e) {
+    console.error('Error al cargar la película:', e)
+  }
 })
 </script>
 

@@ -16,7 +16,7 @@ const isLoading = ref(true);
 
 const loadComments = async () => {
     try {
-        const response = await axios.get('http://localhost:3300/api/comentario/comentarios');
+        const response = await axios.get('/api/comentario/comentarios');
         
         reviews.value = response.data.map((comment, index) => ({
             id: comment.idcomentario || index, 

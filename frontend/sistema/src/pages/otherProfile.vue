@@ -48,9 +48,10 @@
   const id = route.params.id;
   const usario = ref("")
   
+
   const obtenerResenasUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${id}`);
+			const response = await axios.get(`/api/comentario/getComentariosUsuario/${id}`);
 			// Transformar los datos del endpoint al formato que espera UserReviewCard
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
@@ -79,16 +80,16 @@
 
   const data = async () => {
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+			const usarioId = await axios.get("/api/usuario/user")
 			if (usarioId.data.message == "no registrado") {
 				router.push('/');
 				return;
 			}
 
 			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
-				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${id}`),
-				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`),
-				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
+				axios.get(`/api/solicitud/solicitudes/${id}`),
+				axios.get(`/api/cuenta/getCuenta/${id}`),
+				axios.get(`/api/lista/getListasUsuarios/${id}`)
 			]);
 			
 			const datos = cuenta.data.resultCuenta[0];
@@ -106,7 +107,7 @@
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
+						const peliculasRes = await axios.get(`/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
 						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
@@ -158,7 +159,7 @@
 
   async function seguirPerfil () {
     try {
-      const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
+      const result = await axios.post(`/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
           idUsuario:usario.value
         })
