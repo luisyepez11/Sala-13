@@ -115,7 +115,6 @@ const handleUnirse = async (comunidad) => {
       usuarioId.value === comunidad.idCreador ? { ...c, esMiembro: true } : c
     );
     
-    alert(`Te has unido a la comunidad "${comunidad.nombre}"`);
   } catch (error) {
     console.error('Error al unirse a la comunidad:', error);
     

@@ -90,7 +90,7 @@ const obtenerResenasUsuario = async (idUsuario) => {
     <main class="main-content">
         <div  v-for="value in data">
             <h2>{{ value.nombreCuenta }}</h2>
-					<Contenedor :idUsuario="value.id"/>
+            <Contenedor :idUsuario="value.idReceptor"/>
         </div>
     </main>
 

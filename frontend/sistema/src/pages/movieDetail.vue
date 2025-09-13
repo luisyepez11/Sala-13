@@ -32,7 +32,6 @@ const insertVistas = async () => {
 	} catch (error) {
 		console.log(error)
 	}
-	alert("pelicula vistas")
 }
 
 const loadReviews = async () => {

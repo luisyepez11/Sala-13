@@ -71,7 +71,6 @@ const obtenerComunidadesUsuario = async () => {
 // Función para manejar el clic en una comunidad
 const handleComunidadClick = (comunidad) => {
   comunidadSeleccionada.value = comunidad;
-  // alert(`ID de la comunidad: ${comunidad.idcominidad}\nNombre: ${comunidad.nombreComunidad}`);
 };
 
 const buscar = (nombre)=>{

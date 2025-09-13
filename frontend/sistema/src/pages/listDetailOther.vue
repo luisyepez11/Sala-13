@@ -86,7 +86,6 @@ const addListe = async () =>{
             idPelicula:pelicula.id
           })
           })
-          alert("lista agregada a perfil")
           lista.favorito = !lista.favorito
         } catch (error) {
           console.log(error)
