@@ -15,6 +15,9 @@ const props = defineProps({
   comunidadId: {
     type: Number,
     default: null
+  },fotoPoster: {
+    type: String,
+    default: 'Fans del Terror'
   }
 });
 
@@ -49,11 +52,14 @@ const loadPreviousMessages = async (roomId) => {
 };
 const idUsuario = ref("");
 const NombreUsuario = ref("");
+const fotoPerfil = ref("");
 const datos = async () =>{
     try {
       const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
       idUsuario.value = usuarioResponse.data.id;
       NombreUsuario.value = usuarioResponse.data.nombre
+      const response = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${idUsuario.value}`);
+      fotoPerfil.value = response.data.resultCuenta[0].fotoPerfil
     } catch (error) {
       
     }
@@ -74,6 +80,7 @@ const submitReview = () => {
       id: Date.now(), 
       userName: NombreUsuario.value, 
       idCuenta: idUsuario.value, 
+      fotoPerfil:fotoPerfil.value,
       comment: newMessage.value,
       sala: currentRoom.value
     };
@@ -94,6 +101,7 @@ socket.on("mensaje", (nuevoMensaje) => {
       userName: nuevoMensaje.userName,
       idCuenta: nuevoMensaje.idCuenta,
       comment: nuevoMensaje.mensaje,
+      fotoPerfil:nuevoMensaje.fotoPerfil,
       timestamp: nuevoMensaje.timestamp
     });
   }
@@ -112,7 +120,7 @@ onUnmounted(() => {
   <div class="community-chat">
     <div class="chat-header">
       <div class="avatar-container">
-          <div class="avatar-placeholder">{{ title[0] }}</div>
+          <div class="avatar-placeholder"><img :src="props.fotoPoster" alt=""></div>
       </div>
       <h2 class="chat-title">{{ title }}</h2>
       <span class="room-indicator">Sala: {{ currentRoom }}</span>
@@ -125,6 +133,7 @@ onUnmounted(() => {
         v-for="message in messages" 
         :key="message.id"
         :userName="message.userName"
+        :fotoPerfil="message.fotoPerfil"
         :idCuenta="message.idCuenta"
         :comment="message.comment"
         :timestamp="message.timestamp"

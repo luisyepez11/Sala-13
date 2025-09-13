@@ -40,6 +40,7 @@ io.on("connection", socket => {
     if (userRoom && userRoom === data.sala) {
       io.to(data.sala).emit("mensaje", {
         mensaje: data.comment,
+        fotoPerfil:data.fotoPerfil,
         idCuenta: data.idCuenta,
         userName: data.userName,
         sala: data.sala,
