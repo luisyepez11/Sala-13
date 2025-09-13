@@ -160,19 +160,23 @@
 
   async function seguirPerfil () {
     try {
+      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
       const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
-          idUsuario:usario.value
+          idUsuario:usarioId.data.id
         })
     } catch (error) {
       console.log(error)
     }
+    event.target.disabled = true
     
   }
 
   function cambiarTab(tab) {
     activeTab.value = tab
   }
+
+  
 const modalIsOpen = ref(false);
 const openModal = () => {
   modalIsOpen.value = true;
@@ -233,7 +237,7 @@ const buscar = (nombre) => {
             <button
   v-if="!editar"
   class="edit-button"
-  @click="$event.target.disabled = true"
+  @click="seguirPerfil"
 >
   <div class="edit-text">Seguir</div>
 </button>
