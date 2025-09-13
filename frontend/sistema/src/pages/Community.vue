@@ -121,7 +121,7 @@ onMounted(() => {
                     @click="handleComunidadClick(comunidad)"
                 >
                     <div class="avatar-container">
-                        <div class="avatar-placeholder">{{ comunidad.nombreComunidad.charAt(0).toUpperCase() }}</div>
+                        <div class="avatar-placeholder"><img :src="comunidad.fotoPoster" alt=""></div>
                     </div>
                     <div class="user-info">
                         <span class="username">{{ comunidad.nombreComunidad }}</span>
@@ -141,6 +141,7 @@ onMounted(() => {
               v-if="comunidadSeleccionada"
               :title="comunidadSeleccionada.nombreComunidad"
               :comunidadId="comunidadSeleccionada.idcominidad"
+              :fotoPoster="comunidadSeleccionada.fotoPoster"
             />
             <div v-else class="no-chat-selected">
               <p>Selecciona una comunidad para comenzar a chatear</p>

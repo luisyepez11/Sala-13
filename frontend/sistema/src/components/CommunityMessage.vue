@@ -19,6 +19,11 @@ const props = defineProps({
     type: String,
     required: true
   }
+  ,
+  fotoPerfil: {
+    type: String,
+    required: true
+  }
 });
 
 const router = useRouter()
@@ -33,7 +38,7 @@ const cargarUsuario =()=>{
       <div class="avatar-container" @click="cargarUsuario" @touchstart="cargarUsuario">
         <img v-if="userAvatar" :src="userAvatar" :alt="userName" class="avatar" >
         <div v-else class="avatar-placeholder">
-          {{ userName.charAt(0).toUpperCase() }}
+          <img :src="fotoPerfil" alt="">
         </div>
       </div>
       <div class="user-details" >
