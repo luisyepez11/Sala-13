@@ -47,7 +47,7 @@ const datosPeliculas = async (movieId) => {
 const fetchMovies = async () => {
   try {
     loading.value = true
-    const resp = await fetch(`http://localhost:3300/api/vistas/getVistasUsuario/${props.idUsuario}`)
+    const resp = await fetch(`/api/vistas/getVistasUsuario/${props.idUsuario}`)
     if (!resp.ok) throw new Error('Error al obtener la lista de películas')
     
     const datos = await resp.json()

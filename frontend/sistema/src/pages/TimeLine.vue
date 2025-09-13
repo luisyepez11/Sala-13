@@ -5,6 +5,7 @@ import UserReviewCard from "../components/UserReviewCard.vue";
 import Footer from '../components/Footer.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
+import Contenedor from '../components/Contenedor.vue';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
@@ -46,7 +47,7 @@ watch(selectedFilter, (newFilter) => {
 
 const buscar = (nombre) => {
   if (nombre==""){
-        router.push("/")
+     router.push("/")
     }else{
       router.push("/search/"+nombre)
     }
@@ -89,7 +90,7 @@ const obtenerResenasUsuario = async (idUsuario) => {
     <main class="main-content">
         <div  v-for="value in data">
             <h2>{{ value.nombreCuenta }}</h2>
-					<UserReviewCard v-for="review in userReviews" :key="review.id" :review="review"  />
+					<Contenedor :idUsuario="value.id"/>
         </div>
     </main>
 
