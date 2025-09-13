@@ -53,7 +53,7 @@ export const getComentariosLanding = async(req,res) =>{
 	let connection;
 	try {
 		connection = await pool.getConnection();
-		const [data] = await connection.query(`SELECT comentarios.*,cuentas.nombreCuenta,cuentas.nombreReal FROM comentarios INNER JOIN cuentas ON comentarios.idCuenta=cuentas.idcuenta;`)
+		const [data] = await connection.query(`SELECT comentarios.*,cuentas.* FROM comentarios INNER JOIN cuentas ON comentarios.idCuenta=cuentas.idcuenta;`)
 		res.status(200).json(data)
 	} catch (error) {
 		console.log(error)

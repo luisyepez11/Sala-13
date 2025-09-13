@@ -24,7 +24,7 @@ const loadComments = async () => {
             peli: comment.nombrePelicula || "Película desconocida",
             comment: comment.comentario || "Sin comentario",
             punt: "⭐⭐⭐⭐⭐",
-            img: `https://picsum.photos/id/${1005 + index}/200/200`,
+            img: comment.fotoPerfil || `https://picsum.photos/id/${1005 + index}/200/200` ,
             small: false,
         }));
         
