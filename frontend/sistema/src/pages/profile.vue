@@ -205,7 +205,8 @@
 			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
 				nombreReal: editData.value.nombre,
 				descripcionCuenta: editData.value.descripcion,
-				nombreCuenta: editData.value.apodo
+				nombreCuenta: editData.value.apodo,
+				fotoPerfil:profilePictureUrl.value
 			})
 			await data();
 		} catch (error) {
