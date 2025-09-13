@@ -139,7 +139,9 @@
 				cantidad_solicitudes: datos.total_solicitudes,
 				total_seguidos: datos.total_seguidos,
 				total_seguidores: datos.total_seguidores,
-				total_comentarios: datos.total_comentarios
+				total_comentarios: datos.total_comentarios,
+				total_likes:datos.total_likes,
+				total_vistas:datos.total_vistas
 			};
 
 			const listasConPosters = await Promise.all(
@@ -453,12 +455,12 @@
 
 				<div class="stats-container">
 					<div class="stat-item">
-						<div class="stat-number">{{ stats.watched }}</div>
+						<div class="stat-number">{{ usuario.total_vistas }}</div>
 						<div class="stat-label">Vistas</div>
 					</div>
 					<div class="vertical-line"></div>
 					<div class="stat-item">
-						<div class="stat-number">{{ stats.likes }}</div>
+						<div class="stat-number">{{ usuario.total_likes }}</div>
 						<div class="stat-label">Likes</div>
 					</div>
 					<div class="vertical-line"></div>

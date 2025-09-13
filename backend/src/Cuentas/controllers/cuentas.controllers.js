@@ -6,13 +6,15 @@ export const getCuenta = async(req,res) =>{
 		const idCuenta = req.params.id;
 		connection = await pool.getConnection();
 		const [resultCuenta] = await connection.query(`
-			SELECT 
+SELECT 
 				cu.idcuenta,
 				cu.*,
 				COUNT(DISTINCT CASE WHEN s.estado = 'pendiente' THEN s.idsolicitudes END) as total_solicitudes,
 				COUNT(DISTINCT ase.idamigos) as total_seguidos,
 				COUNT(DISTINCT aseg.idamigos) as total_seguidores,
-				COUNT(DISTINCT c.idcomentario) as total_comentarios
+				COUNT(DISTINCT c.idcomentario) as total_comentarios,
+                COUNT(DISTINCT l.idlike) as total_likes,
+                COUNT(DISTINCT v.idvistas) as total_vistas
 			FROM 
 				cuentas cu
 			LEFT JOIN 
@@ -23,7 +25,11 @@ export const getCuenta = async(req,res) =>{
 				amigos aseg ON aseg.idReceptor = cu.idcuenta
 			LEFT JOIN 
 				comentarios c ON c.idCuenta = cu.idcuenta
-			WHERE cu.idcuenta=?
+			LEFT JOIN 
+				likes l ON cu.idcuenta = l.idCuenta
+			LEFT JOIN 
+				vistas v ON cu.idcuenta = v.idCuenta
+			WHERE cu.idcuenta= ?
 			GROUP BY 
 				cu.idcuenta
 			ORDER BY 
