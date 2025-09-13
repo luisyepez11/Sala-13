@@ -1,196 +1,153 @@
 <script setup>
-  import { ref, onMounted, watch } from "vue"
-	import Nav from "../components/navegacio.vue"
-	import Modal from "../components/modal.vue";
-	import UserReviewCard from "../components/UserReviewCard.vue";
-	import FavoriteMovies from "../components/FavoriteMovies.vue";
-	import MovieGrid from '../components/searchresultsection.vue'
-	import ListCoverGrid from "../components/ListCoverGrid.vue";
-	import Footer from '../components/Footer.vue'
-  import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue";
-  import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
-	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
-	import CommunityCard from '../components/CommunityCard.vue'
-	import axios from 'axios';
-  import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from "vue"
+import { useRouter, useRoute } from 'vue-router'
 
-  const router = useRouter()
-  const route = useRoute()
-	axios.defaults.withCredentials = true;
-	const listaSolicitudes = ref()
-	const lista = ref([])
-	const usuarioId = ref("")
-	const nombreLista = ref("")
-	const descripcion = ref("")
-	const isProfileModalOpen = ref(false);
-	const profilePictureUrl = ref(null);
-  const userReviews = ref([]);
-	const comunidades = ref([
-  {
-    id: 1,
-    titulo: 'Cinéfilos Latinos',
-    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-    imagen: 'https://example.com/latinos.jpg',
-    usuarios: 1245
-  },
-  {
-    id: 2,
-    titulo: 'Sci-Fi Lovers',
-    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-    imagen: 'https://example.com/scifi.jpg',
-    usuarios: 893
-  }
-])
+import axios from 'axios'
 
-  axios.defaults.withCredentials = true;
-  const editar=ref(false)
-  const id = route.params.id;
-  const usario = ref("")
-  
-  const obtenerResenasUsuario = async (idUsuario) => {
-		try {
-			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${id}`);
-			// Transformar los datos del endpoint al formato que espera UserReviewCard
-			const reseñasTransformadas = response.data.map(comentario => ({
-				id: comentario.idcomentario,
-				user: {
-					name: comentario.nombreCuenta,
-					avatar: profilePictureUrl.value || "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
-				},
-				movie: {
-					title: comentario.nombrePelicula,
-					poster: `https://image.tmdb.org/t/p/w500`,
-					idPelicula:comentario.idPelicula
+import Nav from "../components/navegacio.vue"
+import popularfilmsection from '../components/popularfilmsection.vue'
+import Modal from "../components/modal.vue"
+import Footer from '../components/Footer.vue'
+import UserReviewCard from '../components/UserReviewCard.vue'
 
-				},
-				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
-				reviewText: comentario.comentario,
-				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
-				fecha: comentario.fecha
-			}));
-			
-			userReviews.value = reseñasTransformadas;
-		} catch (error) {
-			console.error("Error al obtener las reseñas del usuario:", error);
-			userReviews.value = [];
-		}
-	};
+const router = useRouter()
+const route = useRoute()
 
-  const data = async () => {
-		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-			if (usarioId.data.message == "no registrado") {
-				router.push('/');
-				return;
-			}
-
-			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
-				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${id}`),
-				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`),
-				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
-			]);
-			
-			const datos = cuenta.data.resultCuenta[0];
-			usuario.value = {
-				nombre: datos.nombreCuenta,
-				pronombres: datos.pronombres,
-				nombreReal: datos.nombreReal,
-				biografia: datos.descripcionCuenta,
-        fotoPerfil:datos.fotoPerfil,
-				cantidad_solicitudes: datos.total_solicitudes,
-				total_seguidos: datos.total_seguidos,
-				total_seguidores: datos.total_seguidores,
-				total_comentarios: datos.total_comentarios,
-        total_likes:datos.total_likes,
-				total_vistas:datos.total_vistas
-			};
-      profilePictureUrl.value=datos.fotoPerfil
-			const listasConPosters = await Promise.all(
-				listasRes.data.map(async (listaItem) => {
-					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
-						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
-						const posters = peliculas
-							.slice(0, 4)
-							.map(p => `https://image.tmdb.org/t/p/w500${p.poster_path}`)
-							.filter(Boolean);
-						return { ...listaItem, posters };
-					} catch (e) {
-						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
-						return { ...listaItem, posters: [] };
-					}
-				})
-			);
-			lista.value = listasConPosters;
-
-			const unicas = datosSolicitudes.data.filter(
-				(item, index, self) =>
-					index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
-			);
-			listaSolicitudes.value = unicas;
-			
-			// Obtener las reseñas del usuario después de tener su ID
-			obtenerResenasUsuario(id);
-			
-		} catch (error) {
-			console.log("error", error)
-		}
-	}
-  data()
-  const usuario = ref({
+const editar = ref(false)
+const reviews = ref([])
+const isLoadingReviews = ref(false)
+const activeTab = ref("Profile")
+const modalIsOpen = ref(false)
+const usuario = ref({
   nombre: "Usuario1",
   pronombres: "He/Him",
   nombreReal: "Real Name", 
-  biografia: "Bio del usuario"
-});
+  biografia: "Bio del usuario",
+  cantidad_solicitudes: 0,
+  total_seguidos: 0,
+  total_seguidores: 0,
+  total_comentarios: 0,
+  fotoPerfil: "/src/assets/perfilGen.png"
+})
+const stats = ref({
+  watched: 0,
+  likes: 0,
+  reviews: 0,
+  followers: 0,
+  following: 0,
+  requests: 0
+})
 
+const tabs = ["Profile", "Lists", "Likes", "Reviews", "Communities", "Watched"]
 
+const userId = route.params.id
 
-  const activeTab = ref("Favoritas")
-  const tabs = ["Favoritas", "Listas", "Likes", "Reseñas", "Comunidades", "Vistas"]
+axios.defaults.withCredentials = true
 
-  const stats = ref({
-    watched: 0,
-    likes: 0,
-    reviews: 0,
-    followers: 0,
-    following: 0,
-    requests: 0
-  })
-
-  async function seguirPerfil () {
-    try {
-      const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
-          idReceptor:id,
-          idUsuario:usario.value
-        })
-    } catch (error) {
-      console.log(error)
+async function loadUserData() {
+  try {
+    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    usuario.value.id = usarioId.data.id
+    if (usarioId.data.message == "no registrado") {
+      router.push('/login')
+      return
     }
     
-  }
-
-  function cambiarTab(tab) {
-    activeTab.value = tab
-  }
-const modalIsOpen = ref(false);
-const openModal = () => {
-  modalIsOpen.value = true;
-};
-const closeModal = () => {
-  modalIsOpen.value = false;
-};
-  const solicitudes = () =>{
-    alert("funcionando")
-    openModal()
-};
-const buscar = (nombre) => {
-	if (nombre === "") {
-		router.push("/")
-	} else {
-		router.push("/search/" + nombre)
-	}
+    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${userId}`)
+    const datos = cuenta.data.resultCuenta[0]
+    usuario.value.nombre = datos.nombreCuenta
+    usuario.value.pronombres = datos.pronombres
+    usuario.value.nombreReal = datos.nombreReal
+    usuario.value.biografia = datos.descripcionCuenta
+    usuario.value.fotoPerfil = datos.fotoPerfil || "/src/assets/perfilGen.png"
+    usuario.value.cantidad_solicitudes = datos.total_solicitudes
+    usuario.value.total_seguidos = datos.total_seguidos
+    usuario.value.total_seguidores = datos.total_seguidores
+    usuario.value.total_comentarios = datos.total_comentarios
+  } catch (error) {
+    console.log(error)
+  }  
 }
+
+async function loadUserReviews() {
+  if (reviews.value.length > 0) return
+  
+  isLoadingReviews.value = true
+  try {
+    const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${userId}`)
+    
+    const reseñasTransformadas = response.data.map(comentario => ({
+      id: comentario.idcomentario,
+      user: {
+        name: comentario.nombreCuenta,
+        avatar: usuario.value.fotoPerfil || "/src/assets/perfilGen.png"
+      },
+      movie: {
+        title: comentario.nombrePelicula,
+        poster: `https://image.tmdb.org/t/p/w500`,
+        idPelicula: comentario.idPelicula
+      },
+      rating: comentario.calificacion || 0,
+      reviewText: comentario.comentario,
+      likes: 0,
+      fecha: comentario.fecha
+    }))
+    
+    const reseñasOrdenadas = reseñasTransformadas.sort((a, b) => {
+      return new Date(b.fecha) - new Date(a.fecha)
+    })
+    
+    reviews.value = reseñasOrdenadas
+  } catch (error) {
+    console.error('Error al cargar reseñas:', error)
+    reviews.value = []
+  } finally {
+    isLoadingReviews.value = false
+  }
+}
+
+async function seguirPerfil() {
+  try {
+    const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`, {
+      idReceptor: userId,
+      idUsuario: usuario.value.id
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function cambiarTab(tab) {
+  activeTab.value = tab
+  if (tab === 'Reviews') {
+    loadUserReviews()
+  }
+}
+
+function openModal() {
+  modalIsOpen.value = true
+}
+
+function closeModal() {
+  modalIsOpen.value = false
+}
+
+function solicitudes() {
+  alert("funcionando")
+  openModal()
+}
+
+function buscar(nombre) {
+  if (nombre === "") {
+    router.push("/")
+  } else {
+    router.push("/search/" + nombre)
+  }
+}
+
+onMounted(() => {
+  loadUserData()
+})
 </script>
 
 <template>
@@ -202,36 +159,35 @@ const buscar = (nombre) => {
     
   </Modal>
   <div class="perfil-container">
-    <!-- Header Navigation -->
     <Nav :buscar="buscar" ></Nav>
 
-    <!-- Main Content -->
     <div class="main-content">
-      <!-- Profile Section -->
       <div class="profile-section">
         <div class="profile-info">
           <!-- Avatar -->
           <div class="avatar-section">
             <div class="avatar-container">
-              <img v-if="profilePictureUrl" :src="profilePictureUrl" alt="Foto de perfil" class="avatar-image">
-							<svg v-else class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd"
-									d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-							</svg>
+              <img 
+                v-if="usuario.fotoPerfil && usuario.fotoPerfil !== '/src/assets/perfilGen.png'" 
+                :src="usuario.fotoPerfil" 
+                :alt="usuario.nombre"
+                class="avatar-image"
+              />
+              <img 
+                v-else
+                src="/src/assets/perfilGen.png" 
+                :alt="usuario.nombre"
+                class="avatar-image"
+              />
             </div>
-            <button
-  v-if="!editar"
-  class="edit-button"
-  @click="$event.target.disabled = true"
->
-  <div class="edit-text">Seguir</div>
-</button>
+            <button v-if="!editar" class="edit-button" @click="seguirPerfil">
+              <div class="edit-text">seguir</div>
+            </button>
           </div>
           
-          <!-- User Details -->
           <div v-if="!editar" class="user-details">
             <div class="user-name">{{ usuario.nombre }}</div>
-            <div  v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
+            <div v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
             <div class="user-real-name">{{ usuario.nombreReal }}</div>
             <div class="user-bio">{{ usuario.biografia }}</div>
           </div>
@@ -240,12 +196,12 @@ const buscar = (nombre) => {
         <!-- Stats -->
         <div class="stats-container">
           <div class="stat-item">
-            <div class="stat-number">{{ usuario.total_vistas }}</div>
+            <div class="stat-number">{{ stats.watched }}</div>
             <div class="stat-label">watched</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number">{{ usuario.total_likes }}</div>
+            <div class="stat-number">{{ stats.likes }}</div>
             <div class="stat-label">likes</div>
           </div>
           <div class="vertical-line"></div>
@@ -265,105 +221,51 @@ const buscar = (nombre) => {
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number" @click="solicitudes" >{{ usuario.cantidad_solicitudes }}</div>
+            <div class="stat-number" @click="solicitudes">{{ usuario.cantidad_solicitudes }}</div>
             <div class="stat-label">requests</div>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
       <div class="tabs-nav">
-				<div class="tabs-container">
-					<button v-for="tab in tabs" :key="tab" @click="cambiarTab(tab)"
-						:class="['tab-button', activeTab === tab ? 'tab-active' : 'tab-inactive']">
-						{{ tab }}
-					</button>
-				</div>
-			</div>
+        <div class="tabs-container">
+          <button 
+            v-for="tab in tabs" 
+            :key="tab"
+            @click="cambiarTab(tab)"
+            :class="['tab-button', activeTab === tab ? 'tab-active' : 'tab-inactive']"
+          >
+            {{ tab }}
+          </button>
+        </div>
+      </div>
 
-      <div v-if="activeTab === 'Favoritas'" class="content-area">
-				<FavoriteMovies />
-			</div>
-<div v-else-if="activeTab === 'Likes'" class="content-area">
-		  <PopularfilmsectionLike :idUsuario="route.params.id" opcion="other-profile"></PopularfilmsectionLike>
-</div>
-<div v-else-if="activeTab === 'Vistas'" class="content-area">
-		  <PopularfilmsectionVistas :idUsuario="route.params.id"></PopularfilmsectionVistas>
-</div>
-      
-			<div v-else-if="activeTab === 'Listas'" class="content-area">
-				<div v-if="!lista || lista.length === 0" class="listas-vacias">
-					<div class="lista-card create-card" @click="abrirModalListas">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva lista</h2>
-							<p class="lista-description">Empieza a organizar tus películas</p>
-						</div>
-					</div>
-				</div>
-				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
-						@click="$router.push('/listDetail/' + item.idlista)">
-						
-						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
+      <div v-if="activeTab === 'Profile'" class="content-area">
+        <popularfilmsection />
+      </div>
 
-						<div class="lista-info">
-							<h2 class="lista-title">{{ item.nombreLista }}</h2>
-							<p class="lista-description">{{ item.descripcion }}</p>
-						</div>
-					</div>
-					<div class="lista-card create-card" @click="abrirModalListas">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva lista</h2>
-							<p class="lista-description">Empieza a organizar tus películas</p>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div v-else-if="activeTab === 'Likes'" class="content-area">
-				<MovieGrid 
-					genero="/likes" 
-					titulo="Películas que te gustaron" 
-				/>
-			</div>
-			<div v-else-if="activeTab === 'Reseñas'" class="content-area">
-				<div v-if="userReviews.length === 0" class="empty-content">
-					<div class="empty-text">No tienes reseñas todavía</div>
-				</div>
-				<div v-else class="reviews-container">
-					<UserReviewCard v-for="review in userReviews" :key="review.id" :review="review"  />
-				</div>
-			</div>
-			<div v-else-if="activeTab === 'Comunidades'" class="content-area">
-				<div v-if="!comunidades || comunidades.length === 0" class="comunidades-vacias">
-					<div class="lista-card create-card" @click="abrirModalComunidades">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva comunidad</h2>
-							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
-						</div>
-					</div>
-				</div>
-				<div v-else class="comunidades-grid">
-					<CommunityCard
-						v-for="comunidad in comunidades"
-						:key="comunidad.id"
-						:titulo="comunidad.titulo"
-						:descripcion="comunidad.descripcion"
-						:imagen="comunidad.imagen"
-						:usuarios="comunidad.usuarios"
-					/>
+      <div v-else-if="activeTab === 'Reviews'" class="content-area">
+        <div v-if="isLoadingReviews" class="loading-state">
+          <div class="loading-text">Cargando reseñas...</div>
+        </div>
+        <div v-else-if="reviews.length === 0" class="empty-reviews">
+          <div class="empty-text">Este usuario no ha escrito reseñas aún.</div>
+        </div>
+        <div v-else class="reviews-container">
+          
+          <div class="reviews-list">
+            <UserReviewCard 
+              v-for="review in reviews" 
+              :key="review.id" 
+              :review="review" 
+            />
+          </div>
+        </div>
+      </div>
 
-					<div class="lista-card create-card" @click="abrirModalComunidades">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva comunidad</h2>
-							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div v-else class="empty-content">
-				<div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
-			</div>
+      <div v-else class="empty-content">
+        <div class="empty-text">Contenido de {{ activeTab }} próximamente...</div>
+      </div>
     </div>
   </div>
   <Footer />
@@ -407,10 +309,11 @@ const buscar = (nombre) => {
   overflow: hidden;
 }
 
-.avatar-icon {
-  width: 64px;
-  height: 64px;
-  color: #6b7280;
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .edit-button {
@@ -425,13 +328,6 @@ const buscar = (nombre) => {
 
 .edit-button:hover {
   background: #2563eb;
-}
-.edit-button:disabled {
-  background-color: #4a4a4a; 
-  color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.8;
-  transition: background-color 0.3s ease;
 }
 
 .edit-text {
@@ -546,6 +442,50 @@ const buscar = (nombre) => {
 .empty-text {
   color: #9ca3af;
   font-size: 16px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.loading-text {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+.empty-reviews {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.reviews-container {
+  width: 100%;
+}
+
+.reviews-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.reviews-title {
+  color: #ffffff;
+  font-family: "Poppins-SemiBold", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.reviews-count {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 @media (max-width: 768px) {

@@ -15,6 +15,15 @@ const movie = ref(null)
 const nombrePelicula = ref("")
 
 const error = ref(null)
+const reviews = ref([])
+const newReview = ref({
+	rating: 0,
+	comment: ''
+})
+const isLiked = ref(false)
+const modalIsOpen = ref(false);
+const listas = ref([])
+
 const insertLike = async () => {
 	try {
 		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -25,7 +34,6 @@ const insertLike = async () => {
 }
 
 const insertVistas = async () => {
-	
 	try {
 		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
 		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
@@ -83,16 +91,58 @@ const submitReview = async () => {
     })
     loadReviews()
     document.getElementById("comentario").value = ""
+    newReview.value.comment = ""
   } catch (e) {
     error.value = 'Error al cargar los detalles de la película: ' + e.message
     console.error('Error:', e)
   }
 }
 
+const like = async () => {
+	isLiked.value = !isLiked.value
+	await insertLike()
+	const likeButton = document.querySelector('.btn-like')
+	if (isLiked.value) {
+		likeButton.classList.add('btn-click-like')
+	} else {
+		likeButton.classList.remove('btn-click-like')
+	}
+}
 
+const openModal = () => {
+	modalIsOpen.value = true;
+};
 
+const closeModal = () => {
+	modalIsOpen.value = false;
+};
 
+const selecionado = (lista) => {
+	listas.value.push(lista)
+}
 
+const agregar_lista = async () => {
+	listas.value.map(async id => {
+		try {
+			const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula', {
+				idLista: id,
+				idPelicula: route.params.id
+			})
+			alert("agregado a la lista")
+			closeModal()
+		} catch (error) {
+
+		}
+	})
+}
+
+const buscar = (nombre) => {
+	if (nombre === "") {
+		router.push("/")
+	} else {
+		router.push("/search/" + nombre)
+	}
+}
 
 onMounted(async () => {
 	try {
@@ -124,56 +174,6 @@ onMounted(async () => {
 		console.error('Error:', e)
 	}
 })
-
-const reviews = ref([])
-const newReview = ref({
-	rating: 0,
-	comment: ''
-})
-const isLiked = ref(false)
-
-const like = async () => {
-	isLiked.value = !isLiked.value
-	await insertLike()
-	const likeButton = document.querySelector('.btn-like')
-	if (isLiked.value) {
-		likeButton.classList.add('btn-click-like')
-	} else {
-		likeButton.classList.remove('btn-click-like')
-	}
-}
-const modalIsOpen = ref(false);
-const openModal = () => {
-	modalIsOpen.value = true;
-};
-const closeModal = () => {
-	modalIsOpen.value = false;
-};
-const listas = ref([])
-const selecionado = (lista) => {
-	listas.value.push(lista)
-}
-const agregar_lista = async () => {
-	listas.value.map(async id => {
-		try {
-			const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula', {
-				idLista: id,
-				idPelicula: route.params.id
-			})
-			alert("agregado a la lista")
-			closeModal()
-		} catch (error) {
-
-		}
-	})
-}
-const buscar = (nombre) => {
-	if (nombre === "") {
-		router.push("/")
-	} else {
-		router.push("/search/" + nombre)
-	}
-}
 </script>
 
 <template>
@@ -532,7 +532,6 @@ const buscar = (nombre) => {
 	color: #f1f5f9;
 }
 
-/* Ocultar el checkbox nativo */
 .styled-checkbox {
 	appearance: none;
 	-webkit-appearance: none;
@@ -569,7 +568,6 @@ const buscar = (nombre) => {
 }
 
 .listas-table th {
-
 	font-weight: bold;
 	text-transform: uppercase;
 	font-size: 14px;
