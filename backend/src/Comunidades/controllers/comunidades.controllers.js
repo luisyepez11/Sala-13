@@ -99,14 +99,14 @@ export const getComunidade = async (req, res) => {
 };
 
 export const crearComunidades = async (req, res) => {
-	const { nombreComunidad, descripcion, idCreador } = req.body;
-	console.log(nombreComunidad, descripcion, idCreador )
+	const { nombreComunidad, descripcion, idCreador,logoComunidad } = req.body;
+	console.log(nombreComunidad, descripcion, idCreador,logoComunidad )
 	let connection;
 	try {
 		connection = await pool.getConnection();
 		const [result] = await connection.query(
-			"INSERT INTO cominidades (nombreComunidad, descripcionCominidad, idCreador) VALUES (?, ?, ?)",
-			[nombreComunidad, descripcion, idCreador]
+			"INSERT INTO cominidades (nombreComunidad, descripcionCominidad, idCreador,fotoPoster) VALUES (?, ?, ?,?)",
+			[nombreComunidad, descripcion, idCreador,logoComunidad]
 		);
 		const [resultComunidad] = await connection.query(
 			"INSERT INTO comunidadescuentas (idComunidad, idCuenta) VALUES (?, ?)",

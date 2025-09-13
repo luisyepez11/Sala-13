@@ -184,6 +184,17 @@ const closeModal = () => {
     alert("funcionando")
     openModal()
 };
+const mostrarModalLista = ref(false)
+const mostrarModalFoto = ref(false)
+
+const abrirModalListas = () => {
+  mostrarModalLista.value = true
+}
+
+const aceptarModalLista = () => {
+  mostrarModalLista.value = false
+  mostrarModalFoto.value = true
+}
 const buscar = (nombre) => {
 	if (nombre === "") {
 		router.push("/")
