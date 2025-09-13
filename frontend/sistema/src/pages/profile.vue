@@ -300,7 +300,8 @@ const isSelectorFotoOpen = ref(false)
     const response = await axios.post('http://localhost:3300/api/comunidades', {
       nombreComunidad: nombreLista.value,
       descripcionCominidad: descripcion.value,
-      idCreador: usuarioId.value
+      idCreador: usuarioId.value,
+	  logoComunidad:logoComunidad.value
     });
 
     cerrarModalComunidades();
@@ -368,15 +369,16 @@ const isSelectorFotoOpen = ref(false)
         cerrarProfileModal();
     }
 		function abrirSelectorFoto() {
-	isSelectorFotoOpen.value = true
+	isProfileModal.value = true
 	}
 
 	function cerrarSelectorFoto() {
-	isSelectorFotoOpen.value = false
+	isProfileModal.value = false
 	}
-
+	const logoComunidad = ref("")
 	function handleFotoComunidadSeleccionada(url) {
-	//fotoComunidad.value = url
+	 logoComunidad.value = url
+	 console.log(logoComunidad.value)
 	cerrarSelectorFoto()
 }
 </script>
