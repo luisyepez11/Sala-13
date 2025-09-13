@@ -74,7 +74,7 @@
 				titulo: comunidad.nombreComunidad,
 				descripcion: comunidad.descripcionCominidad,
 				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-				usuarios: Math.floor(Math.random() * 1000) + 100 
+				usuarios: comunidad.total_seguidores
 			}));
 			
 			comunidades.value = comunidadesTransformadas;
@@ -274,7 +274,7 @@
 
         const response = await axios.post('http://localhost:3300/api/comunidades', {
             nombreComunidad: nombreLista.value,
-            descripcionCominidad: descripcion.value,
+            descripcion: descripcion.value,
             idCreador: usuarioId.value
         });
 
