@@ -5,7 +5,6 @@ import axios from 'axios';
 
 const router = useRouter();
 
-
 const props = defineProps({
     buscar: {
         type: Function,
@@ -159,7 +158,7 @@ onMounted(() => {
     margin: 0 auto;
     padding: 20px 24px;
     display: flex;
-    gap:5rem;
+    gap: 5rem;
     align-items: center;
     justify-content: space-between;
     height: max-content;
@@ -277,7 +276,7 @@ onMounted(() => {
 
 .search-button {
     position: absolute;
-    right: -3rem;
+    right: -3rem; /* lo dejas como lo tienes */
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -294,8 +293,33 @@ onMounted(() => {
 .profile-image {
     width: 160%;
     height: 160%;
-    object-fit:fill;
+    object-fit: fill;
     display: block;
 }
-</style>
 
+.edit-button {
+    height: 36px;                
+    padding: 0 30px;             
+    border-radius: 8px;
+
+    font-size: 1.05rem;
+    line-height: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background: #2563eb;
+}
+
+.edit-button p {
+    margin: 0;
+}
+</style>
