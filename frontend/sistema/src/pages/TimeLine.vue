@@ -16,6 +16,7 @@ const componentKey = ref(0)
 const data = ref([])
 const selectedFilter = ref('peliculas')
 
+
 const listas = async () =>{
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
