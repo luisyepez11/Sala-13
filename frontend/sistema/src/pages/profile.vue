@@ -281,7 +281,8 @@ const isSelectorFotoOpen = ref(false)
         const response = await axios.post('http://localhost:3300/api/comunidades', {
             nombreComunidad: nombreLista.value,
             descripcion: descripcion.value,
-            idCreador: usuarioId.value
+            idCreador: usuarioId.value,
+			logoComunidad:logoComunidad.value
         });
 
         cerrarModalComunidades();
@@ -297,12 +298,6 @@ const isSelectorFotoOpen = ref(false)
         alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
     }
 
-    const response = await axios.post('http://localhost:3300/api/comunidades', {
-      nombreComunidad: nombreLista.value,
-      descripcionCominidad: descripcion.value,
-      idCreador: usuarioId.value,
-	  logoComunidad:logoComunidad.value
-    });
 
     cerrarModalComunidades();
     nombreLista.value = "";
@@ -381,6 +376,7 @@ const isSelectorFotoOpen = ref(false)
 	 console.log(logoComunidad.value)
 	cerrarSelectorFoto()
 }
+
 </script>
 
 <template>
@@ -620,7 +616,7 @@ const isSelectorFotoOpen = ref(false)
 						:usuarios="comunidad.usuarios"
 					/>
 
-					<div class="lista-card create-card" @click="abrirModal.values">
+					<div class="lista-card create-card" @click="abrirModalComunidades">
 						<div class="lista-info">
 							<h2 class="lista-title">+ Crear nueva comunidad</h2>
 							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
