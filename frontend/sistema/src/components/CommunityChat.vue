@@ -5,7 +5,11 @@ import io from "socket.io-client"
 import axios from 'axios'
 axios.defaults.withCredentials = true
 
-const socket = io("http://localhost:3300");
+const socket = io("https://sala-13-production.up.railway.app", {
+	transports: ['websocket', 'polling'],
+	withCredentials: true,
+})
+
 
 const props = defineProps({
 	title: {
@@ -28,16 +32,12 @@ const chatContainer = ref(null);
 
 const joinRoom = (roomId) => {
 	if (roomId) {
-
 		if (currentRoom.value) {
 			socket.emit('leaveRoom', currentRoom.value);
 		}
-
 		socket.emit('joinRoom', roomId);
 		currentRoom.value = roomId;
-	
 		messages.value = [];
-		
 		console.log(`Unido a la sala: ${roomId}`);
 	}
 };
@@ -46,7 +46,6 @@ const joinRoom = (roomId) => {
 const loadPreviousMessages = async (roomId) => {
 	try {
 		await datos();
-		console.log(NombreUsuario.value)
 	} catch (error) {
 		console.error('Error al cargar mensajes anteriores:', error);
 	}
@@ -54,17 +53,19 @@ const loadPreviousMessages = async (roomId) => {
 const idUsuario = ref("");
 const NombreUsuario = ref("");
 const fotoPerfil = ref("");
-const datos = async () =>{
+const datos = async () => {
 	try {
 		const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
 		idUsuario.value = usuarioResponse.data.id;
 		NombreUsuario.value = usuarioResponse.data.nombre
 		const response = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${idUsuario.value}`);
+		console.log(response.data)
 		fotoPerfil.value = response.data.resultCuenta[0].fotoPerfil
 	} catch (error) {
-		
+		console.error("Error al obtener datos del usuario:", error);
 	}
-} 
+}
+
 
 watch(() => props.comunidadId, (newComunidadId, oldComunidadId) => {
 	if (newComunidadId && newComunidadId !== oldComunidadId) {
@@ -76,35 +77,32 @@ watch(() => props.comunidadId, (newComunidadId, oldComunidadId) => {
 
 const submitReview = () => {
 	if (newMessage.value.trim() !== "" && currentRoom.value) {
-
 		const userData = {
-			id: Date.now(), 
-			userName: NombreUsuario.value, 
-			idCuenta: idUsuario.value, 
+			id: Date.now(),
+			userName: NombreUsuario.value,
+			idCuenta: idUsuario.value,
 			fotoPerfil:fotoPerfil.value,
 			comment: newMessage.value,
 			sala: currentRoom.value
 		};
-
 		socket.emit("mensaje", userData);
 		newMessage.value = "";
 	}
 };
 
 socket.on("mensaje", (nuevoMensaje) => {
-	console.log("Nuevo mensaje recibido:", nuevoMensaje);
-	
 	if (nuevoMensaje.sala === currentRoom.value) {
 		messages.value.push({
-			id: messages.value.length > 0 
-				? Math.max(...messages.value.map(m => m.id)) + 1 
+			id: messages.value.length > 0
+				? Math.max(...messages.value.map(m => m.id)) + 1
 				: 1,
 			userName: nuevoMensaje.userName,
 			idCuenta: nuevoMensaje.idCuenta,
-			comment: nuevoMensaje.mensaje,
 			fotoPerfil:nuevoMensaje.fotoPerfil,
+			comment: nuevoMensaje.mensaje,
 			timestamp: nuevoMensaje.timestamp
 		});
+		console.log(messages.value)
 	}
 });
 
