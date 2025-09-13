@@ -65,6 +65,23 @@
 		total_comentarios: 0
 	});
 
+
+	const fotoComunidad = ref(null)
+const isSelectorFotoOpen = ref(false)
+
+function abrirSelectorFoto() {
+  isSelectorFotoOpen.value = true
+}
+
+function cerrarSelectorFoto() {
+  isSelectorFotoOpen.value = false
+}
+
+function handleFotoComunidadSeleccionada(url) {
+  fotoComunidad.value = url
+  cerrarSelectorFoto()
+}
+
 	const obtenerComunidadesUsuario = async (idUsuario) => {
 		try {
 			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
@@ -266,30 +283,32 @@
 		modalCrearComunidades.value = false
 	}
 	const crearComunidad = async () => {
-    try {
-        if (!nombreLista.value.trim() || !descripcion.value.trim()) {
-            alert('Por favor, completa todos los campos');
-            return;
-        }
-
-        const response = await axios.post('http://localhost:3300/api/comunidades', {
-            nombreComunidad: nombreLista.value,
-            descripcionCominidad: descripcion.value,
-            idCreador: usuarioId.value
-        });
-
-        cerrarModalComunidades();
-        nombreLista.value = "";
-        descripcion.value = "";
-
-        alert('Comunidad creada exitosamente');
-
-        obtenerComunidadesUsuario(usuarioId.value);
-        
-    } catch (error) {
-        console.error("Error al crear la comunidad:", error);
-        alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
+  try {
+    if (!nombreLista.value.trim() || !descripcion.value.trim()) {
+      alert('Por favor, completa todos los campos');
+      return;
     }
+
+    const response = await axios.post('http://localhost:3300/api/comunidades', {
+      nombreComunidad: nombreLista.value,
+      descripcionCominidad: descripcion.value,
+      idCreador: usuarioId.value
+    });
+
+    cerrarModalComunidades();
+    nombreLista.value = "";
+    descripcion.value = "";
+
+    alert('Comunidad creada exitosamente');
+
+    obtenerComunidadesUsuario(usuarioId.value);
+
+    isProfileModalOpen.value = true;
+
+  } catch (error) {
+    console.error("Error al crear la comunidad:", error);
+    alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
+  }
 }
 	const crearLista = async () => {
 		try {
@@ -355,6 +374,13 @@
 	<div class="modal-crear-lista">
 		<h2 class="modal-title">Crear nueva Comunidad</h2>
 		<div class="form-group">
+			<div class="form-group">
+  <label class="user-bio">Foto de la comunidad</label>
+  <div v-if="fotoComunidad" class="preview-imagen">
+    <img :src="fotoComunidad" alt="Preview" class="imagen-preview" />
+  </div>
+  <button class="btn-crear" @click="abrirSelectorFoto">Seleccionar foto</button>
+</div>
 			<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
 			<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
 				class="input-field" />
