@@ -48,7 +48,6 @@ onMounted(async () => {
       id: p.idPelicula,
       title: p.title,
       year: p.release_date,
-      genre: p.genre || 'Sin género',
       synopsis: p.overview,
       rating: p.vote_average,
       poster: `https://image.tmdb.org/t/p/original${p.poster_path}`

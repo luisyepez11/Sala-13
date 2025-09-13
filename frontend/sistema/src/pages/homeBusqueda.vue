@@ -72,7 +72,6 @@ const buscar = (query) => {
           <select id="filter-select" v-model="selectedFilter" class="filter-select">
             <option value="peliculas">Películas</option>
             <option value="listas">Listas</option>
-            <option value="usuarios">Usuarios</option>
             <option value="comunidades">Comunidades</option>
           </select>
         </div>
