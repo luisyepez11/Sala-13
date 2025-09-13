@@ -47,7 +47,7 @@ const loadReviews = async () => {
       idCuenta: comentario.idCuenta,
       userName: comentario.nombreCuenta,
 	  fotoPerfil: comentario.fotoPerfil || "https://placehold.co/40x40/4A5568/E2E8F0?text=U",
-      rating: 4,
+      rating: comentario.valoracion,
       date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
       comment: comentario.comentario,
       realName: comentario.nombreReal,
@@ -67,6 +67,13 @@ const loadReviews = async () => {
 };
 
 const submitReview = async () => {
+  // Mostrar alerta con la cantidad de estrellas seleccionadas
+  if (newReview.rating > 0) {
+    alert(`¡Gracias por tu reseña de ${newReview.rating} estrellas!`);
+  } else {
+    alert('¡Gracias por tu reseña!');
+  }
+  
   try {
     const movieId = route.params.id
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
@@ -80,10 +87,14 @@ const submitReview = async () => {
       idPelicula: movieId,
       comentario: comentario,
       fecha: fecha,
-      nombrePelicula: nombrePelicula.value
+      nombrePelicula: nombrePelicula.value,
+      valoracion: valoracion.value
     })
     loadReviews()
     document.getElementById("comentario").value = ""
+    
+    newReview.rating = 0;
+	valoracion.value=0
   } catch (e) {
     error.value = 'Error al cargar los detalles de la película: ' + e.message
     console.error('Error:', e)
@@ -146,6 +157,12 @@ const closeModal = () => {
 	modalIsOpen.value = false;
 };
 const listas = ref([])
+const valoracion = ref("")
+const cantidad = (n)=>{
+	valoracion.value = n
+	newReview.rating=n
+	console.log(valoracion.value)
+}
 const selecionado = (lista) => {
 	listas.value.push(lista)
 }
@@ -238,18 +255,21 @@ const buscar = (nombre) => {
 				</div>
 				<div class="reviews-section">
 					<h2 class="section-title">Reseñas</h2>
-					<div class="write-review">
-						<h3>Escribe tu reseña</h3>
-						<div class="rating-input">
-							<span v-for="n in 5" :key="n" @click="newReview.rating = n" class="star-input"
-								:class="{ 'filled': n <= newReview.rating }">
-								★
-							</span>
-						</div>
-						<textarea v-model="newReview.comment" placeholder="Comparte tu opinión sobre la película..."
-							class="review-textarea" id="comentario"></textarea>
-						<button @click="submitReview" class="btn-submit">Publicar reseña</button>
-					</div>
+					 <div class="write-review">
+    <h3>Escribe tu reseña</h3>
+    <div class="rating-input">
+      <span v-for="n in 5" :key="n" @click="cantidad(n)" class="star-input"
+        :class="{ 'filled': n <= valoracion, 'hover-effect': true }">
+        ★
+      </span>
+    </div>
+    <p class="rating-text" v-if="newReview.rating > 0">
+      Has seleccionado {{ newReview.rating }} {{ newReview.rating === 1 ? 'estrella' : 'estrellas' }}
+    </p>
+    <textarea v-model="newReview.comment" placeholder="Comparte tu opinión sobre la película..."
+      class="review-textarea" id="comentario"></textarea>
+    <button @click="submitReview" class="btn-submit">Publicar reseña</button>
+  </div>
 					<div class="reviews-list">
 						<ReviewComment v-for="review in reviews" :key="review.userName" :idCuenta="review.idCuenta"
 							:userName="review.userName" :userAvatar="review.fotoPerfil" :rating="review.rating" :date="review.date"
@@ -646,5 +666,19 @@ const buscar = (nombre) => {
 	text-align: center;
 	padding: 2rem;
 	font-size: 1.2rem;
+}
+.rating-text {
+  color: #fbbf24;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.star-input.hover-effect {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.star-input.hover-effect:hover {
+  transform: scale(1.2);
+  color: #fbbf24;
 }
 </style>
