@@ -186,10 +186,10 @@ const navegationToMessage = ()=>{
           <!-- Botones de acción -->
           <div class="comunidad-actions">
             <button 
-              @click="unirse(comunidad)" 
-              :class="['action-button', 'join-button', { 'joined': comunidad.unido }]"
+              @click="$event.target.disabled = true" 
+              :class="['action-button', 'join-button']"
             >
-              {{ comunidad.unido ? 'Unido' : 'Unirse' }}
+              Unirse
             </button>
             <button 
               @click="verDetalles(comunidad)" 
@@ -374,6 +374,14 @@ const navegationToMessage = ()=>{
   cursor: pointer;
   transition: all 0.3s ease;
 }
+.join-button:disabled {
+  background-color: #4a4a4a;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transition: background-color 0.3s ease;
+}
+
 
 .card-full .action-button {
   flex: none;
