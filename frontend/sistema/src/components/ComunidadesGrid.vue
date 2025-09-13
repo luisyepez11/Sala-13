@@ -192,12 +192,7 @@ const navegationToMessage = ()=>{
             >
               {{ comunidad.unido ? 'Unido' : 'Unirse' }}
             </button>
-            <button 
-              @click="verDetalles(comunidad)" 
-              class="action-button details-button"
-            >
-              Detalles
-            </button>
+  
           </div>
         </div>
       </div>
