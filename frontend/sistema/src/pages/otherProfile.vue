@@ -185,7 +185,6 @@ const closeModal = () => {
   modalIsOpen.value = false;
 };
   const solicitudes = () =>{
-    alert("funcionando")
     openModal()
 };
 const mostrarModalLista = ref(false)
@@ -279,10 +278,6 @@ const buscar = (nombre) => {
             <div class="stat-label">following</div>
           </div>
           <div class="vertical-line"></div>
-          <div class="stat-item">
-            <div class="stat-number" @click="solicitudes" >{{ usuario.cantidad_solicitudes }}</div>
-            <div class="stat-label">requests</div>
-          </div>
         </div>
       </div>
 
