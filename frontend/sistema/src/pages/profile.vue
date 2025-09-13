@@ -78,7 +78,7 @@ const isSelectorFotoOpen = ref(false)
 				id: comunidad.idcominidad,
 				titulo: comunidad.nombreComunidad,
 				descripcion: comunidad.descripcionCominidad,
-				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+				imagen: comunidad.fotoPoster,
 				usuarios: comunidad.total_seguidores
 			}));
 			
@@ -620,7 +620,7 @@ const isSelectorFotoOpen = ref(false)
 						:usuarios="comunidad.usuarios"
 					/>
 
-					<div class="lista-card create-card" @click="abrirModalComunidades">
+					<div class="lista-card create-card" @click="abrirModal.values">
 						<div class="lista-info">
 							<h2 class="lista-title">+ Crear nueva comunidad</h2>
 							<p class="lista-description">Empieza a construir tu espacio cinéfilo</p>
