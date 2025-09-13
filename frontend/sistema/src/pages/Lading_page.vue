@@ -13,17 +13,37 @@ const activeTab = ref('Reseñas Destacadas');
 const slide = ref(0); 
 const reviews = ref([]);
 const isLoading = ref(true);
-
+const calcular = (n) =>{
+  let estralla = ''
+  if (n==1){
+    estralla = '⭐'
+  }
+  else if(n==2){
+      estralla = '⭐⭐'
+  }
+  else if(n==3){
+    estralla = '⭐⭐⭐'
+  }
+  else if(n==4){
+      estralla = '⭐⭐⭐⭐'
+  }
+  else if(n==2){
+      estralla = '⭐⭐⭐⭐⭐'
+  }
+  return estralla
+}
 const loadComments = async () => {
+  
     try {
         const response = await axios.get('http://localhost:3300/api/comentario/comentarios');
         
-        reviews.value = response.data.map((comment, index) => ({
+        reviews.value = response.data.map((comment, index) => (
+          {
             id: comment.idcomentario || index, 
             name: "Usuario " + (comment.nombreCuenta || "Anónimo"),
             peli: comment.nombrePelicula || "Película desconocida",
             comment: comment.comentario || "Sin comentario",
-            punt: "⭐⭐⭐⭐⭐",
+            punt: calcular(comment.valoracion),
             img: comment.fotoPerfil || `https://picsum.photos/id/${1005 + index}/200/200` ,
             small: false,
         }));
