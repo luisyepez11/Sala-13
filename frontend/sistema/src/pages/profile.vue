@@ -65,6 +65,11 @@
 		total_comentarios: 0
 	});
 
+
+	const fotoComunidad = ref(null)
+const isSelectorFotoOpen = ref(false)
+
+
 	const obtenerComunidadesUsuario = async (idUsuario) => {
 		try {
 			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
@@ -73,7 +78,7 @@
 				id: comunidad.idcominidad,
 				titulo: comunidad.nombreComunidad,
 				descripcion: comunidad.descripcionCominidad,
-				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+				imagen: comunidad.fotoPoster,
 				usuarios: comunidad.total_seguidores
 			}));
 			
@@ -276,7 +281,8 @@
         const response = await axios.post('http://localhost:3300/api/comunidades', {
             nombreComunidad: nombreLista.value,
             descripcion: descripcion.value,
-            idCreador: usuarioId.value
+            idCreador: usuarioId.value,
+			logoComunidad:logoComunidad.value
         });
 
         cerrarModalComunidades();
@@ -291,6 +297,19 @@
         console.error("Error al crear la comunidad:", error);
         alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
     }
+
+
+    cerrarModalComunidades();
+    nombreLista.value = "";
+    descripcion.value = "";
+
+    alert('Comunidad creada exitosamente');
+
+    obtenerComunidadesUsuario(usuarioId.value);
+
+    isProfileModalOpen.value = true;
+
+  
 }
 	const crearLista = async () => {
 		try {
@@ -330,6 +349,34 @@
         profilePictureUrl.value = posterUrl;
         closeProfileModal();
     }
+
+	const isProfileModal = ref(false);
+	function openProfileModalComunidad() {
+            isProfileModal.value = true;
+    }
+
+    function cerrarProfileModal() {
+        isProfileModalOpen.value = false;
+    }
+
+    function handlePosterSelectedComunidad(posterUrl) {
+        profilePictureUrl.value = posterUrl;
+        cerrarProfileModal();
+    }
+		function abrirSelectorFoto() {
+	isProfileModal.value = true
+	}
+
+	function cerrarSelectorFoto() {
+	isProfileModal.value = false
+	}
+	const logoComunidad = ref("")
+	function handleFotoComunidadSeleccionada(url) {
+	 logoComunidad.value = url
+	 console.log(logoComunidad.value)
+	cerrarSelectorFoto()
+}
+
 </script>
 
 <template>
@@ -356,6 +403,13 @@
 	<div class="modal-crear-lista">
 		<h2 class="modal-title">Crear nueva Comunidad</h2>
 		<div class="form-group">
+			<div class="form-group">
+  <label class="user-bio">Foto de la comunidad</label>
+  <div v-if="fotoComunidad" class="preview-imagen">
+    <img :src="fotoComunidad" alt="Preview" class="imagen-preview" />
+  </div>
+  <button class="btn-crear" @click="openProfileModalComunidad">Seleccionar foto</button>
+</div>
 			<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
 			<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
 				class="input-field" />
@@ -403,6 +457,11 @@
 		:isOpen="isProfileModalOpen"
 		@close="closeProfileModal"
 		@poster-selected="handlePosterSelected"
+	/>
+	<ProfilePictureModal
+		:isOpen="isProfileModal"
+		@close="cerrarSelectorFoto"
+		@poster-selected="handleFotoComunidadSeleccionada"
 	/>
 
 	<div class="perfil-container">
