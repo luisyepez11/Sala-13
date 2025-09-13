@@ -202,15 +202,15 @@ const isSelectorFotoOpen = ref(false)
 	}
 	async function aceptareditar() {
 		if (editData.value.nombre.trim() === '') {
-			editData.value.nombre = usuario.value.nombre;
+			editData.value.nombreReal = usuario.value.nombreReal;
 		}
 
 		try {
 			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
 			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
-				nombreReal: editData.value.nombre,
+				nombreReal: editData.value.apodo,
 				descripcionCuenta: editData.value.descripcion,
-				nombreCuenta: editData.value.apodo,
+				nombreCuenta: editData.value.nombre,
 				fotoPerfil:profilePictureUrl.value
 			})
 			await data();
