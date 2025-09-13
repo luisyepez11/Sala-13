@@ -11,9 +11,8 @@
   import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'
-  import MovieCartList from '../components/MovieCardList.vue'
-	import axios from 'axios';
-	import { useRouter,useRoute } from 'vue-router';
+  import axios from 'axios';
+  import { useRouter,useRoute } from 'vue-router';
 
   const router = useRouter()
   const route = useRoute()
@@ -26,22 +25,7 @@
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
   const userReviews = ref([]);
-	const comunidades = ref([
-  {
-    id: 1,
-    titulo: 'Cinéfilos Latinos',
-    descripcion: 'Un espacio para compartir reseñas y listas de películas latinoamericanas.',
-    imagen: 'https://example.com/latinos.jpg',
-    usuarios: 1245
-  },
-  {
-    id: 2,
-    titulo: 'Sci-Fi Lovers',
-    descripcion: 'Explora mundos futuristas y teorías locas con otros fans del sci-fi.',
-    imagen: 'https://example.com/scifi.jpg',
-    usuarios: 893
-  }
-])
+	const comunidades = ref([]) // <-- ahora será llenado dinámicamente
 
   axios.defaults.withCredentials = true;
   const editar=ref(false)
@@ -77,6 +61,23 @@
 			userReviews.value = [];
 		}
 	};
+
+  const obtenerComunidadesUsuario = async (idUsuario) => {
+    try {
+      const response = await axios.get(`/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+
+      comunidades.value = response.data.map(com => ({
+        id: com.idcominidad,
+        titulo: com.nombreComunidad,
+        descripcion: com.descripcionCominidad || "Sin descripción",
+        imagen: com.logo || "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        usuarios: com.cantidad_usuarios || 0
+      }));
+    } catch (error) {
+      console.error("Error al obtener comunidades del usuario:", error);
+      comunidades.value = [];
+    }
+  };
 
   const data = async () => {
 		try {
@@ -130,6 +131,8 @@
 			
 			// Obtener las reseñas del usuario después de tener su ID
 			obtenerResenasUsuario(id);
+			// Obtener las comunidades del usuario
+			await obtenerComunidadesUsuario(id);
 			
 		} catch (error) {
 			console.log("error", error)
