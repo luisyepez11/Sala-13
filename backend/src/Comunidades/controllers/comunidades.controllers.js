@@ -52,7 +52,7 @@ export const getComunidadesUsuarios = async (req, res) => {
 	let connection;
 	try {
 		connection = await pool.getConnection();
-		const [listas] = await connection.query("SELECT co.*,c.* FROM comunidadescuentas co INNER JOIN  cominidades c ON co.idComunidad=c.idcominidad WHERE idCuenta = ?", [req.params.id]);
+		const [listas] = await connection.query("SELECT co.*,c.*,(SELECT count(*) FROM comunidadescuentas where comunidadescuentas.idComunidad=co.idComunidad) AS total_seguidores FROM comunidadescuentas co INNER JOIN  cominidades c ON co.idComunidad=c.idcominidad WHERE idCuenta = ?", [req.params.id]);
 		res.status(200).json(listas);
 	} catch (error) {
 		console.error(error);
@@ -100,6 +100,7 @@ export const getComunidade = async (req, res) => {
 
 export const crearComunidades = async (req, res) => {
 	const { nombreComunidad, descripcion, idCreador } = req.body;
+	console.log(nombreComunidad, descripcion, idCreador )
 	let connection;
 	try {
 		connection = await pool.getConnection();
