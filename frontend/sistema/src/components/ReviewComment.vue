@@ -30,12 +30,10 @@ const props = defineProps({
   }
 });
 
-const stars = ref(Array(5).fill(false));
+const stars = ref( 0 || props.rating);
 
 // Llenar estrellas basado en el rating
-for (let i = 0; i < props.rating; i++) {
-  stars.value[i] = true;
-}
+console.log(props.rating)
 const router = useRouter()
 const cargarUsuario =()=>{
   router.push('/otherProfile/'+props.idCuenta);
@@ -54,7 +52,7 @@ const cargarUsuario =()=>{
       <div class="user-details" >
         <h3 class="username" >{{ userName }}</h3>
         <div class="rating">
-          <span v-for="(filled, index) in stars" :key="index" class="star">
+          <span v-for="(index) in stars" :key="index" class="star">
             ★
           </span>
         </div>

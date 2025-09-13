@@ -3,9 +3,10 @@ import { pool } from "../../db.js";
 export const insertComentario = async(req,res) =>{
 	let connection;
 	try {
-		const {idCuenta,idPelicula,comentario,fecha,nombrePelicula} = req.body
+		const {idCuenta,idPelicula,comentario,fecha,nombrePelicula,valoracion} = req.body
+		console.log(valoracion)
 		connection = await pool.getConnection();
-		await connection.query(`INSERT INTO comentarios (idCuenta,idPelicula,comentario,fecha,nombrePelicula) VALUES (?,?,?,?,?)`,[idCuenta,idPelicula,comentario,fecha,nombrePelicula])
+		await connection.query(`INSERT INTO comentarios (idCuenta,idPelicula,comentario,fecha,nombrePelicula,valoracion) VALUES (?,?,?,?,?,?)`,[idCuenta,idPelicula,comentario,fecha,nombrePelicula,valoracion])
 		res.status(201).json({
 			message:"ok"
 		})

@@ -103,7 +103,7 @@ const isSelectorFotoOpen = ref(false)
 					poster: `https://image.tmdb.org/t/p/w500`,
 					idPelicula:comentario.idPelicula
 				},
-				rating: 0, 
+				valoracion: comentario.valoracion, 
 				reviewText: comentario.comentario,
 				likes: 0, 
 				fecha: comentario.fecha
