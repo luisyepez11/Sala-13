@@ -12,12 +12,38 @@ const emit = defineEmits(['close', 'poster-selected']);
 
 const searchQuery = ref('');
 const searchResults = ref([]);
+const isLoading = ref(false)
+
 
 const performSearch = async () => {
   if (searchQuery.value.trim().length === 0) {
     searchResults.value = [];
     return;
   }
+
+  isLoading.value = true; // ⏳ empieza la carga
+
+  try {
+    const formattedQuery = searchQuery.value.trim().replace(/\s+/g, '+');
+    const res = await axios.get(`http://localhost:3300/api/pelicula/busqueda/${formattedQuery}`);
+
+    const moviesWithPosters = res.data.results.filter(movie => movie.poster_path);
+
+    const newMovies = moviesWithPosters.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+    }));
+
+    searchResults.value = newMovies;
+  } catch (err) {
+    console.error("Error al buscar películas:", err);
+    searchResults.value = [];
+  } finally {
+    isLoading.value = false; // ✅ termina la carga
+  }
+};
+const buscarPeliculas = async () => {
   
   try {
     const formattedQuery = searchQuery.value.trim().replace(/\s+/g, '+');
@@ -38,6 +64,7 @@ const performSearch = async () => {
     searchResults.value = [];
   }
 };
+
 
 function selectPoster(posterUrl) {
   emit('poster-selected', posterUrl);
@@ -60,15 +87,23 @@ function selectPoster(posterUrl) {
         </button>
       </form>
       <div class="search-results-container">
-        <div v-if="searchResults.length > 0" class="results-grid">
-           <div v-for="movie in searchResults" :key="movie.id" class="result-item" @click="selectPoster(movie.poster)">
-             <img :src="movie.poster" :alt="movie.title" class="result-poster-circular">
-           </div>
-        </div>
-        <div v-else class="no-results">
-          <p>Busca una película para seleccionar un póster.</p>
-        </div>
-      </div>
+  <div v-if="isLoading" class="loading-spinner">
+    <svg class="spinner" viewBox="0 0 50 50">
+      <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" />
+    </svg>
+  </div>
+
+  <div v-else-if="searchResults.length > 0" class="results-grid">
+    <div v-for="movie in searchResults" :key="movie.id" class="result-item" @click="selectPoster(movie.poster)">
+      <img :src="movie.poster" :alt="movie.title" class="result-poster-circular">
+    </div>
+  </div>
+
+  <div v-else class="no-results">
+    <p>Busca una película para seleccionar un póster.</p>
+  </div>
+</div>
+
     </div>
   </div>
 </template>
@@ -98,6 +133,50 @@ function selectPoster(posterUrl) {
   display: flex;
   flex-direction: column;
 }
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+}
+
+.spinner {
+  animation: rotate 1s linear infinite;
+  width: 80px;
+  height: 80px;
+}
+
+.path {
+  stroke: #4a90e2;
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
+}
+
 
 .modal-title {
   color: #ffffff;
