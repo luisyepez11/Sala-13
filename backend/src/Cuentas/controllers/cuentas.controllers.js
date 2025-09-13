@@ -47,19 +47,25 @@ SELECT
 }
 
 export const updateCuenta = async(req,res) =>{
-	let connection;
-	try {
-		const idCuenta = req.params.id;
-		const {nombreReal,descripcionCuenta,nombreCuenta} = req.body;
-		connection = await pool.getConnection();
-		const [resultCuenta] = await connection.query(`UPDATE cuentas SET nombreReal=? , descripcionCuenta=?, nombreCuenta=? WHERE idcuenta = ?`,[nombreReal,descripcionCuenta,nombreCuenta,idCuenta])
-		res.status(200).json({resultCuenta})
-	} catch (error) {
-		console.log(error)
-		res.status(500).json({
-			message:"error al actualizar la cuenta"
-		})
-	} finally {
-		if (connection) connection.release();
-	}
+    let connection;
+    try {
+        const idCuenta = req.params.id;
+        const {nombreReal, descripcionCuenta, nombreCuenta, fotoPerfil} = req.body;
+        
+        connection = await pool.getConnection();
+        
+        const [resultCuenta] = await connection.query(
+            `UPDATE cuentas SET nombreReal=?, descripcionCuenta=?, nombreCuenta=?, fotoPerfil=? WHERE idcuenta = ?`,
+            [nombreReal, descripcionCuenta, nombreCuenta, fotoPerfil, idCuenta] 
+        );
+        
+        res.status(200).json({resultCuenta});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "error al actualizar la cuenta"
+        });
+    } finally {
+        if (connection) connection.release();
+    }
 }

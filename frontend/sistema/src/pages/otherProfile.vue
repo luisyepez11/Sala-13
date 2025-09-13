@@ -12,7 +12,7 @@
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
-	import { useRouter,useRoute } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router'
 
   const router = useRouter()
   const route = useRoute()
@@ -96,12 +96,15 @@
 				pronombres: datos.pronombres,
 				nombreReal: datos.nombreReal,
 				biografia: datos.descripcionCuenta,
+        fotoPerfil:datos.fotoPerfil,
 				cantidad_solicitudes: datos.total_solicitudes,
 				total_seguidos: datos.total_seguidos,
 				total_seguidores: datos.total_seguidores,
-				total_comentarios: datos.total_comentarios
+				total_comentarios: datos.total_comentarios,
+        total_likes:datos.total_likes,
+				total_vistas:datos.total_vistas
 			};
-
+      profilePictureUrl.value=usuario.value.fotoPerfil
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
@@ -210,13 +213,19 @@ const buscar = (nombre) => {
           <!-- Avatar -->
           <div class="avatar-section">
             <div class="avatar-container">
-              <svg class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-              </svg>
+              <img v-if="fotoPerfil" :src="fotoPerfil" alt="Foto de perfil" class="avatar-image">
+							<svg v-else class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd"
+									d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+							</svg>
             </div>
-            <button v-if="!editar" class="edit-button" @click="seguirPerfil">
-              <div class="edit-text">seguir</div>
-            </button>
+            <button
+  v-if="!editar"
+  class="edit-button"
+  @click="$event.target.disabled = true"
+>
+  <div class="edit-text">Seguir</div>
+</button>
           </div>
           
           <!-- User Details -->
@@ -231,12 +240,12 @@ const buscar = (nombre) => {
         <!-- Stats -->
         <div class="stats-container">
           <div class="stat-item">
-            <div class="stat-number">{{ stats.watched }}</div>
+            <div class="stat-number">{{ usuario.total_vistas }}</div>
             <div class="stat-label">watched</div>
           </div>
           <div class="vertical-line"></div>
           <div class="stat-item">
-            <div class="stat-number">{{ stats.likes }}</div>
+            <div class="stat-number">{{ usuario.total_likes }}</div>
             <div class="stat-label">likes</div>
           </div>
           <div class="vertical-line"></div>
@@ -416,6 +425,13 @@ const buscar = (nombre) => {
 
 .edit-button:hover {
   background: #2563eb;
+}
+.edit-button:disabled {
+  background-color: #4a4a4a; 
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transition: background-color 0.3s ease;
 }
 
 .edit-text {
