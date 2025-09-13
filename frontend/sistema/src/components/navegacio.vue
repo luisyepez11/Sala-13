@@ -292,8 +292,8 @@ onMounted(() => {
 }
 
 .profile-image {
-    width: 150%;
-    height: 150%;
+    width: 160%;
+    height: 160%;
     object-fit:fill;
     display: block;
 }
