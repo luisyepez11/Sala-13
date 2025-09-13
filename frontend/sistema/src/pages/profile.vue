@@ -303,7 +303,6 @@ const isSelectorFotoOpen = ref(false)
     nombreLista.value = "";
     descripcion.value = "";
 
-    alert('Comunidad creada exitosamente');
 
     obtenerComunidadesUsuario(usuarioId.value);
 

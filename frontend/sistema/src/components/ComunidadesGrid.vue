@@ -147,10 +147,9 @@ const navegationToMessage = ()=>{
           <!-- Botones de acción -->
           <div class="comunidad-actions">
             <button 
-              @click="unirse(comunidad)" 
-              :class="['action-button', 'join-button', { 'joined': comunidadSeleccionada.unido }]"
-            >
-              {{ comunidadSeleccionada.unido ? 'Unido' : 'Unirse' }}
+              @click="$event.target.disabled = true" 
+              :class="['action-button', 'join-button']"
+            >Unirse
             </button>
           </div>
         </div>
@@ -263,6 +262,14 @@ const navegationToMessage = ()=>{
   margin-right: 20px;
   flex-shrink: 0;
 }
+.join-button:disabled {
+  background-color: #4a4a4a;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transition: background-color 0.3s ease;
+}
+
 
 .comunidad-avatar {
   width: 80px;

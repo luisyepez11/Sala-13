@@ -32,7 +32,6 @@ const insertVistas = async () => {
 	} catch (error) {
 		console.log(error)
 	}
-	alert("pelicula vistas")
 }
 
 const loadReviews = async () => {
@@ -67,11 +66,8 @@ const loadReviews = async () => {
 };
 
 const submitReview = async () => {
-  // Mostrar alerta con la cantidad de estrellas seleccionadas
   if (newReview.rating > 0) {
-    alert(`¡Gracias por tu reseña de ${newReview.rating} estrellas!`);
   } else {
-    alert('¡Gracias por tu reseña!');
   }
   
   try {
@@ -174,7 +170,6 @@ const agregar_lista = async () => {
 				idLista: id,
 				idPelicula: route.params.id
 			})
-			alert("agregado a la lista")
 			closeModal()
 		} catch (error) {
 
