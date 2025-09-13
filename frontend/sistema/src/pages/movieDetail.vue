@@ -99,6 +99,7 @@ const submitReview = async () => {
     error.value = 'Error al cargar los detalles de la película: ' + e.message
     console.error('Error:', e)
   }
+  router.go(0)
 }
 
 onMounted(async () => {
