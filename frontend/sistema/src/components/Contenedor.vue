@@ -26,6 +26,7 @@ const obtenerResenasUsuario = async (idUsuario) => {
         idPelicula: comentario.idPelicula
       },
       rating: 0,
+      valoracion: comentario.valoracion, 
       reviewText: comentario.comentario,
       likes: 0,
       fecha: comentario.fecha
