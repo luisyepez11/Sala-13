@@ -8,6 +8,7 @@ axios.defaults.withCredentials = true
 const router = useRouter()
 
 const props = defineProps({ idUsuario: String })
+
 const userReviews = ref([])
 
 const obtenerResenasUsuario = async (idUsuario) => {
@@ -17,7 +18,7 @@ const obtenerResenasUsuario = async (idUsuario) => {
       id: comentario.idcomentario,
       user: {
         name: comentario.nombreCuenta,
-        avatar: "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
+        avatar: comentario.fotoPerfil || "https://placehold.co/40x40/4A5568/E2E8F0?text=U"
       },
       movie: {
         title: comentario.nombrePelicula,
@@ -54,6 +55,7 @@ onMounted(() => {
       v-for="review in userReviews"
       :key="review.id"
       :review="review"
+	  userAvatar="review.fotoPerfil"
     />
   </div>
 </template>

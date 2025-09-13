@@ -46,6 +46,7 @@ const loadReviews = async () => {
     const reviewsData = comentarios.map(comentario => ({
       idCuenta: comentario.idCuenta,
       userName: comentario.nombreCuenta,
+	  fotoPerfil: comentario.fotoPerfil || "https://placehold.co/40x40/4A5568/E2E8F0?text=U",
       rating: 4,
       date: new Date(comentario.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
       comment: comentario.comentario,
@@ -88,11 +89,6 @@ const submitReview = async () => {
     console.error('Error:', e)
   }
 }
-
-
-
-
-
 
 onMounted(async () => {
 	try {
@@ -256,7 +252,7 @@ const buscar = (nombre) => {
 					</div>
 					<div class="reviews-list">
 						<ReviewComment v-for="review in reviews" :key="review.userName" :idCuenta="review.idCuenta"
-							:userName="review.userName" :rating="review.rating" :date="review.date"
+							:userName="review.userName" :userAvatar="review.fotoPerfil" :rating="review.rating" :date="review.date"
 							:comment="review.comment" />
 					</div>
 				</div>

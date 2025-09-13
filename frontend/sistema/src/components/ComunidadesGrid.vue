@@ -94,6 +94,7 @@ const comunidadesActuales = computed(() => {
 const unirse = (comunidad) => {
   // Actualizar estado local para demo
   const index = comunidadesEjemplo.value.findIndex(c => c.id === comunidad.id);
+  event.target.disabled = true;
   if (index !== -1) {
     comunidadesEjemplo.value[index].unido = !comunidadesEjemplo.value[index].unido;
   }
@@ -186,10 +187,10 @@ const navegationToMessage = ()=>{
           <!-- Botones de acción -->
           <div class="comunidad-actions">
             <button 
-              @click="$event.target.disabled = true" 
-              :class="['action-button', 'join-button']"
+              @click="unirse(comunidad)"
+              :class="['action-button', 'join-button', { 'joined': comunidad.unido }]"
             >
-              Unirse
+              {{ comunidad.unido ? 'Unido' : 'Unirse' }}
             </button>
             <button 
               @click="verDetalles(comunidad)" 
@@ -374,14 +375,6 @@ const navegationToMessage = ()=>{
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.join-button:disabled {
-  background-color: #4a4a4a;
-  color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.8;
-  transition: background-color 0.3s ease;
-}
-
 
 .card-full .action-button {
   flex: none;
