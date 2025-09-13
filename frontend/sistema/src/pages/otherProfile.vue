@@ -96,6 +96,7 @@
 				pronombres: datos.pronombres,
 				nombreReal: datos.nombreReal,
 				biografia: datos.descripcionCuenta,
+        fotoPerfil:datos.fotoPerfil,
 				cantidad_solicitudes: datos.total_solicitudes,
 				total_seguidos: datos.total_seguidos,
 				total_seguidores: datos.total_seguidores,
@@ -103,7 +104,7 @@
         total_likes:datos.total_likes,
 				total_vistas:datos.total_vistas
 			};
-
+      profilePictureUrl.value=datos.fotoPerfil
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
@@ -223,9 +224,11 @@ const buscar = (nombre) => {
           <!-- Avatar -->
           <div class="avatar-section">
             <div class="avatar-container">
-              <svg class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-              </svg>
+              <img v-if="profilePictureUrl" :src="profilePictureUrl" alt="Foto de perfil" class="avatar-image">
+							<svg v-else class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd"
+									d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+							</svg>
             </div>
             <button
   v-if="!editar"

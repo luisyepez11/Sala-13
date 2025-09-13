@@ -69,18 +69,6 @@
 	const fotoComunidad = ref(null)
 const isSelectorFotoOpen = ref(false)
 
-function abrirSelectorFoto() {
-  isSelectorFotoOpen.value = true
-}
-
-function cerrarSelectorFoto() {
-  isSelectorFotoOpen.value = false
-}
-
-function handleFotoComunidadSeleccionada(url) {
-  fotoComunidad.value = url
-  cerrarSelectorFoto()
-}
 
 	const obtenerComunidadesUsuario = async (idUsuario) => {
 		try {
@@ -91,7 +79,7 @@ function handleFotoComunidadSeleccionada(url) {
 				titulo: comunidad.nombreComunidad,
 				descripcion: comunidad.descripcionCominidad,
 				imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-				usuarios: Math.floor(Math.random() * 1000) + 100 
+				usuarios: comunidad.total_seguidores
 			}));
 			
 			comunidades.value = comunidadesTransformadas;
@@ -222,7 +210,8 @@ function handleFotoComunidadSeleccionada(url) {
 			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
 				nombreReal: editData.value.nombre,
 				descripcionCuenta: editData.value.descripcion,
-				nombreCuenta: editData.value.apodo
+				nombreCuenta: editData.value.apodo,
+				fotoPerfil:profilePictureUrl.value
 			})
 			await data();
 		} catch (error) {
@@ -283,10 +272,29 @@ function handleFotoComunidadSeleccionada(url) {
 		modalCrearComunidades.value = false
 	}
 	const crearComunidad = async () => {
-  try {
-    if (!nombreLista.value.trim() || !descripcion.value.trim()) {
-      alert('Por favor, completa todos los campos');
-      return;
+    try {
+        if (!nombreLista.value.trim() || !descripcion.value.trim()) {
+            alert('Por favor, completa todos los campos');
+            return;
+        }
+
+        const response = await axios.post('http://localhost:3300/api/comunidades', {
+            nombreComunidad: nombreLista.value,
+            descripcion: descripcion.value,
+            idCreador: usuarioId.value
+        });
+
+        cerrarModalComunidades();
+        nombreLista.value = "";
+        descripcion.value = "";
+
+        alert('Comunidad creada exitosamente');
+
+        obtenerComunidadesUsuario(usuarioId.value);
+        
+    } catch (error) {
+        console.error("Error al crear la comunidad:", error);
+        alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
     }
 
     const response = await axios.post('http://localhost:3300/api/comunidades', {
@@ -305,10 +313,7 @@ function handleFotoComunidadSeleccionada(url) {
 
     isProfileModalOpen.value = true;
 
-  } catch (error) {
-    console.error("Error al crear la comunidad:", error);
-    alert('Error al crear la comunidad. Por favor, intenta nuevamente.');
-  }
+  
 }
 	const crearLista = async () => {
 		try {
@@ -348,6 +353,32 @@ function handleFotoComunidadSeleccionada(url) {
         profilePictureUrl.value = posterUrl;
         closeProfileModal();
     }
+
+	const isProfileModal = ref(false);
+	function openProfileModalComunidad() {
+            isProfileModal.value = true;
+    }
+
+    function cerrarProfileModal() {
+        isProfileModalOpen.value = false;
+    }
+
+    function handlePosterSelectedComunidad(posterUrl) {
+        profilePictureUrl.value = posterUrl;
+        cerrarProfileModal();
+    }
+		function abrirSelectorFoto() {
+	isSelectorFotoOpen.value = true
+	}
+
+	function cerrarSelectorFoto() {
+	isSelectorFotoOpen.value = false
+	}
+
+	function handleFotoComunidadSeleccionada(url) {
+	//fotoComunidad.value = url
+	cerrarSelectorFoto()
+}
 </script>
 
 <template>
@@ -379,7 +410,7 @@ function handleFotoComunidadSeleccionada(url) {
   <div v-if="fotoComunidad" class="preview-imagen">
     <img :src="fotoComunidad" alt="Preview" class="imagen-preview" />
   </div>
-  <button class="btn-crear" @click="abrirSelectorFoto">Seleccionar foto</button>
+  <button class="btn-crear" @click="openProfileModalComunidad">Seleccionar foto</button>
 </div>
 			<label class="user-bio" for="nombreLista">Nombre de la Comunidad</label>
 			<input id="nombreLista" type="text" v-model="nombreLista" placeholder="Ejemplo: Fanaticos del Cine"
@@ -428,6 +459,11 @@ function handleFotoComunidadSeleccionada(url) {
 		:isOpen="isProfileModalOpen"
 		@close="closeProfileModal"
 		@poster-selected="handlePosterSelected"
+	/>
+	<ProfilePictureModal
+		:isOpen="isProfileModal"
+		@close="cerrarSelectorFoto"
+		@poster-selected="handleFotoComunidadSeleccionada"
 	/>
 
 	<div class="perfil-container">

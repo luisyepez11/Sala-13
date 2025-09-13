@@ -1,10 +1,9 @@
 <script setup>
-import { ref } from 'vue';
 import comunidadGrid from "../components/comunidadesGrid.vue"
+import axios from 'axios';
+import { useRouter,useRoute } from 'vue-router';
+import { ref, onMounted, watch } from "vue"
 
-// --- Lógica para el carrusel de publicaciones ---
-
-// Datos de ejemplo para las publicaciones
 const reviews = ref([
     {
         id: 1,
