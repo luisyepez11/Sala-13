@@ -30,7 +30,7 @@ onMounted(async () => {
     const datosLista = await respLista.json()
     const datos = await resp.json()
     lista.value = {
-  idLista:datosLista[0].idlista,
+  idLista:datosLista[0].idLista,
   nombre: datosLista[0].nombreLista,
   descripcion: datosLista[0].descripcion,
   nombreCreador: datosLista[0].nombreCuenta,

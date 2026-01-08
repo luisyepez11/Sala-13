@@ -134,8 +134,8 @@ const isSelectorFotoOpen = ref(false)
 				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usuarioId.value}`),
 				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usuarioId.value}`)
 			]);
+			const datos = cuenta.data;
 			
-			const datos = cuenta.data.resultCuenta[0];
 			usuario.value = {
 				nombre: datos.nombreCuenta,
 				pronombres: datos.pronombres,
@@ -148,11 +148,11 @@ const isSelectorFotoOpen = ref(false)
 				total_likes:datos.total_likes,
 				total_vistas:datos.total_vistas
 			};
-
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
+						console.log(listaItem)
+						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
 						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
@@ -160,7 +160,7 @@ const isSelectorFotoOpen = ref(false)
 							.filter(Boolean);
 						return { ...listaItem, posters };
 					} catch (e) {
-						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
+						console.error(`Error al obtener películas para la lista ${listaItem.idLista}:`, e);
 						return { ...listaItem, posters: [] };
 					}
 				})
@@ -243,8 +243,8 @@ const isSelectorFotoOpen = ref(false)
 		try {
 			await axios.post(`http://localhost:3300/api/amigo/insertAmigo`, {
 				idReceptor: usuarioId.value,
-				idUsuario: id,
-				idsolicitudes: idsolicitudes
+				idCuenta: id,
+				idSolicitudes: idsolicitudes
 			})
 			await data();
 		} catch (error) {
@@ -437,9 +437,9 @@ const isSelectorFotoOpen = ref(false)
 						<td class="table-data nombre">{{ solicitud.nombremanda }}</td>
 						<td class="table-data acciones">
 							<button class="btn-aceptar"
-								@click="aceptarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Aceptar</button>
+								@click="aceptarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idSolicitudes)">Aceptar</button>
 							<button class="btn-rechazar"
-								@click="rechazarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idsolicitudes)">Rechazar</button>
+								@click="rechazarSolicitud(solicitud.idManda, solicitud.nombremanda, solicitud.idSolicitudes)">Rechazar</button>
 						</td>
 					</tr>
 				</tbody>
@@ -568,10 +568,10 @@ const isSelectorFotoOpen = ref(false)
 					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="(item, index) in lista" :key="item.idlista" class="lista-card"
-						@click="$router.push('/listDetail/' + item.idlista)">
-						<MovieCartList v-show="false" :idLista="item.idlista" @listaPoster="(posters) => getposters(posters, item.idlista)" ></MovieCartList>
-						<ListCoverGrid :posters="portadaLista[item.idlista] || []" class="lista-portada"/>
+					<div v-for="(item, index) in lista" :key="item.idLista" class="lista-card"
+						@click="$router.push('/listDetail/' + item.idLista)">
+						<MovieCartList v-show="false" :idLista="item.idLista" @listaPoster="(posters) => getposters(posters, item.idLista)" ></MovieCartList>
+						<ListCoverGrid :posters="portadaLista[item.idLista] || []" class="lista-portada"/>
 						<div class="lista-info">
 							<h2 class="lista-title">{{ item.nombreLista }}</h2>
 							<p class="lista-description">{{ item.descripcion }}</p>
@@ -608,7 +608,7 @@ const isSelectorFotoOpen = ref(false)
 				<div v-else class="comunidades-grid">
 					<CommunityCard
 						v-for="comunidad in comunidades"
-						:key="comunidad.id"
+						:key="comunidad.idComunidad"
 						:titulo="comunidad.titulo"
 						:descripcion="comunidad.descripcion"
 						:imagen="comunidad.imagen"

@@ -38,10 +38,12 @@ const loadReviews = async () => {
   try {
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
     const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
+	console.log(listas.data)
     lista.value = listas.data
     const movieId = route.params.id;
     const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
+	console.log(comentarios)
     const reviewsData = comentarios.map(comentario => ({
       idCuenta: comentario.idCuenta,
       userName: comentario.nombreCuenta,
@@ -74,7 +76,7 @@ const submitReview = async () => {
     const movieId = route.params.id
     const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
     const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-    const idcuenta = cuenta.data.resultCuenta[0].idcuenta
+    const idcuenta = cuenta.data.idCuenta
     const comentario = document.getElementById('comentario').value
     const fechaISO = new Date().toISOString();
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
@@ -197,10 +199,10 @@ const buscar = (nombre) => {
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="listasItem in lista" :key="listasItem.idlista" class="list-item">
+					<tr v-for="listasItem in lista" :key="listasItem.idLista" class="list-item">
 						<td class="list-name">{{ listasItem.nombreLista }}</td>
 						<td class="list-check">
-							<input type="checkbox" class="styled-checkbox" @change="selecionado(listasItem.idlista)">
+							<input type="checkbox" class="styled-checkbox" @change="selecionado(listasItem.idLista)">
 						</td>
 					</tr>
 				</tbody>

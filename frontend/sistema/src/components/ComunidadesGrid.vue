@@ -22,7 +22,7 @@ const comunidadSeleccionada = ref(null)
 // Datos de ejemplo para las comunidades
 const comunidadesEjemplo = ref([
   {
-    id: 1,
+    idComunidad: 1,
     nombre: 'Comunidad1',
     descripcion: 'Una comunidad dedicada a los amantes del cine clásico y las películas de culto. Aquí discutimos desde Hitchcock hasta Tarantino.',
     miembros: 1250,
@@ -30,7 +30,7 @@ const comunidadesEjemplo = ref([
     unido: false
   },
   {
-    id: 2,
+    idComunidad: 2,
     nombre: 'Comunidad2',
     descripcion: 'Espacio para cinéfilos que buscan descubrir joyas ocultas del séptimo arte y compartir recomendaciones únicas.',
     miembros: 890,
@@ -38,7 +38,7 @@ const comunidadesEjemplo = ref([
     unido: true
   },
   {
-    id: 3,
+    idComunidad: 3,
     nombre: 'Comunidad3',
     descripcion: 'Comunidad enfocada en el análisis profundo de películas independientes y documentales premiados internacionalmente.',
     miembros: 2100,
@@ -46,7 +46,7 @@ const comunidadesEjemplo = ref([
     unido: false
   },
   {
-    id: 4,
+    idComunidad: 4,
     nombre: 'Comunidad4',
     descripcion: 'Para los fanáticos de la ciencia ficción y el terror. Desde clásicos de los 80 hasta las últimas producciones del género.',
     miembros: 1750,
@@ -54,7 +54,7 @@ const comunidadesEjemplo = ref([
     unido: false
   },
   {
-    id: 5,
+    idComunidad: 5,
     nombre: 'Comunidad5',
     descripcion: 'Comunidad multicultural que celebra el cine internacional, desde el cine francés hasta las producciones asiáticas más aclamadas.',
     miembros: 950,
@@ -62,7 +62,7 @@ const comunidadesEjemplo = ref([
     unido: true
   },
   {
-    id: 6,
+    idComunidad: 6,
     nombre: 'Comunidad6',
     descripcion: 'Espacio dedicado a los cortometrajes y el cine experimental. Perfecto para creadores emergentes y amantes del arte audiovisual.',
     miembros: 680,
@@ -70,7 +70,7 @@ const comunidadesEjemplo = ref([
     unido: false
   },
   {
-    id: 7,
+    idComunidad: 7,
     nombre: 'Comunidad7',
     descripcion: 'Comunidad para discutir series de televisión, desde dramas épicos hasta comedias contemporáneas y producciones de streaming.',
     miembros: 3200,
@@ -78,7 +78,7 @@ const comunidadesEjemplo = ref([
     unido: false
   },
   {
-    id: 8,
+    idComunidad: 8,
     nombre: 'Comunidad8',
     descripcion: 'Enfocada en el cine de animación, desde los clásicos de Disney hasta las últimas producciones de Pixar y estudios independientes.',
     miembros: 1450,
@@ -88,11 +88,11 @@ const comunidadesEjemplo = ref([
 ]);
 
 const comunidadesActuales = computed(() => {
+  console.log(props.comunidades)
   return props.comunidades.length > 0 ? props.comunidades : comunidadesEjemplo.value;
 });
 
 const unirse = (comunidad) => {
-  // Actualizar estado local para demo
   const index = comunidadesEjemplo.value.findIndex(c => c.id === comunidad.id);
   event.target.disabled = true;
   if (index !== -1) {
@@ -137,7 +137,7 @@ const navegationToMessage = ()=>{
         <!-- Contenido de la tarjeta -->
         <div class="comunidad-content">
           <div class="comunidad-header">
-            
+
             <h3 class="comunidad-nombre">{{ comunidadSeleccionada.nombre }}</h3>
             <p class="comunidad-miembros">{{ comunidadSeleccionada.miembros?.toLocaleString() || 'N/A' }} miembros</p>
             <p>{{comunidadSeleccionada.descripcion}}</p>
@@ -158,16 +158,14 @@ const navegationToMessage = ()=>{
     <div :class="['comunidades-grid', { 'grid-mode': viewMode === 'grid', 'full-mode': viewMode === 'full' }]">
       <div 
         v-for="comunidad in comunidadesActuales" 
-        :key="comunidad.id" 
+        :key="comunidad.idComunidad" 
         :class="['comunidad-card', { 'card-grid': viewMode === 'grid', 'card-full': viewMode === 'full' }]"
         
       >
         <!-- Imagen de la comunidad -->
         <div class="comunidad-image-container">
           <div class="comunidad-avatar">
-            <svg class="avatar-icon" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-            </svg>
+              <img :src="comunidad.imagen" alt="">
           </div>
         </div>
 
@@ -272,8 +270,8 @@ const navegationToMessage = ()=>{
 
 
 .comunidad-avatar {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   background: #d1d5db;
   border-radius: 50%;
   display: flex;
@@ -281,7 +279,13 @@ const navegationToMessage = ()=>{
   justify-content: center;
   transition: all 0.3s ease;
 }
-
+.comunidad-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
 .card-full .comunidad-avatar {
   width: 60px;
   height: 60px;

@@ -90,7 +90,7 @@
 				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
 			]);
 			
-			const datos = cuenta.data.resultCuenta[0];
+			const datos = cuenta.data;
 			usuario.value = {
 				nombre: datos.nombreCuenta,
 				pronombres: datos.pronombres,
@@ -108,7 +108,7 @@
 			const listasConPosters = await Promise.all(
 				listasRes.data.map(async (listaItem) => {
 					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
+						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
 						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
@@ -116,7 +116,7 @@
 							.filter(Boolean);
 						return { ...listaItem, posters };
 					} catch (e) {
-						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
+						console.error(`Error al obtener películas para la lista ${listaItem.idLista}:`, e);
 						return { ...listaItem, posters: [] };
 					}
 				})
@@ -161,9 +161,10 @@
   async function seguirPerfil () {
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      console.log(usarioId)
       const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
-          idUsuario:usarioId.data.id
+          idCuenta:usarioId.data.id
         })
     } catch (error) {
       console.log(error)
@@ -311,8 +312,8 @@ const buscar = (nombre) => {
 					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
-						@click="$router.push('/listDetail/' + item.idlista)">
+					<div v-for="item in lista" :key="item.idLista" class="lista-card"
+						@click="$router.push('/listDetail/' + item.idLista)">
 						
 						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
 
@@ -355,7 +356,7 @@ const buscar = (nombre) => {
 				<div v-else class="comunidades-grid">
 					<CommunityCard
 						v-for="comunidad in comunidades"
-						:key="comunidad.id"
+						:key="comunidad.idComunidad"
 						:titulo="comunidad.titulo"
 						:descripcion="comunidad.descripcion"
 						:imagen="comunidad.imagen"

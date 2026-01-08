@@ -30,6 +30,7 @@ export const getBusquedaPeliculas = async (req, res) => {
         let allResults = [];
         let currentPage = 1;
         let totalPages = 1;
+        console.log("comenzando busqueda")
         while (currentPage <= totalPages) {
             const params = {
                 api_key: "a96c294e02f5de8a45192c80ca9bda2f",
@@ -51,6 +52,7 @@ export const getBusquedaPeliculas = async (req, res) => {
             total_pages: totalPages,
             total_results: allResults.length
         };
+        console.log("fin de la busqueda")
         res.status(200).json(combinedResponse);
     } catch (error) {
         console.error("Error en getBusquedaPeliculas:", error);
@@ -68,6 +70,7 @@ export const getBusquedaPeliculas = async (req, res) => {
 };
 export const getPelicula = async (req, res) => {
     const id = req.params.id;
+    console.log(id)
     try {
         const data = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=a96c294e02f5de8a45192c80ca9bda2f&language=es-MX`)
         res.status(201).json(data.data)

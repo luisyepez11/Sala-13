@@ -38,12 +38,12 @@ const cargarComunidades = async () => {
     } catch (error) {
       console.log('No se pudieron cargar las comunidades del usuario:', error);
     }
-
+    console.log(response.data)
     comunidades.value = response.data.map(comunidad => ({
-      id: comunidad.idcominidad,
+      idComunidad: comunidad.idComunidad,
       nombre: comunidad.nombreComunidad,
       descripcion: comunidad.descripcionCominidad || 'Sin descripción',
-      imagen: "https://images.unsplash.com/photo-1581905764498-f1b60bae943a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+      imagen: comunidad.fotoPoster,
       cantidad_usuarios: comunidad.cantidad_usuarios, 
       esMiembro: comunidad.idCreador==usuarioId.value
     }));
@@ -109,7 +109,8 @@ const handleUnirse = async (comunidad) => {
   }
   
   try {
-    await unirseAComunidad(comunidad.id, usuarioId.value);
+
+    await unirseAComunidad(comunidad.idComunidad, usuarioId.value);
     
     comunidades.value = comunidades.value.map(c => 
       usuarioId.value === comunidad.idCreador ? { ...c, esMiembro: true } : c
@@ -122,7 +123,7 @@ const handleUnirse = async (comunidad) => {
     if (error.response && error.response.status === 409) {
       alert('Ya eres miembro de esta comunidad.');
       comunidades.value = comunidades.value.map(c => 
-        c.id === comunidad.id ? { ...c, esMiembro: true } : c
+        c.idComunidad === comunidad.idComunidad ? { ...c, esMiembro: true } : c
       );
     } else {
       alert('No se pudo unir a la comunidad. Intenta nuevamente.');
@@ -132,7 +133,7 @@ const handleUnirse = async (comunidad) => {
 
 const handleVerDetalles = (comunidad) => {
   console.log('Ver detalles de comunidad:', comunidad.nombre);
-  router.push(`/ComunidadesDetail/${comunidad.id}`);
+  router.push(`/ComunidadesDetail/${comunidad.idComunidad}`);
 };
 </script>
 

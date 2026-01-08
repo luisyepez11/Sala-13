@@ -1,11 +1,9 @@
 import { pool } from "../../db.js";
 
 export const insertVistas = async(req,res) =>{
-	let connection;
 	try {
 		const {idCuenta,idPelicula} = req.body
-		connection = await pool.getConnection();
-		await connection.query(`INSERT INTO vistas (idCuenta,idPelicula) VALUES (?,?)`,[idCuenta,idPelicula])
+		await pool.query(`INSERT INTO vistas ("idCuenta","idPelicula") VALUES ($1,$2)`,[idCuenta,idPelicula])
 		res.status(201).json({
 			message:"ok"
 		})
@@ -14,60 +12,46 @@ export const insertVistas = async(req,res) =>{
 		res.status(500).json({
 			message:"error al insertar like"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }
 
 
 
 export const getVistasUsuario = async(req,res) =>{
-	let connection;
 	try {
 		const id = req.params.id
-		connection = await pool.getConnection();
-		const [data] = await connection.query(`SELECT * FROM vistas LEFT JOIN cuentas ON vistas.idCuenta = cuentas.idcuenta WHERE cuentas.idcuenta=?`,[id])
-		res.status(200).json(data)
+		const data = await pool.query(`SELECT * FROM vistas LEFT JOIN cuentas ON vistas."idCuenta" = cuentas."idCuenta" WHERE cuentas."idCuenta"=$1`,[id])
+		res.status(200).json(data.rows)
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({
 			message:"error al obtener vistas"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }
 
 
 export const getLikes = async(req,res) =>{
-	let connection;
 	try {
 		const id = req.params.id
-		connection = await pool.getConnection();
-		const [data] = await connection.query(`SELECT * FROM comentarios LEFT JOIN cuentas ON comentarios.idCuenta = cuentas.idcuenta WHERE idPelicula=?`,[id])
+		const [data] = await pool.query(`SELECT * FROM comentarios LEFT JOIN cuentas ON comentarios.idCuenta = cuentas.idcuenta WHERE idPelicula=?`,[id])
 		res.status(200).json(data)
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({
 			message:"error al obtener vi"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }
 
 export const getLikesLanding = async(req,res) =>{
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [data] = await connection.query(`SELECT comentarios.*,cuentas.nombreCuenta,cuentas.nombreReal FROM comentarios INNER JOIN cuentas ON comentarios.idCuenta=cuentas.idcuenta;`)
+		const [data] = await pool.query(`SELECT comentarios.*,cuentas.nombreCuenta,cuentas.nombreReal FROM comentarios INNER JOIN cuentas ON comentarios.idCuenta=cuentas.idcuenta;`)
 		res.status(200).json(data)
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({
 			message:"error al obtener likes de landing"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }

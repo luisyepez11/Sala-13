@@ -5,7 +5,7 @@ import io from "socket.io-client"
 import axios from 'axios'
 axios.defaults.withCredentials = true
 
-const socket = io("https://sala-13-production.up.railway.app", {
+const socket = io("http://localhost:3300", {
 	transports: ['websocket', 'polling'],
 	withCredentials: true,
 })
@@ -17,14 +17,13 @@ const props = defineProps({
 		default: 'Fans del Terror'
 	},
 	comunidadId: {
-		type: Number,
+		type: String,
 		default: null
 	},fotoPoster: {
 		type: String,
 		default: 'Fans del Terror'
 	}
 });
-
 const newMessage = ref("");
 const messages = ref([]);
 const currentRoom = ref(null);
@@ -60,7 +59,7 @@ const datos = async () => {
 		NombreUsuario.value = usuarioResponse.data.nombre
 		const response = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${idUsuario.value}`);
 		console.log(response.data)
-		fotoPerfil.value = response.data.resultCuenta[0].fotoPerfil
+		fotoPerfil.value = response.data.fotoPerfil
 	} catch (error) {
 		console.error("Error al obtener datos del usuario:", error);
 	}
@@ -77,6 +76,7 @@ watch(() => props.comunidadId, (newComunidadId, oldComunidadId) => {
 
 const submitReview = () => {
 	if (newMessage.value.trim() !== "" && currentRoom.value) {
+		console.log("mensaje")
 		const userData = {
 			id: Date.now(),
 			userName: NombreUsuario.value,

@@ -55,7 +55,7 @@ const buscar = (nombre) => {
     
     <div class="main-content">
 
-      <Popularfilmsection v-for="value in data" :titulo="value.nombreLista" :idLista="value.idlista"></Popularfilmsection>
+      <Popularfilmsection v-for="value in data" :titulo="value.nombreLista" :idLista="value.idLista"></Popularfilmsection>
     </div>
 
   </main>
