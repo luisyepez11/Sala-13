@@ -17,7 +17,7 @@ export const pool = new Pool({
 
 pool.connect()
   .then((client) => {
-    console.log("✅ Conexión exitosa a PostgreSQL (Supabase)");
+    console.log(" Conexión exitosa a PostgreSQL (Supabase)");
     client.release();
   })
   .catch((err) => {
