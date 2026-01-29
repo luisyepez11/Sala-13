@@ -7,7 +7,7 @@ const listas = ref([])
 
 onMounted(async () => {
   try {
-    const resp = await fetch(`https://sala-13.onrender.com/api/lista/getListas`)
+    const resp = await fetch(`http://localhost:3300/api/lista/getListas`)
     const datos = await resp.json()
     listas.value = datos
   } catch (e) {

@@ -16,7 +16,7 @@ const selectedFilter = ref('peliculas')
 
 const listas = async () =>{
   try {
-    const result = await fetch(`https://sala-13.onrender.com/api/lista`)
+    const result = await fetch(`http://localhost:3300/api/lista`)
     const lista = await result.json()
     data.value = lista
     console.log(data.value)

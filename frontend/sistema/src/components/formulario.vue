@@ -22,7 +22,7 @@ async function saludar() {
   if (opcion === "login") {
     try {
       await axios.post(
-        "https://sala-13.onrender.com/api/usuario/login",
+        "http://localhost:3300/api/usuario/login",
         { user: nombre, password: contraseña },
         { withCredentials: true }
       );
@@ -33,7 +33,7 @@ async function saludar() {
   } else {
     try {
       await axios.post(
-        "https://sala-13.onrender.com/api/usuario/create",
+        "http://localhost:3300/api/usuario/create",
         { user: nombre, password: contraseña },
         { withCredentials: true }
       );

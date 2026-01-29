@@ -19,7 +19,7 @@ const listsData = ref([]);
 
 const fetchLists = async (query) => {
   try {
-    const res = await axios.get(`https://sala-13.onrender.com/api/lista/getListasBusqueda/${query}`);
+    const res = await axios.get(`http://localhost:3300/api/lista/getListasBusqueda/${query}`);
     listsData.value = res.data;
   } catch (error) {
     console.error("Error al obtener listas:", error);

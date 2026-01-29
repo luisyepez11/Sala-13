@@ -12,7 +12,7 @@ let intervalId = null
 
 const fetchMovies = async () => {
 	try {
-		const response = await axios.get("https://sala-13.onrender.com/api/pelicula")
+		const response = await axios.get("http://localhost:3300/api/pelicula")
 		slides.value = response.data.results
 			.filter(movie => movie.backdrop_path)
 			.slice(0, 10)

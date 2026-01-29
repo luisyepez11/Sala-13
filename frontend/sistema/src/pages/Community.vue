@@ -46,10 +46,10 @@ const obtenerComunidadesUsuario = async () => {
 	try {
 		cargandoComunidades.value = true;
 		
-		const usuarioResponse = await axios.get("https://sala-13.onrender.com/api/usuario/user");
+		const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
 		const idUsuario = usuarioResponse.data.id;
 		
-		const response = await axios.get(`https://sala-13.onrender.com/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+		const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
 		
 		comunidadesUsuario.value = response.data;
 		

@@ -14,13 +14,13 @@ const isEditing = ref(false);
 // Cargar películas al montar
 onMounted(async () => {
     try {
-        const userRes = await axios.get("https://sala-13.onrender.com/api/usuario/user");
+        const userRes = await axios.get("http://localhost:3300/api/usuario/user");
         
-        const favoritesRes = await axios.get(`https://sala-13.onrender.com/api/favoritas/${route.params.id}`);
+        const favoritesRes = await axios.get(`http://localhost:3300/api/favoritas/${route.params.id}`);
         
         const storedMovies = await Promise.all(favoritesRes.data.map(async (p) => {
             try {
-                const resp = await fetch(`https://sala-13.onrender.com/api/pelicula/getPelicula/${p.idPelicula}`);
+                const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${p.idPelicula}`);
                 const datos = await resp.json();
                 return {
                     id: datos.id,
@@ -59,8 +59,8 @@ async function selectMovie(movie) {
     }
 
     try {
-        const userRes = await axios.get("https://sala-13.onrender.com/api/usuario/user");
-        await axios.post('https://sala-13.onrender.com/api/favoritas/agregarPeliculaAFavoritas', {
+        const userRes = await axios.get("http://localhost:3300/api/usuario/user");
+        await axios.post('http://localhost:3300/api/favoritas/agregarPeliculaAFavoritas', {
             idPelicula: movie.id,
             idCuenta: userRes.data.id
         });
@@ -87,10 +87,10 @@ async function removeMovie(index) {
     if (!movieToRemove) return;
 
     try {
-        const userRes = await axios.get("https://sala-13.onrender.com/api/usuario/user");
+        const userRes = await axios.get("http://localhost:3300/api/usuario/user");
         
         // Asumiendo que tienes este endpoint para eliminar
-        await axios.delete(`https://sala-13.onrender.com/api/favoritas/eliminarPeliculaDeFavoritas`, {
+        await axios.delete(`http://localhost:3300/api/favoritas/eliminarPeliculaDeFavoritas`, {
             data: {
                 idPelicula: movieToRemove.id,
                 idCuenta: userRes.data.id

@@ -18,7 +18,7 @@ const PROFILE_PIC_KEY = 'user_profile_picture';
 
 const cargar = async () => {
     try {
-        const usuarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user");
+        const usuarioId = await axios.get("http://localhost:3300/api/usuario/user");
         logueado.value = usuarioId.data.message !== "no registrado";
         
         if (logueado.value) {
@@ -54,7 +54,7 @@ const reemplazarEspacios = (texto) => {
 
 const deleteUser = async () => {
     try {
-        await axios.get("https://sala-13.onrender.com/api/usuario/delete");
+        await axios.get("http://localhost:3300/api/usuario/delete");
         profilePictureUrl.value = null;
         logueado.value = false;
         router.push('/');

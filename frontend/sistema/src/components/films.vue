@@ -13,7 +13,7 @@ const displayedMovies = ref([])
 
 const fetchMovies = async () => {
   try {
-    const res = await axios.get(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${props.genero}`)
+    const res = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${props.genero}`)
     const newMovies = res.data.results.map(movie => ({
       id: movie.id,
       title: movie.title,

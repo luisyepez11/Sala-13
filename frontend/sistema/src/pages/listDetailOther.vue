@@ -25,8 +25,8 @@ const lista = ref({
 onMounted(async () => {
   try {
     const listaId = route.params.id
-    const resp = await fetch(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${listaId}`)
-    const respLista = await fetch(`https://sala-13.onrender.com/api/lista/getLista/${listaId}`)
+    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaId}`)
+    const respLista = await fetch(`http://localhost:3300/api/lista/getLista/${listaId}`)
     const datosLista = await respLista.json()
     console.log(datosLista)
     const datos = await resp.json()
@@ -71,8 +71,8 @@ const fetchListaDetails = async (listaId) => {
 
 const addListe = async () =>{
         try {
-          const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
-          const dataLista = await axios.post(`https://sala-13.onrender.com/api/lista`, {
+          const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+          const dataLista = await axios.post(`http://localhost:3300/api/lista`, {
 				nombreLista: lista.value.nombre,
 				descripcion: lista.value.descripcion,
 				idCuenta: usarioId.data.id
@@ -81,7 +81,7 @@ const addListe = async () =>{
       console.log(peliculas.value)
           peliculas.value.forEach(async pelicula =>{
             
-                const result = await axios.post('https://sala-13.onrender.com/api/lista/agregarPelicula',{
+                const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula',{
             idLista:idLista.data.id, 
             idPelicula:pelicula.id
           })
@@ -95,7 +95,7 @@ const addListe = async () =>{
 const eliminarDeLista = async (movie) => {
   try {
     const listaId = route.params.id;
-    await axios.delete('https://sala-13.onrender.com/api/lista/eliminarPelicula', {
+    await axios.delete('http://localhost:3300/api/lista/eliminarPelicula', {
       data: { lista_id: listaId, pelicula_id: movie.id }
     });
     peliculas.value = peliculas.value.filter(p => p.title !== movie.title);

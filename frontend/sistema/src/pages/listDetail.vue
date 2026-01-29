@@ -25,8 +25,8 @@ const lista = ref({
 onMounted(async () => {
   try {
     const listaId = route.params.id
-    const resp = await fetch(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${listaId}`)
-    const respLista = await fetch(`https://sala-13.onrender.com/api/lista/getLista/${listaId}`)
+    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaId}`)
+    const respLista = await fetch(`http://localhost:3300/api/lista/getLista/${listaId}`)
     const datosLista = await respLista.json()
     const datos = await resp.json()
     console.log(resp)
@@ -72,7 +72,7 @@ const fetchListaDetails = async (listaId) => {
 const eliminarDeLista = async (movie) => {
   try {
     const listaId = route.params.id;
-    await axios.delete('https://sala-13.onrender.com/api/lista/eliminarPelicula', {
+    await axios.delete('http://localhost:3300/api/lista/eliminarPelicula', {
       data: { lista_id: listaId, pelicula_id: movie.id }
     });
     peliculas.value = peliculas.value.filter(p => p.title !== movie.title);
