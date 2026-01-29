@@ -72,7 +72,7 @@ const isSelectorFotoOpen = ref(false)
 
 	const obtenerComunidadesUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
+			const response = await axios.get(`https://sala-13.onrender.com/api/comunidades/getComunidadesUsuarios/${idUsuario}`);
 			
 			const comunidadesTransformadas = response.data.map(comunidad => ({
 				id: comunidad.idcominidad,
@@ -91,7 +91,7 @@ const isSelectorFotoOpen = ref(false)
 
 	const obtenerResenasUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${idUsuario}`);
+			const response = await axios.get(`https://sala-13.onrender.com/api/comentario/getComentariosUsuario/${idUsuario}`);
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
 				user: {
@@ -122,7 +122,7 @@ const isSelectorFotoOpen = ref(false)
 
 	const data = async () => {
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+			const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
 			if (usarioId.data.message == "no registrado") {
 				router.push('/');
 				return;
@@ -130,9 +130,9 @@ const isSelectorFotoOpen = ref(false)
 			usuarioId.value = usarioId.data.id;
 
 			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
-				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${usuarioId.value}`),
-				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usuarioId.value}`),
-				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usuarioId.value}`)
+				axios.get(`https://sala-13.onrender.com/api/solicitud/solicitudes/${usuarioId.value}`),
+				axios.get(`https://sala-13.onrender.com/api/cuenta/getCuenta/${usuarioId.value}`),
+				axios.get(`https://sala-13.onrender.com/api/lista/getListasUsuarios/${usuarioId.value}`)
 			]);
 			const datos = cuenta.data;
 			
@@ -152,7 +152,7 @@ const isSelectorFotoOpen = ref(false)
 				listasRes.data.map(async (listaItem) => {
 					try {
 						console.log(listaItem)
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
+						const peliculasRes = await axios.get(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
 						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
 						const posters = peliculas
 							.slice(0, 4)
@@ -206,8 +206,8 @@ const isSelectorFotoOpen = ref(false)
 		}
 
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-			await axios.put(`http://localhost:3300/api/cuenta/${usarioId.data.id}`, {
+			const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
+			await axios.put(`https://sala-13.onrender.com/api/cuenta/${usarioId.data.id}`, {
 				nombreReal: editData.value.apodo,
 				descripcionCuenta: editData.value.descripcion,
 				nombreCuenta: editData.value.nombre,
@@ -241,7 +241,7 @@ const isSelectorFotoOpen = ref(false)
 }
 	const aceptarSolicitud = async (id, nombre, idsolicitudes) => {
 		try {
-			await axios.post(`http://localhost:3300/api/amigo/insertAmigo`, {
+			await axios.post(`https://sala-13.onrender.com/api/amigo/insertAmigo`, {
 				idReceptor: usuarioId.value,
 				idCuenta: id,
 				idSolicitudes: idsolicitudes
@@ -278,7 +278,7 @@ const isSelectorFotoOpen = ref(false)
             return;
         }
 
-        const response = await axios.post('http://localhost:3300/api/comunidades', {
+        const response = await axios.post('https://sala-13.onrender.com/api/comunidades', {
             nombreComunidad: nombreLista.value,
             descripcion: descripcion.value,
             idCreador: usuarioId.value,
@@ -312,7 +312,7 @@ const isSelectorFotoOpen = ref(false)
 }
 	const crearLista = async () => {
 		try {
-			await axios.post(`http://localhost:3300/api/lista`, {
+			await axios.post(`https://sala-13.onrender.com/api/lista`, {
 				nombreLista: nombreLista.value,
 				descripcion: descripcion.value,
 				idCuenta: usuarioId.value

@@ -17,7 +17,7 @@ const usarioId = ref('')
 const error = ref(null)
 const insertLike = async () => {
 	try {
-		const like = await axios.post("http://localhost:3300/api/like", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
+		const like = await axios.post("https://sala-13.onrender.com/api/like", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}
@@ -27,7 +27,7 @@ const insertVistas = async () => {
 	
 	try {
 
-		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
+		const viste = await axios.post("https://sala-13.onrender.com/api/vistas", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}
@@ -35,11 +35,11 @@ const insertVistas = async () => {
 
 const loadReviews = async () => {
   try {
-    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.value.data.id}`)
+    const listas = await axios.get(`https://sala-13.onrender.com/api/lista/getListasUsuarios/${usarioId.value.data.id}`)
 	console.log(listas.data)
     lista.value = listas.data
     const movieId = route.params.id;
-    const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
+    const response = await axios.get(`https://sala-13.onrender.com/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
 	console.log(comentarios)
     const reviewsData = comentarios.map(comentario => ({
@@ -72,12 +72,12 @@ const submitReview = async () => {
   
   try {
     const movieId = route.params.id
-    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.value.data.id}`)
+    const cuenta = await axios.get(`https://sala-13.onrender.com/api/cuenta/getCuenta/${usarioId.value.data.id}`)
     const idcuenta = cuenta.data.idCuenta
     const comentario = document.getElementById('comentario').value
     const fechaISO = new Date().toISOString();
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
-    const result = await axios.post(`http://localhost:3300/api/comentario`, {
+    const result = await axios.post(`https://sala-13.onrender.com/api/comentario`, {
       idCuenta: idcuenta,
       idPelicula: movieId,
       comentario: comentario,
@@ -104,7 +104,7 @@ onMounted(async () => {
 			router.push('/')
 			return
 		}
-		const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${movieId}`)
+		const resp = await fetch(`https://sala-13.onrender.com/api/pelicula/getPelicula/${movieId}`)
 		const datos = await resp.json();
 		
 		nombrePelicula.value = datos.title
@@ -121,8 +121,8 @@ onMounted(async () => {
 			rating: (datos.vote_average / 2).toFixed(1),
 			poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
 		}
-		usarioId.value = await axios.get("http://localhost:3300/api/usuario/user")
-		const likeadoData = await axios.get("http://localhost:3300/api/like/pruebaPeliculaLike",{
+		usarioId.value = await axios.get("https://sala-13.onrender.com/api/usuario/user")
+		const likeadoData = await axios.get("https://sala-13.onrender.com/api/like/pruebaPeliculaLike",{
 			params: {
         idUsuario: usarioId.value.data.id,
         idPelicula: movieId
@@ -179,7 +179,7 @@ const selecionado = (lista) => {
 const agregar_lista = async () => {
 	listas.value.map(async id => {
 		try {
-			const result = await axios.post('http://localhost:3300/api/lista/agregarPelicula', {
+			const result = await axios.post('https://sala-13.onrender.com/api/lista/agregarPelicula', {
 				idLista: id,
 				idPelicula: route.params.id
 			})

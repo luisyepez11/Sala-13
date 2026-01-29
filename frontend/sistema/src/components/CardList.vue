@@ -11,7 +11,7 @@ const movie = ref(null)
 const emit = defineEmits(['portada'])
 onMounted(async () => {
   try {
-    const resp = await fetch(`http://localhost:3300/api/pelicula/getPelicula/${props.idPelicula}`)
+    const resp = await fetch(`https://sala-13.onrender.com/api/pelicula/getPelicula/${props.idPelicula}`)
     const datos = await resp.json()
     movie.value = {
       id: datos.id,
@@ -30,7 +30,7 @@ onMounted(async () => {
 
 const eliminar = async() =>{
   try {
-    const result = await axios.delete('http://localhost:3300/api/lista/eliminarPelicula',{
+    const result = await axios.delete('https://sala-13.onrender.com/api/lista/eliminarPelicula',{
           data: {
         idLista: props.idLista,
         idPelicula: props.idPelicula

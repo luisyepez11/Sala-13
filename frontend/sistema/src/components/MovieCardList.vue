@@ -20,7 +20,7 @@ const getPoster = (mensaje)=>{
 
 onMounted(async () => {
   try {
-    const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${props.idLista}`)
+    const resp = await fetch(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${props.idLista}`)
     const datos = await resp.json()
     peliculas.value = datos
   } catch (e) {

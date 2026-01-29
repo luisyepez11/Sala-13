@@ -25,7 +25,7 @@ const performSearch = async () => {
 
   try {
     const formattedQuery = searchQuery.value.trim().replace(/\s+/g, '+');
-    const res = await axios.get(`http://localhost:3300/api/pelicula/busqueda/${formattedQuery}`);
+    const res = await axios.get(`https://sala-13.onrender.com/api/pelicula/busqueda/${formattedQuery}`);
 
     const moviesWithPosters = res.data.results.filter(movie => movie.poster_path);
 
@@ -47,7 +47,7 @@ const buscarPeliculas = async () => {
   
   try {
     const formattedQuery = searchQuery.value.trim().replace(/\s+/g, '+');
-    const res = await axios.get(`http://localhost:3300/api/pelicula/busqueda/${formattedQuery}`);
+    const res = await axios.get(`https://sala-13.onrender.com/api/pelicula/busqueda/${formattedQuery}`);
 
     const moviesWithPosters = res.data.results.filter(movie => movie.poster_path);
 

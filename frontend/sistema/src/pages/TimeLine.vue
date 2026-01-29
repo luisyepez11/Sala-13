@@ -19,9 +19,9 @@ const selectedFilter = ref('peliculas')
 
 const listas = async () =>{
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+    const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
     console.log(usarioId)
-    const result = await fetch(`http://localhost:3300/api/amigo/getAmigosId/${usarioId.data.id}`)
+    const result = await fetch(`https://sala-13.onrender.com/api/amigo/getAmigosId/${usarioId.data.id}`)
     const amigos = await result.json()
     data.value = amigos
     console.log(data.value)

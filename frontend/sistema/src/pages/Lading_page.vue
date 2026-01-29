@@ -35,7 +35,7 @@ const calcular = (n) =>{
 const loadComments = async () => {
   
     try {
-        const response = await axios.get('http://localhost:3300/api/comentario/comentarios');
+        const response = await axios.get('https://sala-13.onrender.com/api/comentario/comentarios');
         
         reviews.value = response.data.map((comment, index) => (
           {

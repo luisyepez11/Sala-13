@@ -13,7 +13,7 @@ const userReviews = ref([])
 
 const obtenerResenasUsuario = async (idUsuario) => {
   try {
-    const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${idUsuario}`)
+    const response = await axios.get(`https://sala-13.onrender.com/api/comentario/getComentariosUsuario/${idUsuario}`)
     const reseñasTransformadas = response.data.map(comentario => ({
       id: comentario.idcomentario,
       user: {

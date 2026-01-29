@@ -50,7 +50,7 @@
   
   const obtenerResenasUsuario = async (idUsuario) => {
 		try {
-			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${id}`);
+			const response = await axios.get(`https://sala-13.onrender.com/api/comentario/getComentariosUsuario/${id}`);
 
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
@@ -79,12 +79,12 @@
 
   const data = async () => {
 		try {
-			const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+			const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
 			if (usarioId.data.message == "no registrado") {
 				router.push('/');
 				return;
 			}
-      const validarSeguir = await axios.post(`http://localhost:3300/api/solicitud/pruebaSolicitud`,{
+      const validarSeguir = await axios.post(`https://sala-13.onrender.com/api/solicitud/pruebaSolicitud`,{
         idReceptor:id,
           idUsuario:usarioId.data.id
       })
@@ -92,9 +92,9 @@
         editar.value=true
       }
 			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
-				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${id}`),
-				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`),
-				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
+				axios.get(`https://sala-13.onrender.com/api/solicitud/solicitudes/${id}`),
+				axios.get(`https://sala-13.onrender.com/api/cuenta/getCuenta/${id}`),
+				axios.get(`https://sala-13.onrender.com/api/lista/getListasUsuarios/${id}`)
 			]);
 			
 			const datos = cuenta.data;
@@ -117,13 +117,13 @@
 const listasConPosters = await Promise.all(
   listasRes.data.map(async (listaItem) => {
     try {
-      const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
+      const peliculasRes = await axios.get(`https://sala-13.onrender.com/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
       const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
       
       const posters = await Promise.all(
         peliculas.slice(0, 4).map(async (p) => {
           try {
-            const peli = await axios.get(`http://localhost:3300/api/pelicula/getPelicula/${p.idPelicula}`);
+            const peli = await axios.get(`https://sala-13.onrender.com/api/pelicula/getPelicula/${p.idPelicula}`);
             return `https://image.tmdb.org/t/p/w500${peli.data.poster_path}`;
           } catch (err) {
             return null;
@@ -179,9 +179,9 @@ lista.value = listasConPosters;
 
   async function seguirPerfil () {
     try {
-      const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      const usarioId = await axios.get("https://sala-13.onrender.com/api/usuario/user")
       console.log(usarioId)
-      const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
+      const result = await axios.post(`https://sala-13.onrender.com/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
           idCuenta:usarioId.data.id
         })

@@ -54,10 +54,10 @@ const NombreUsuario = ref("");
 const fotoPerfil = ref("");
 const datos = async () => {
 	try {
-		const usuarioResponse = await axios.get("http://localhost:3300/api/usuario/user");
+		const usuarioResponse = await axios.get("https://sala-13.onrender.com/api/usuario/user");
 		idUsuario.value = usuarioResponse.data.id;
 		NombreUsuario.value = usuarioResponse.data.nombre
-		const response = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${idUsuario.value}`);
+		const response = await axios.get(`https://sala-13.onrender.com/api/cuenta/getCuenta/${idUsuario.value}`);
 		console.log(response.data)
 		fotoPerfil.value = response.data.fotoPerfil
 	} catch (error) {
