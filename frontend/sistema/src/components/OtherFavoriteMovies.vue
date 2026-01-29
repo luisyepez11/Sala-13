@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import MovieSearchModal from './MovieSearchModal.vue';
 import axios from 'axios';
-
-const router = useRouter();
+  import { useRouter, useRoute } from 'vue-router'
+const router = useRouter()
+  const route = useRoute()
 const favoriteMovies = ref([null, null, null, null]);
 const isModalOpen = ref(false);
 const activeSlotIndex = ref(null);
@@ -15,9 +15,8 @@ const isEditing = ref(false);
 onMounted(async () => {
     try {
         const userRes = await axios.get("http://localhost:3300/api/usuario/user");
-        const userId = userRes.data.id;
         
-        const favoritesRes = await axios.get(`http://localhost:3300/api/favoritas/${userId}`);
+        const favoritesRes = await axios.get(`http://localhost:3300/api/favoritas/${route.params.id}`);
         
         const storedMovies = await Promise.all(favoritesRes.data.map(async (p) => {
             try {
@@ -125,11 +124,6 @@ function toggleEditMode() {
 
 <template>
   <div>
-    <div class="edit-controls">
-      <button @click="toggleEditMode" class="edit-toggle-btn">
-        {{ isEditing ? 'Hecho' : 'Editar' }}
-      </button>
-    </div>
 
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
@@ -167,9 +161,9 @@ function toggleEditMode() {
             </div>
           </div>
         </div>
-        <button v-else class="placeholder-button" @click="openMovieModal(index)">
+        <button v-else class="placeholder-button">
           <div class="placeholder-card">
-            <h2 class="placeholder-title">+ Agregar película</h2>
+            <h2 class="placeholder-title">No tiene pelicula asignada</h2>
             <p class="placeholder-description">Selecciona una favorita</p>
           </div>
         </button>

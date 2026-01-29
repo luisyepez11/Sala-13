@@ -28,12 +28,13 @@ onMounted(async () => {
     const resp = await fetch(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaId}`)
     const respLista = await fetch(`http://localhost:3300/api/lista/getLista/${listaId}`)
     const datosLista = await respLista.json()
+    console.log(datosLista)
     const datos = await resp.json()
     lista.value = {
-  idLista:datosLista[0].idLista,
-  nombre: datosLista[0].nombreLista,
-  descripcion: datosLista[0].descripcion,
-  nombreCreador: datosLista[0].nombreCuenta,
+  idLista:datosLista.idLista,
+  nombre: datosLista.nombreLista,
+  descripcion: datosLista.descripcion,
+  nombreCreador: datosLista.nombreCuenta,
   like: false,
   favorito: false
 }
