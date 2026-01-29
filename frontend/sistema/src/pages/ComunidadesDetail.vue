@@ -1,5 +1,5 @@
 <script setup>
-import comunidadGrid from "../components/comunidadesGrid.vue"
+import comunidadGrid from "../components/ComunidadesGrid.vue"
 import axios from 'axios';
 import { useRouter,useRoute } from 'vue-router';
 import { ref, onMounted, watch } from "vue"
