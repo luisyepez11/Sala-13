@@ -89,9 +89,9 @@ const buscar = (query) => {
           <div v-if="listsData.length > 0">
             <popularfilmsectionListas
               v-for="list in listsData"
-              :key="list.idlista"
+              :key="list.idLista"
               :titulo="list.nombreLista"
-              :idLista="list.idlista"
+              :idLista="list.idLista"
             />
           </div>
           <div v-else class="loading-message">

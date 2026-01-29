@@ -3,7 +3,7 @@
 	import Nav from "../components/navegacio.vue"
 	import Modal from "../components/modal.vue";
 	import UserReviewCard from "../components/UserReviewCard.vue";
-	import FavoriteMovies from "../components/FavoriteMovies.vue";
+	import OtherFavoriteMovies from "../components/OtherFavoriteMovies.vue";
 	import MovieGrid from '../components/searchresultsection.vue'
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
@@ -25,6 +25,7 @@
 	const isProfileModalOpen = ref(false);
 	const profilePictureUrl = ref(null);
   const userReviews = ref([]);
+  const poster = ref([])
 	const comunidades = ref([
   {
     id: 1,
@@ -50,7 +51,7 @@
   const obtenerResenasUsuario = async (idUsuario) => {
 		try {
 			const response = await axios.get(`http://localhost:3300/api/comentario/getComentariosUsuario/${id}`);
-			// Transformar los datos del endpoint al formato que espera UserReviewCard
+
 			const reseñasTransformadas = response.data.map(comentario => ({
 				id: comentario.idcomentario,
 				user: {
@@ -63,9 +64,9 @@
 					idPelicula:comentario.idPelicula
 
 				},
-				rating: 0, // El endpoint no parece incluir rating, podrías necesitar obtenerlo por separado
+				rating: 0, 
 				reviewText: comentario.comentario,
-				likes: 0, // El endpoint no incluye likes, podrías necesitar obtenerlos por separado
+				likes: 0, 
 				fecha: comentario.fecha
 			}));
 			
@@ -83,14 +84,21 @@
 				router.push('/');
 				return;
 			}
-
+      const validarSeguir = await axios.post(`http://localhost:3300/api/solicitud/pruebaSolicitud`,{
+        idReceptor:id,
+          idUsuario:usarioId.data.id
+      })
+      if (validarSeguir.data.solicitudEnviada){
+        editar.value=true
+      }
 			const [datosSolicitudes, cuenta, listasRes] = await Promise.all([
 				axios.get(`http://localhost:3300/api/solicitud/solicitudes/${id}`),
 				axios.get(`http://localhost:3300/api/cuenta/getCuenta/${id}`),
 				axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${id}`)
 			]);
 			
-			const datos = cuenta.data.resultCuenta[0];
+			const datos = cuenta.data;
+      console.log(datos)
 			usuario.value = {
 				nombre: datos.nombreCuenta,
 				pronombres: datos.pronombres,
@@ -105,24 +113,35 @@
 				total_vistas:datos.total_vistas
 			};
       profilePictureUrl.value=datos.fotoPerfil
-			const listasConPosters = await Promise.all(
-				listasRes.data.map(async (listaItem) => {
-					try {
-						const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idlista}`);
-						const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
-						const posters = peliculas
-							.slice(0, 4)
-							.map(p => `https://image.tmdb.org/t/p/w500${p.poster_path}`)
-							.filter(Boolean);
-						return { ...listaItem, posters };
-					} catch (e) {
-						console.error(`Error al obtener películas para la lista ${listaItem.idlista}:`, e);
-						return { ...listaItem, posters: [] };
-					}
-				})
-			);
-			lista.value = listasConPosters;
 
+const listasConPosters = await Promise.all(
+  listasRes.data.map(async (listaItem) => {
+    try {
+      const peliculasRes = await axios.get(`http://localhost:3300/api/lista/getPeliculasDeLista/${listaItem.idLista}`);
+      const peliculas = Array.isArray(peliculasRes.data) ? peliculasRes.data : (peliculasRes.data.results || []);
+      
+      const posters = await Promise.all(
+        peliculas.slice(0, 4).map(async (p) => {
+          try {
+            const peli = await axios.get(`http://localhost:3300/api/pelicula/getPelicula/${p.idPelicula}`);
+            return `https://image.tmdb.org/t/p/w500${peli.data.poster_path}`;
+          } catch (err) {
+            return null;
+          }
+        })
+      );
+      const postersValidos = posters.filter(p => p !== null);
+
+      return { ...listaItem, posters: postersValidos };
+    } catch (e) {
+      console.error(`Error al obtener películas para la lista ${listaItem.idLista}:`, e);
+      return { ...listaItem, posters: [] };
+    }
+  })
+);
+
+lista.value = listasConPosters;
+        console.log(lista.value)
 			const unicas = datosSolicitudes.data.filter(
 				(item, index, self) =>
 					index === self.findIndex((t) => t.idsolicitudes === item.idsolicitudes)
@@ -161,9 +180,10 @@
   async function seguirPerfil () {
     try {
       const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
+      console.log(usarioId)
       const result = await axios.post(`http://localhost:3300/api/solicitud/solicitudAmigo`,{
           idReceptor:id,
-          idUsuario:usarioId.data.id
+          idCuenta:usarioId.data.id
         })
     } catch (error) {
       console.log(error)
@@ -243,7 +263,7 @@ const buscar = (nombre) => {
           </div>
           
           <!-- User Details -->
-          <div v-if="!editar" class="user-details">
+          <div class="user-details">
             <div class="user-name">{{ usuario.nombre }}</div>
             <div  v-if="false" class="user-pronouns">{{ usuario.pronombres }}</div>
             <div class="user-real-name">{{ usuario.nombreReal }}</div>
@@ -292,7 +312,7 @@ const buscar = (nombre) => {
 			</div>
 
       <div v-if="activeTab === 'Favoritas'" class="content-area">
-				<FavoriteMovies />
+				<OtherFavoriteMovies />
 			</div>
 <div v-else-if="activeTab === 'Likes'" class="content-area">
 		  <PopularfilmsectionLike :idUsuario="route.params.id" opcion="other-profile"></PopularfilmsectionLike>
@@ -303,16 +323,10 @@ const buscar = (nombre) => {
       
 			<div v-else-if="activeTab === 'Listas'" class="content-area">
 				<div v-if="!lista || lista.length === 0" class="listas-vacias">
-					<div class="lista-card create-card" @click="abrirModalListas">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva lista</h2>
-							<p class="lista-description">Empieza a organizar tus películas</p>
-						</div>
-					</div>
 				</div>
 				<div v-else class="listas-contenedor">
-					<div v-for="item in lista" :key="item.idlista" class="lista-card"
-						@click="$router.push('/listDetail/' + item.idlista)">
+					<div v-for="item in lista" :key="item.idLista" class="lista-card"
+						@click="$router.push('/listDetail/' + item.idLista)">
 						
 						<ListCoverGrid :posters="item.posters" class="lista-portada"/>
 
@@ -321,12 +335,7 @@ const buscar = (nombre) => {
 							<p class="lista-description">{{ item.descripcion }}</p>
 						</div>
 					</div>
-					<div class="lista-card create-card" @click="abrirModalListas">
-						<div class="lista-info">
-							<h2 class="lista-title">+ Crear nueva lista</h2>
-							<p class="lista-description">Empieza a organizar tus películas</p>
-						</div>
-					</div>
+					
 				</div>
 			</div>
 			<div v-else-if="activeTab === 'Likes'" class="content-area">
@@ -355,7 +364,7 @@ const buscar = (nombre) => {
 				<div v-else class="comunidades-grid">
 					<CommunityCard
 						v-for="comunidad in comunidades"
-						:key="comunidad.id"
+						:key="comunidad.idComunidad"
 						:titulo="comunidad.titulo"
 						:descripcion="comunidad.descripcion"
 						:imagen="comunidad.imagen"

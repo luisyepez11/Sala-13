@@ -322,7 +322,7 @@ fill="currentColor" viewBox="0 0 24 24" >
             </div>
             <div v-if="activeTab === 'Comunidades Activas'" class="container-card">
               <div v-for="comunidad in communities"
-                :class="{'active-card': comunidad.id === slide}"
+                :class="{'active-card': comunidad.idComunidad === slide}"
                 class="review-card"
               >
                 <img :src="comunidad.image" alt="Perfil" />

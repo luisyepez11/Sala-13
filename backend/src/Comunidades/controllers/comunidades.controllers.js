@@ -1,24 +1,20 @@
 import { pool } from "../../db.js";
 
 export const getComunidades = async (req, res) => {
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [listas] = await connection.query(`
+		const listas = await pool.query(`
 			SELECT 
     c.*,
-    COUNT(cc.idcomunidadecuenta) as cantidad_usuarios
-FROM cominidades c
-LEFT JOIN comunidadescuentas cc ON c.idcominidad = cc.idComunidad
-GROUP BY c.idcominidad;
+    COUNT(cc."idComunidadesCuentas") as cantidad_usuarios
+FROM comunidades c
+LEFT JOIN "comunidadesCuentas" cc ON c."idComunidad" = cc."idComunidad"
+GROUP BY c."idComunidad";
 			`);
-		res.status(200).json(listas);
+		res.status(200).json(listas.rows);
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al obtener las listas" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 function decodificarParametroURL(cadena) {
@@ -27,14 +23,12 @@ function decodificarParametroURL(cadena) {
 }
 
 export const getComunidadesBusqueda = async (req, res) => {
-	let connection;
 	try {
 		const listaId = req.params.id;
 		if (!listaId) {
 			return res.status(400).json({ message: "El parámetro listaId es requerido" });
 		}
-		connection = await pool.getConnection();
-		const [listas] = await connection.query(`
+		const [listas] = await pool.query(`
 			SELECT * FROM listas 
 			WHERE nombreLista LIKE ?;
 		`, ['%' + decodificarParametroURL(listaId) + '%']);
@@ -43,31 +37,23 @@ export const getComunidadesBusqueda = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al obtener las listas" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const getComunidadesUsuarios = async (req, res) => {
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [listas] = await connection.query("SELECT co.*,c.*,(SELECT count(*) FROM comunidadescuentas where comunidadescuentas.idComunidad=co.idComunidad) AS total_seguidores FROM comunidadescuentas co INNER JOIN  cominidades c ON co.idComunidad=c.idcominidad WHERE idCuenta = ?", [req.params.id]);
-		res.status(200).json(listas);
+		const listas = await pool.query(`SELECT co.*,c.*,(SELECT count(*) FROM "comunidadesCuentas" where "comunidadesCuentas"."idComunidad"=co."idComunidad") AS total_seguidores FROM "comunidadesCuentas" co INNER JOIN  comunidades c ON co."idComunidad"=c."idComunidad" WHERE "idCuenta" = $1`, [req.params.id]);
+		res.status(200).json(listas.rows);
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al obtener las listas" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const getComunidadesDeLista = async (req, res) => {
 	const listaId = req.params.id;
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [peliculas] = await connection.query(
+		const [peliculas] = await pool.query(
 			`SELECT * FROM listaspeliculas WHERE idLista = ?`,
 			[listaId]
 		);
@@ -75,76 +61,64 @@ export const getComunidadesDeLista = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al obtener las películas de la lista" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const getComunidade = async (req, res) => {
 	const listaId = req.params.id;
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [peliculas] = await connection.query(
-			`SELECT l.*,c.* FROM cominidades l INNER JOIN cuentas c ON c.idcuenta=l.idCuenta WHERE idcominidad = ?`,
+		const [peliculas] = await pool.query(
+			`SELECT l.*,c.* FROM comunidades l INNER JOIN cuentas c ON c."idCuenta"=l."idCuenta" WHERE idcomunidad = ?`,
 			[listaId]
 		);
 		res.status(200).json(peliculas);
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al obtener las películas de la lista" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const crearComunidades = async (req, res) => {
 	const { nombreComunidad, descripcion, idCreador,logoComunidad } = req.body;
 	console.log(nombreComunidad, descripcion, idCreador,logoComunidad )
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		const [result] = await connection.query(
-			"INSERT INTO cominidades (nombreComunidad, descripcionCominidad, idCreador,fotoPoster) VALUES (?, ?, ?,?)",
+		 await pool.query(`BEGIN`)
+		const result = await pool.query(
+			`INSERT INTO comunidades ("nombreComunidad", "descripcionCominidad", "idCreador","fotoPoster") VALUES ($1, $2, $3,$4) RETURNING "idComunidad"`,
 			[nombreComunidad, descripcion, idCreador,logoComunidad]
 		);
-		const [resultComunidad] = await connection.query(
-			"INSERT INTO comunidadescuentas (idComunidad, idCuenta) VALUES (?, ?)",
-			[result.insertId, idCreador]
+		const resultComunidad = await pool.query(
+			`INSERT INTO "comunidadesCuentas" ("idComunidad", "idCuenta") VALUES ($1, $2)`,
+			[result.rows[0].idComunidad, idCreador]
 		);
-		res.status(201).json({ id: result.insertId, nombreComunidad, descripcion, idCreador });
+		await pool.query(`COMMIT`)
+		res.status(201).json({ id: result.rows[0].idComunidad, nombreComunidad, descripcion, idCreador });
 	} catch (error) {
 		console.error(error);
+		pool.query(`ROLLBACK`)
 		res.status(500).json({ message: "Error al crear la lista" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const agregarUsuariosAComunidades = async (req, res) => {
 	const { idComunidad, idUsuario } = req.body;
-	let connection;
+	console.log({ idComunidad, idUsuario })
 	try {
-		connection = await pool.getConnection();
-		await connection.query(
-			"INSERT INTO comunidadescuentas (idComunidad, idCuenta) VALUES (?, ?)",
+		await pool.query(
+			`INSERT INTO "comunidadesCuentas" ("idComunidad", "idCuenta") VALUES ($1, $2)`,
 			[idComunidad, idUsuario]
 		);
-		res.status(201).json({ message: "Película agregada a la lista" });
+		res.status(201).json({ message: "Usuario agregado a comunidad" });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al agregar la película a la lista" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 };
 
 export const eliminarComunidadesDeLista = async (req, res) => {
 	const { idLista, idPelicula } = req.body;
-	let connection;
 	try {
-		connection = await pool.getConnection();
-		await connection.query(
+		await pool.query(
 			"DELETE FROM listaspeliculas WHERE idLista = ? AND idPelicula = ?",
 			[idLista, idPelicula]
 		);
@@ -152,7 +126,5 @@ export const eliminarComunidadesDeLista = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Error al eliminar la película de la lista" });
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }

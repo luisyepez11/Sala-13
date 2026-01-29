@@ -1,11 +1,10 @@
 import { pool } from "../../db.js";
 
 export const solicitudAmigo = async(req,res) =>{
-	let connection;
+
 	try {
-		const {idReceptor,idUsuario} = req.body
-		connection = await pool.getConnection();
-		await connection.query(`INSERT INTO solicitudes (idReceptor,idUsuario,estado) VALUES (?,?,?)`,[idReceptor,idUsuario,"pendiente"])
+		const {idReceptor,idCuenta} = req.body
+		await pool.query(`INSERT INTO solicitudes ("idReceptor","idCuenta",estado) VALUES ($1,$2,$3)`,[idReceptor,idCuenta,"pendiente"])
 		res.status(201).json({
 			message:"ok"
 		})
@@ -14,23 +13,44 @@ export const solicitudAmigo = async(req,res) =>{
 		res.status(500).json({
 			message:"error al enviar solicitud"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }
 export const getSolicitudes = async(req,res) =>{
-	let connection;
+
 	try {
 		const id = req.params.id
-		connection = await pool.getConnection();
-		const [data] = await connection.query(`SELECT solicitudes.idsolicitudes,m.nombreCuenta as nombremanda,m.idcuenta as idManda FROM b3zs7ppnycr3kdwuxumu.solicitudes inner join b3zs7ppnycr3kdwuxumu.cuentas as m on solicitudes.idUsuario=m.idcuenta WHERE solicitudes.idReceptor=? AND solicitudes.estado=?`,[id,"pendiente"])
-		res.status(200).json(data)
+		const data = await pool.query(`SELECT solicitudes."idSolicitudes",m."nombreCuenta" as nombremanda,m."idCuenta" as "idManda" FROM solicitudes inner join cuentas as m on solicitudes."idCuenta"=m."idCuenta" WHERE solicitudes."idReceptor"=$1 and solicitudes.estado=$2`,[id,"pendiente"])
+		res.status(200).json(data.rows)
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({
 			message:"error al obtener solicitudes"
 		})
-	} finally {
-		if (connection) connection.release();
-	}
+	} 
 }
+
+export const pruebaSolicitud = async (req, res) => {
+    try {
+        const { idUsuario, idReceptor } = req.body;
+		console.log({ idUsuario, idReceptor })
+        const query = `
+            SELECT EXISTS (
+                SELECT 1 
+                FROM solicitudes 
+                WHERE "idCuenta" = $1 AND "idReceptor" = $2
+            ) AS "enviada";
+        `;
+
+        const result = await pool.query(query, [idUsuario, idReceptor]);
+        
+        res.status(200).json({
+            solicitudEnviada: result.rows[0].enviada
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Error al verificar la solicitud"
+        });
+    }
+};

@@ -13,12 +13,11 @@ axios.defaults.withCredentials = true
 const lista = ref({})
 const movie = ref(null)
 const nombrePelicula = ref("")
-
+const usarioId = ref('')
 const error = ref(null)
 const insertLike = async () => {
 	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const like = await axios.post("http://localhost:3300/api/like", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+		const like = await axios.post("http://localhost:3300/api/like", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}
@@ -27,8 +26,8 @@ const insertLike = async () => {
 const insertVistas = async () => {
 	
 	try {
-		const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.data.id, idPelicula: route.params.id })
+
+		const viste = await axios.post("http://localhost:3300/api/vistas", { idCuenta: usarioId.value.data.id, idPelicula: route.params.id })
 	} catch (error) {
 		console.log(error)
 	}
@@ -36,12 +35,13 @@ const insertVistas = async () => {
 
 const loadReviews = async () => {
   try {
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.data.id}`)
+    const listas = await axios.get(`http://localhost:3300/api/lista/getListasUsuarios/${usarioId.value.data.id}`)
+	console.log(listas.data)
     lista.value = listas.data
     const movieId = route.params.id;
     const response = await axios.get(`http://localhost:3300/api/comentario/pelicula/${movieId}`);
     const comentarios = response.data;
+	console.log(comentarios)
     const reviewsData = comentarios.map(comentario => ({
       idCuenta: comentario.idCuenta,
       userName: comentario.nombreCuenta,
@@ -72,9 +72,8 @@ const submitReview = async () => {
   
   try {
     const movieId = route.params.id
-    const usarioId = await axios.get("http://localhost:3300/api/usuario/user")
-    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.data.id}`)
-    const idcuenta = cuenta.data.resultCuenta[0].idcuenta
+    const cuenta = await axios.get(`http://localhost:3300/api/cuenta/getCuenta/${usarioId.value.data.id}`)
+    const idcuenta = cuenta.data.idCuenta
     const comentario = document.getElementById('comentario').value
     const fechaISO = new Date().toISOString();
     const fecha = fechaISO.replace('T', ' ').replace('Z', '').split('.')[0];
@@ -122,6 +121,20 @@ onMounted(async () => {
 			rating: (datos.vote_average / 2).toFixed(1),
 			poster: `https://image.tmdb.org/t/p/original${datos.poster_path}`
 		}
+		usarioId.value = await axios.get("http://localhost:3300/api/usuario/user")
+		const likeadoData = await axios.get("http://localhost:3300/api/like/pruebaPeliculaLike",{
+			params: {
+        idUsuario: usarioId.value.data.id,
+        idPelicula: movieId
+    }
+		}
+	)
+	console.log(usarioId.value.data)
+	const likeButton = document.querySelector('.btn-like')
+		if (likeadoData.data.liked){
+			likeButton.classList.add('btn-click-like')
+		}
+		
 		loadReviews()
 	} catch (e) {
 		error.value = 'Error al cargar los detalles de la película: ' + e.message
@@ -197,10 +210,10 @@ const buscar = (nombre) => {
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="listasItem in lista" :key="listasItem.idlista" class="list-item">
+					<tr v-for="listasItem in lista" :key="listasItem.idLista" class="list-item">
 						<td class="list-name">{{ listasItem.nombreLista }}</td>
 						<td class="list-check">
-							<input type="checkbox" class="styled-checkbox" @change="selecionado(listasItem.idlista)">
+							<input type="checkbox" class="styled-checkbox" @change="selecionado(listasItem.idLista)">
 						</td>
 					</tr>
 				</tbody>
@@ -243,7 +256,7 @@ const buscar = (nombre) => {
 						</div>
 						<p class="synopsis">{{ movie.synopsis }}</p>
 						<div class="action-buttons">
-							<button class="btn-like" @click="like"><i class='bx bx-like'></i></button>
+							<button class="btn-like " @click="like"><i class='bx bx-like'></i></button>
 							<button class="btn-list" @click="openModal"><i class='bx bx-bookmark-plus-alt'></i> </button>
 							<button class="btn-eye" @click="insertVistas"><i class='bx bx-eye-alt'></i></button>
 						</div>

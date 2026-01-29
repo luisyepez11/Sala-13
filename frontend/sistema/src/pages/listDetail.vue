@@ -29,9 +29,10 @@ onMounted(async () => {
     const respLista = await fetch(`http://localhost:3300/api/lista/getLista/${listaId}`)
     const datosLista = await respLista.json()
     const datos = await resp.json()
+    console.log(resp)
     lista.value = {
-  nombre: datosLista[0].nombreLista,
-  descripcion: datosLista[0].descripcion,
+  nombre: datosLista.nombreLista,
+  descripcion: datosLista.descripcion,
   like: false,
   favorito: false
 }

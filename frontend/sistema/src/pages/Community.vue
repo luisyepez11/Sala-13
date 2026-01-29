@@ -66,6 +66,7 @@ const obtenerComunidadesUsuario = async () => {
 
 const handleComunidadClick = (comunidad) => {
 	comunidadSeleccionada.value = comunidad;
+	console.log(comunidad)
 };
 
 const buscar = (nombre)=>{
@@ -104,7 +105,7 @@ onMounted(() => {
 							v-for="comunidad in comunidadesUsuario" 
 							:key="comunidad.idcomunidadecuenta"
 							class="user-item"
-							:class="{ 'active': comunidadSeleccionada && comunidadSeleccionada.idcominidad === comunidad.idcominidad }"
+							:class="{ 'active': comunidadSeleccionada && comunidadSeleccionada.idCominidad === comunidad.idCominidad }"
 							@click="handleComunidadClick(comunidad)"
 						>
 							<div class="avatar-container">
@@ -126,7 +127,7 @@ onMounted(() => {
 				<CommunityChat 
 					v-if="comunidadSeleccionada"
 					:title="comunidadSeleccionada.nombreComunidad"
-					:comunidadId="comunidadSeleccionada.idcominidad"
+					:comunidadId="comunidadSeleccionada.idComunidad"
 					:fotoPoster="comunidadSeleccionada.fotoPoster"
 				/>
 				<div v-else class="no-chat-selected">
