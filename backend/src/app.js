@@ -27,12 +27,11 @@ const app = express()
 
 // Middleware
 const corsOptions = {
-  origin: 'https://sala-13.vercel.app', 
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   credentials: true, 
   optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));
 app.use(cookieParser())
 app.use(json());
 
