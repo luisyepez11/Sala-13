@@ -21,7 +21,8 @@ import likeRouter from "./Likes/routers/likes.router.js";
 import vistasRouter from "./Vistas/routers/vistas.router.js";
 //Comunidades
 import ComunidadesRouter from "./Comunidades/routers/comunidades.router.js";
-
+//favoritos
+import FavoritosRouter from "./Favoritas/routers/favorita.router.js";
 const app = express()
 
 // Middleware
@@ -52,4 +53,6 @@ app.use("/api/like", likeRouter)
 app.use("/api/vistas", vistasRouter) 
 //Comunidades
 app.use("/api/comunidades",ComunidadesRouter)
+//favoritos
+app.use("/api/favoritas",FavoritosRouter)
 export default app;
