@@ -7,7 +7,7 @@
 	import MovieGrid from '../components/searchresultsection.vue'
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
-  import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue";
+  import PopularfilmsectionVistas from "../components/popularfilmsectionVistas.vue";
   import PopularfilmsectionLike from "../components/popularfilmsectionLike.vue";
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'

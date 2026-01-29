@@ -9,7 +9,7 @@
 	import Footer from '../components/Footer.vue'
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import Popularfilmsection from "../components/popularfilmsectionLike.vue"
-	import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue"
+	import PopularfilmsectionVistas from "../components/popularfilmsectionVistas.vue"
 	import MovieCartList from '../components/MovieCardList.vue'
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
