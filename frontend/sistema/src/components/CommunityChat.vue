@@ -5,7 +5,7 @@ import io from "socket.io-client"
 import axios from 'axios'
 axios.defaults.withCredentials = true
 
-const socket = io("http://localhost:3300", {
+const socket = io("https://sala-13.onrender.com", {
 	transports: ['websocket', 'polling'],
 	withCredentials: true,
 })

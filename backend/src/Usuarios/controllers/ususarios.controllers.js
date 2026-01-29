@@ -47,7 +47,7 @@ export const loginUser = async (req, res) => {
 		const { user, password } = req.body
 		
 		const result = await pool.query(`SELECT * FROM usuarios WHERE "nombreUsuario"=$1 `, [user])
-
+		console.log(result.rows)
 		const validacion = bcrypt.compareSync(password, result.rows[0].contraseñaUsuario) 
 		if (validacion) {
 			const token = jwt.sign({ idUser: (result.rows[0]).idCuenta,nombreUsuario: (result.rows[0]).nombreUsuario}, SALT)
