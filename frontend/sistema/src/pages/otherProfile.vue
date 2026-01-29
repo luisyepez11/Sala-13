@@ -8,7 +8,7 @@
 	import ListCoverGrid from "../components/ListCoverGrid.vue";
 	import Footer from '../components/Footer.vue'
   import PopularfilmsectionVistas from "../components/PopularfilmsectionVistas.vue";
-  import PopularfilmsectionLike from "../components/PopularfilmsectionLike.vue";
+  import PopularfilmsectionLike from "../components/popularfilmsectionLike.vue";
 	import ProfilePictureModal from "../components/ProfilePictureModal.vue";
 	import CommunityCard from '../components/CommunityCard.vue'
 	import axios from 'axios';
