@@ -9,7 +9,7 @@ import OtherProfile from "../pages/otherProfile.vue";
 import Community from "../pages/Community.vue";
 import ListDetail from "../pages/listDetail.vue";
 import listDetailOther from "../pages/listDetailOther.vue";
-import Lading_page from "../pages/lading_page.vue";
+import Lading_page from "../pages/Lading_page.vue";
 import homeBusquedaListas from "../pages/homeBusquedaListas.vue";
 import PdfViewer from "../pages/PdfViewer.vue";
 import ContactPage from "../pages/ContactPage.vue";
