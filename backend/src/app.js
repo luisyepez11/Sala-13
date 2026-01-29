@@ -26,10 +26,12 @@ import FavoritosRouter from "./Favoritas/routers/favorita.router.js";
 const app = express()
 
 // Middleware
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
+const corsOptions = {
+  origin: 'https://sala-13.vercel.app', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, 
+  optionsSuccessStatus: 200
+};
 app.use(json());
 app.use(cookieParser())
 
