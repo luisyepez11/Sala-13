@@ -26,15 +26,12 @@ import FavoritosRouter from "./Favoritas/routers/favorita.router.js";
 const app = express()
 
 // Middleware
-const corsOptions = {
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-  credentials: true, 
-  optionsSuccessStatus: 200
-};
-app.use(cookieParser())
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(json());
-
+app.use(cookieParser())
 
 //Usuarios
 app.use("/api/usuario",usuarioRouter)
